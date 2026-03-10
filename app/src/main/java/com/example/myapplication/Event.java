@@ -12,8 +12,8 @@ public class Event {
     private String descirption;
     // location is String for now, but maybe it should be coords or something? Change as needed
     private String location;
-    private int regStart;
-    private int regEnd;
+    private String regStart;
+    private String regEnd;
     private String posterURL;
     private int qrValue;
 
@@ -22,7 +22,7 @@ public class Event {
     public Event() {
     }
 
-    public Event(int eventId, String title, String descirption, String location, int regStart, int regEnd, String posterURL, int qrValue, int capacity) {
+    public Event(int eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, int qrValue, int capacity) {
         this.eventId = eventId;
         this.title = title;
         this.descirption = descirption;
@@ -54,11 +54,11 @@ public class Event {
         return location;
     }
 
-    public int getRegStart() {
+    public String getRegStart() {
         return regStart;
     }
 
-    public int getRegEnd() {
+    public String getRegEnd() {
         return regEnd;
     }
 
@@ -89,7 +89,7 @@ public class Event {
         this.location = location;
     }
 
-    public void setRegStart(int regStart) {
+    public void setRegStart(String regStart) {
         this.regStart = regStart;
     }
 
@@ -97,7 +97,7 @@ public class Event {
         this.posterURL = posterURL;
     }
 
-    public void setRegEnd(int regEnd) {
+    public void setRegEnd(String regEnd) {
         this.regEnd = regEnd;
     }
 

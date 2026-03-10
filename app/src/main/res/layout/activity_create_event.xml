@@ -74,7 +74,9 @@
                     android:hint="Start Date"
                     android:inputType="text"
                     android:paddingStart="30dp"
-                    android:paddingEnd="30dp" />
+                    android:paddingEnd="30dp"
+                    android:focusable="false"
+                    android:clickable="true"/>
 
                 <EditText
                     android:id="@+id/end_date_input"
@@ -85,7 +87,9 @@
                     android:hint="End Date"
                     android:inputType="text"
                     android:paddingStart="30dp"
-                    android:paddingEnd="30dp" />
+                    android:paddingEnd="30dp"
+                    android:focusable="false"
+                    android:clickable="true"/>
 
                 <EditText
                     android:id="@+id/event_description_input"

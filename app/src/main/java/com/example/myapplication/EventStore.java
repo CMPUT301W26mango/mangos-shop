@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.util.Log;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -11,7 +13,6 @@ public class EventStore {
 
     public interface OnEventLoadedListener {
         void onEventLoaded(Event event);
-        void onError(String message);
     }
 
     public EventStore() {
@@ -62,8 +63,8 @@ public class EventStore {
                     event.setTitle(document.getString("title"));
                     event.setDescirption(document.getString("description"));
                     event.setLocation(document.getString("location"));
-                    event.setRegStart(document.getLong("regStart").intValue());
-                    event.setRegEnd(document.getLong("regEnd").intValue());
+                    event.setRegStart(document.getString("regStart"));
+                    event.setRegEnd(document.getString("regEnd"));
                     event.setPosterURL(document.getString("posterURL"));
                     event.setQrValue(document.getLong("qrValue").intValue());
                     event.setQrValue(document.getLong("capacity").intValue());
