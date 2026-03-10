@@ -27,6 +27,8 @@ public class EventCreateActivity extends AppCompatActivity {
     private Button uploadPosterButton;
     private Button createEventButton;
 
+    private EditText eventDateInput;
+
     private EventStore eventStore;
 
     @Override
@@ -42,8 +44,65 @@ public class EventCreateActivity extends AppCompatActivity {
         eventDescriptionInput = findViewById(R.id.event_description_input);
         uploadPosterButton = findViewById(R.id.upload_poster_button);
         createEventButton = findViewById(R.id.create_event_button);
+        eventDateInput = findViewById(R.id.event_date_input);
 
-        // using time picker and date picker
+        // using time picker and date picker (event date logic)
+        eventDateInput.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            DatePickerDialog dialog = new DatePickerDialog(
+                    this,
+                    (view, year, month, dayOfMonth) -> {
+                        TimePickerDialog timeDialog = new TimePickerDialog(
+                                this,
+                                (timeView, hourOfDay, minute) -> {
+                                    String result = String.format(Locale.getDefault(),
+                                            "%04d-%02d-%02d %02d:%02d",
+                                            year, month + 1, dayOfMonth, hourOfDay, minute);
+
+                                    String endText = endDateInput.getText().toString().trim();
+
+                                    if (!endText.isEmpty()) {
+                                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
+                                        try {
+                                            Date regEnd = formatter.parse(endText);
+                                            Date eventDate = formatter.parse(result);
+
+                                            if (!eventDate.after(regEnd)) {
+                                                new AlertDialog.Builder(this)
+                                                        .setTitle("Invalid Event Time")
+                                                        .setMessage("Event date and time must be after the registration end.")
+                                                        .setPositiveButton("OK", null)
+                                                        .show();
+                                                return;
+                                            }
+                                        } catch (ParseException e) {
+                                            new AlertDialog.Builder(this)
+                                                    .setTitle("Invalid Date")
+                                                    .setMessage("Please select the date again.")
+                                                    .setPositiveButton("OK", null)
+                                                    .show();
+                                            return;
+                                        }
+                                    }
+
+                                    eventDateInput.setText(result);
+                                },
+                                calendar.get(Calendar.HOUR_OF_DAY),
+                                calendar.get(Calendar.MINUTE),
+                                true
+                        );
+                        timeDialog.show();
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            dialog.show();
+        });
+
+
+        // using time picker and date picker (reg start logic)
         startDateInput.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog dialog = new DatePickerDialog(
@@ -55,6 +114,30 @@ public class EventCreateActivity extends AppCompatActivity {
                                 String result = String.format(Locale.getDefault(),
                                         "%04d-%02d-%02d %02d:%02d",
                                         year, month + 1, dayOfMonth, hourOfDay, minute);
+
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
+                                try {
+                                    Date selectedStart = formatter.parse(result);
+                                    Date now = new Date();
+
+                                    if (selectedStart.before(now)) {
+                                        new AlertDialog.Builder(this)
+                                                .setTitle("Invalid Start Time")
+                                                .setMessage("Registration start must be today or later.")
+                                                .setPositiveButton("OK", null)
+                                                .show();
+                                        return;
+                                    }
+                                } catch (ParseException e) {
+                                    new AlertDialog.Builder(this)
+                                            .setTitle("Invalid Date")
+                                            .setMessage("Please select the date again.")
+                                            .setPositiveButton("OK", null)
+                                            .show();
+                                    return;
+                                }
+
                                 startDateInput.setText(result);
                             },
                             calendar.get(Calendar.HOUR_OF_DAY),
@@ -72,7 +155,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
 
 
-        // using time picker and date picker, also validation that end > start
+        // using time picker and date picker, also validation that end > start (reg end logic)
         endDateInput.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog dialog = new DatePickerDialog(
@@ -86,6 +169,7 @@ public class EventCreateActivity extends AppCompatActivity {
                                         year, month + 1, dayOfMonth, hourOfDay, minute);
 
                                 String startText = startDateInput.getText().toString().trim();
+
 
                                 if (!startText.isEmpty()) {
                                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -102,6 +186,8 @@ public class EventCreateActivity extends AppCompatActivity {
                                                     .show();
                                             return;
                                         }
+
+
                                     } catch (ParseException e) {
                                         new AlertDialog.Builder(this)
                                                 .setTitle("Invalid Date")

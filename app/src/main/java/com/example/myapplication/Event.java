@@ -19,10 +19,14 @@ public class Event {
 
     private int capacity;
 
+    private String dateEvent;
+
+
+
     public Event() {
     }
 
-    public Event(int eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, int qrValue, int capacity) {
+    public Event(int eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, int qrValue, int capacity, String dateEvent) {
         this.eventId = eventId;
         this.title = title;
         this.descirption = descirption;
@@ -32,6 +36,15 @@ public class Event {
         this.posterURL = posterURL;
         this.qrValue = qrValue;
         this.capacity = capacity;
+        this.dateEvent = dateEvent;
+    }
+
+    public String getDateEvent() {
+        return dateEvent;
+    }
+
+    public void setDateEvent(String dateEvent) {
+        this.dateEvent = dateEvent;
     }
 
     public int getEventId() {
