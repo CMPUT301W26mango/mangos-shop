@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:background="@android:color/white">
+        android:background="@drawable/guidelines_dialog_background">
 
 
         <ImageButton
@@ -17,6 +18,7 @@
             android:layout_height="30dp"
             android:layout_gravity="end"
             android:background="@android:color/transparent"
+            app:tint="@color/blue"
             android:src="@android:drawable/ic_menu_close_clear_cancel"/>
 
 
@@ -37,7 +39,6 @@
             android:gravity="center"
             android:layout_marginTop="8dp"
             android:text="Event Name"/>
-
 
         <View
             android:layout_width="match_parent"
@@ -74,6 +75,29 @@
 
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="8dp"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DESCRIPTION"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tv_event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No description available"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
 
         <View
             android:layout_width="match_parent"
@@ -104,6 +128,34 @@
 
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="8dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Event Date"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/tv_event_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TBD"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -122,7 +174,65 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Number of Spots"
+                android:text="Registration Opens"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/tv_reg_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TBD"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="8dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Registration Closes"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/tv_reg_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TBD"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="8dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Available Spots"
                 android:textSize="16sp"/>
 
             <TextView
@@ -133,7 +243,6 @@
                 android:textSize="16sp"/>
 
         </LinearLayout>
-
 
         <View
             android:layout_width="match_parent"

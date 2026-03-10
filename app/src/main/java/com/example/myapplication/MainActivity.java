@@ -53,18 +53,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        Button btnTestEvent = findViewById(R.id.eventdetails_btn);
-        btnTestEvent.setOnClickListener(v -> {
-            btnTestEvent.setVisibility(View.GONE);
+       eventDetailsBtn = findViewById(R.id.eventdetails_btn);
+        eventDetailsBtn.setOnClickListener(v -> {
+          eventDetailsBtn.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
-            bundle.putString("eventId", "1");
+            bundle.putString("eventId", "12345");
             EventDetailsFragment fragment = new EventDetailsFragment();
             fragment.setArguments(bundle);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            fragment.show(getSupportFragmentManager(), "eventDetails");
         });
 
     }

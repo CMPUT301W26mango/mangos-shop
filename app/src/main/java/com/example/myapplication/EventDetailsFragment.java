@@ -15,8 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * EventDetailsFragment - Displays event details as a popup dialog.
@@ -28,7 +33,7 @@ public class EventDetailsFragment extends DialogFragment {
     private FirebaseFirestore db;
 
     public EventDetailsFragment() {
-        // Required empty public constructor
+
     }
 
     @NonNull
@@ -47,11 +52,9 @@ public class EventDetailsFragment extends DialogFragment {
 
         db = FirebaseFirestore.getInstance();
 
-        // Close button
         ImageButton btnClose = view.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(v -> dismiss());
 
-        // Get eventId from bundle passed by QR scanner
         Bundle args = getArguments();
         if (args != null && args.containsKey("eventId")) {
             String eventId = args.getString("eventId");
@@ -67,7 +70,6 @@ public class EventDetailsFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        // Set popup width to 90% of screen width
         if (getDialog() != null && getDialog().getWindow() != null) {
             int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
             getDialog().getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -75,9 +77,8 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     /**
-     * Loads event data from Firestore using eventId and populates the popup UI.
-     * Uses EventStore field names: title, description, location, capacity,
-     * regStart, regEnd, eventStart, posterURL
+     * Loads event data from Firestore using qrValue and populates the popup UI.
+     * Handles regStart/regEnd as Timestamp or String, dateEvent as String.
      */
     private void loadEventFromFirestore(String eventId, View view) {
         TextView tvTitle = view.findViewById(R.id.tv_event_title);
@@ -85,6 +86,10 @@ public class EventDetailsFragment extends DialogFragment {
         TextView tvSpots = view.findViewById(R.id.tv_spots_available);
         TextView tvOrganizer = view.findViewById(R.id.tv_organizer);
         TextView tvEventType = view.findViewById(R.id.tv_event_type);
+        TextView tvEventDate = view.findViewById(R.id.tv_event_date);
+        TextView tvRegStart = view.findViewById(R.id.tv_reg_start);
+        TextView tvRegEnd = view.findViewById(R.id.tv_reg_end);
+        TextView tvDescription = view.findViewById(R.id.tv_event_description);
         ImageView ivPoster = view.findViewById(R.id.iv_event_poster);
 
         int parsedId;
@@ -97,7 +102,7 @@ public class EventDetailsFragment extends DialogFragment {
         }
 
         db.collection("events")
-                .whereEqualTo("id", parsedId)
+                .whereEqualTo("qrValue", parsedId)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -109,30 +114,55 @@ public class EventDetailsFragment extends DialogFragment {
                         String title = document.getString("title");
                         tvTitle.setText(title != null ? title : "No Title");
 
+                        // Event Type
+                        String eventType = document.getString("eventType");
+                        tvEventType.setText(eventType != null ? eventType : "GENERAL");
+
+                        // Description
+                        String description = document.getString("description");
+                        tvDescription.setText(description != null ? description : "No description available");
+
                         // Location
                         String location = document.getString("location");
                         tvLocation.setText(location != null ? location : "No Location");
 
+                        // Event Date (String)
+                        String eventDate = document.getString("dateEvent");
+                        tvEventDate.setText(eventDate != null ? eventDate : "TBD");
+
+                        // Registration dates - handle Timestamp or String
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
+                        Object regStartObj = document.get("regStart");
+                        if (regStartObj instanceof Timestamp) {
+                            tvRegStart.setText(sdf.format(((Timestamp) regStartObj).toDate()));
+                        } else if (regStartObj instanceof String) {
+                            tvRegStart.setText((String) regStartObj);
+                        } else {
+                            tvRegStart.setText("TBD");
+                        }
+
+                        Object regEndObj = document.get("regEnd");
+                        if (regEndObj instanceof Timestamp) {
+                            tvRegEnd.setText(sdf.format(((Timestamp) regEndObj).toDate()));
+                        } else if (regEndObj instanceof String) {
+                            tvRegEnd.setText((String) regEndObj);
+                        } else {
+                            tvRegEnd.setText("TBD");
+                        }
+
                         // Capacity/spots
                         if (document.getLong("capacity") != null) {
-                            tvSpots.setText(String.valueOf(document.getLong("capacity").intValue()));
+                            tvSpots.setText(String.valueOf(Objects.requireNonNull(document.getLong("spotsToFill")).intValue()));
                         } else {
                             tvSpots.setText("N/A");
                         }
 
-                        // Registration dates
-                        String regStart = document.getString("regStart");
-                        String regEnd = document.getString("regEnd");
-                        String eventStart = document.getString("eventStart");
-                        if (regStart != null && regEnd != null) {
-                            tvEventType.setText("Reg: " + regStart + " → " + regEnd);
-                        }
+                        // Organizer
+                        String organizerName = document.getString("organizerName");
+                        tvOrganizer.setText(organizerName != null ? organizerName : "Unknown");
 
-                        // Organizer ID
-                        String organizerId = document.getString("organizerId");
-                        tvOrganizer.setText(organizerId != null ? organizerId : "Unknown");
-
-                        // Load poster with Glide if URL exists
+                        // Poster
                         String posterUrl = document.getString("posterURL");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             ivPoster.setVisibility(View.VISIBLE);
