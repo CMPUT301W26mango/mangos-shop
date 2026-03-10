@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    US 02.02.01 - Single entrant row in the waiting list.
+    Display only: profile icon + name. No action buttons.
+    (Replace/Cancel buttons belong to US 02.05.03 and US 02.06.04)
+-->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="14dp">
+
+        <!-- Profile icon placeholder -->
+        <ImageView
+            android:id="@+id/ivProfileIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:contentDescription="Profile icon"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Entrant name -->
+        <TextView
+            android:id="@+id/tvEntrantName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Entrant Name"
+            android:textSize="16sp"
+            android:textColor="#333333" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    US 02.02.01 - Waiting List screen for Organizers
+    Shows all entrants currently on the waiting list for a specific event.
+    This is the PRE-LOTTERY list only. No action buttons.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8E0E0"
+    android:padding="16dp">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvWaitingListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Waiting List"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Total entrant count -->
+    <TextView
+        android:id="@+id/tvEntrantCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Entrants: 0"
+        android:textSize="14sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Entrant list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEntrants"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
+
+</LinearLayout>
