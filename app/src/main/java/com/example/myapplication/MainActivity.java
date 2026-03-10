@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                eventListBtn.setVisibility(View.GONE);
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.main, new EventListFragment())
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
        eventDetailsBtn = findViewById(R.id.eventdetails_btn);
         eventDetailsBtn.setOnClickListener(v -> {
-          eventDetailsBtn.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("eventId", "12345");
             EventDetailsFragment fragment = new EventDetailsFragment();

@@ -38,7 +38,8 @@
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginTop="8dp"
-            android:text="Event Name"/>
+            android:text="Event Name"
+            android:textColor="@color/darkergray"/>
 
         <View
             android:layout_width="match_parent"
@@ -58,7 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Event Type"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_event_type"
@@ -97,6 +99,7 @@
             android:layout_height="wrap_content"
             android:text="No description available"
             android:textSize="14sp"
+            android:textColor="@color/darkergray"
             android:layout_marginTop="4dp"/>
 
         <View
@@ -117,14 +120,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Location"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_event_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Address"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
         </LinearLayout>
 
@@ -132,7 +137,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            />
 
 
         <LinearLayout
@@ -146,14 +152,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Event Date"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_event_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TBD"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
         </LinearLayout>
 
@@ -175,14 +183,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Registration Opens"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_reg_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TBD"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
         </LinearLayout>
 
@@ -204,14 +214,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Registration Closes"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_reg_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TBD"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
         </LinearLayout>
 
@@ -233,14 +245,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Available Spots"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
             <TextView
                 android:id="@+id/tv_spots_available"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textColor="@color/darkergray"/>
 
         </LinearLayout>
 
@@ -265,6 +279,7 @@
             android:layout_height="wrap_content"
             android:text="• Selection is completely random and fair"
             android:textSize="14sp"
+            android:textColor="@color/darkergray"
             android:layout_marginTop="6dp"/>
 
         <TextView
@@ -272,6 +287,7 @@
             android:layout_height="wrap_content"
             android:text="• If a selected entrant declines, a new one will be drawn"
             android:textSize="14sp"
+            android:textColor="@color/darkergray"
             android:layout_marginTop="4dp"/>
 
         <TextView
@@ -279,6 +295,7 @@
             android:layout_height="wrap_content"
             android:text="• You will be notified if you are selected or not"
             android:textSize="14sp"
+            android:textColor="@color/darkergray"
             android:layout_marginTop="4dp"/>
 
 
@@ -296,6 +313,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Organizer Name"
+            android:textColor="@color/darkergray"
             android:textSize="16sp"
             android:layout_marginTop="4dp"/>
 
