@@ -27,6 +27,7 @@ public class EventStore {
         eventData.put("location", event.getLocation());
         eventData.put("regStart", event.getRegStart());
         eventData.put("regEnd", event.getRegEnd());
+        eventData.put("eventStart", event.getDateEvent());
         eventData.put("posterURL", event.getPosterURL());
         eventData.put("qrValue", event.getQrValue());
         eventData.put("capacity", event.getQrValue());
@@ -65,6 +66,7 @@ public class EventStore {
                     event.setLocation(document.getString("location"));
                     event.setRegStart(document.getString("regStart"));
                     event.setRegEnd(document.getString("regEnd"));
+                    event.setDateEvent(document.getString("eventStart"));
                     event.setPosterURL(document.getString("posterURL"));
                     event.setQrValue(document.getLong("qrValue").intValue());
                     event.setQrValue(document.getLong("capacity").intValue());
