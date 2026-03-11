@@ -1,8 +1,7 @@
-package com.example.myapplication;
+/*package com.example.myapplication;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 

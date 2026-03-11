@@ -1,4 +1,4 @@
-package com.example.myapplication;
+/*package com.example.myapplication;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -258,4 +258,4 @@ public class EventCreateActivity extends AppCompatActivity {
             capacityInput.setText("");
         });
     }
-    };
+}; */

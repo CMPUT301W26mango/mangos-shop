@@ -1,33 +1,36 @@
 package com.example.myapplication;
 
-// testing things right now
-// test 2
-
-// test 3
+import com.google.firebase.Timestamp;
 
 public class Event {
-    // class that holds all the data for Events
-    private String eventId;
+
+    private String id;
     private String title;
     private String descirption;
-    // location is String for now, but maybe it should be coords or something? Change as needed
     private String location;
-    private String regStart;
-    private String regEnd;
-    private String posterURL;
-    private String qrValue;
 
+    private Timestamp regStart;
+    private Timestamp regEnd;
+
+    private String posterURL;
+    private int qrValue;
     private int capacity;
 
     private String dateEvent;
 
+    private String organizerName;
+    private String eventType;
+    private int spotsToFill;
 
+    // Empty constructor for Firebase
+    public Event(){}
 
-    public Event() {
-    }
+    public Event(String id, String title, String descirption, String location,
+                 Timestamp regStart, Timestamp regEnd, String posterURL,
+                 int qrValue, int capacity, String dateEvent,
+                 String organizerName, String eventType, int spotsToFill) {
 
-    public Event(String eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, String qrValue, int capacity, String dateEvent) {
-        this.eventId = eventId;
+        this.id = id;
         this.title = title;
         this.descirption = descirption;
         this.location = location;
@@ -37,6 +40,84 @@ public class Event {
         this.qrValue = qrValue;
         this.capacity = capacity;
         this.dateEvent = dateEvent;
+        this.organizerName = organizerName;
+        this.eventType = eventType;
+        this.spotsToFill = spotsToFill;
+    }
+
+    // Getters and Setters
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescirption() {
+        return descirption;
+    }
+
+    public void setDescirption(String descirption) {
+        this.descirption = descirption;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Timestamp getRegStart() {
+        return regStart;
+    }
+
+    public void setRegStart(Timestamp regStart) {
+        this.regStart = regStart;
+    }
+
+    public Timestamp getRegEnd() {
+        return regEnd;
+    }
+
+    public void setRegEnd(Timestamp regEnd) {
+        this.regEnd = regEnd;
+    }
+
+    public String getPosterURL() {
+        return posterURL;
+    }
+
+    public void setPosterURL(String posterURL) {
+        this.posterURL = posterURL;
+    }
+
+    public int getQrValue() {
+        return qrValue;
+    }
+
+    public void setQrValue(int qrValue) {
+        this.qrValue = qrValue;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     public String getDateEvent() {
@@ -47,76 +128,39 @@ public class Event {
         this.dateEvent = dateEvent;
     }
 
-    public String getEventId() {
-        return eventId;
+    public String getOrganizerName() {
+        return organizerName;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
     }
 
-    public String getTitle() {
-        return title;
+    public String getEventType() {
+        return eventType;
     }
 
-    public String getDescirption() {
-        return descirption;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
-    public String getLocation() {
-        return location;
+    public int getSpotsToFill() {
+        return spotsToFill;
     }
 
-    public String getRegStart() {
-        return regStart;
+    public void setSpotsToFill(int spotsToFill) {
+        this.spotsToFill = spotsToFill;
     }
 
-    public String getRegEnd() {
-        return regEnd;
-    }
+    // Logic from your class
+    public boolean isRegistrationOpen() {
+        if (regStart == null || regEnd == null) {
+            return false;
+        }
 
-    public String getPosterURL() {
-        return posterURL;
-    }
+        Timestamp currentTime = Timestamp.now();
 
-    public String getQrValue() {
-        return qrValue;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-    public void setDescirption(String descirption) {
-        this.descirption = descirption;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setRegStart(String regStart) {
-        this.regStart = regStart;
-    }
-
-    public void setPosterURL(String posterURL) {
-        this.posterURL = posterURL;
-    }
-
-    public void setRegEnd(String regEnd) {
-        this.regEnd = regEnd;
-    }
-
-    public void setQrValue(String qrValue) {
-        this.qrValue = qrValue;
+        return currentTime.compareTo(regStart) > 0 &&
+                currentTime.compareTo(regEnd) <= 0;
     }
 }
-
-
