@@ -19,7 +19,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".AdminBrowseProfilesActivity"
+            android:name=".AdminBrowseEventsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +32,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".AdminBrowseEventsActivity"
+            android:name=".AdminBrowseProfilesActivity"
             android:exported="false" />
 
         <activity
