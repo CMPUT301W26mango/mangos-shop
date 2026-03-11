@@ -116,15 +116,16 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
-                <TextView
-                    android:id="@+id/qr_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginTop="16dp"
-                    android:text="Event QR Code"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                <EditText
+                    android:id="@+id/capacity_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Capacity"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
 
                 <Button
                     android:id="@+id/upload_poster_button"
