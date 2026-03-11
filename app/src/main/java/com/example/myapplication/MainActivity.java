@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,11 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
 public class MainActivity extends AppCompatActivity {
     private EditText userName, userEmail, userPhone;
     private String selectedRole = "";
     private Profiles profiles;
     private String deviceId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,3 +90,27 @@ public class MainActivity extends AppCompatActivity {
 //2) email checker
 // firebase delete (call live server again to make sure dleete is fast and doen) -done
 // do toggle for picking (colour)
+
+        Intent intent = new Intent(MainActivity.this, EventCreateActivity.class);
+        startActivity(intent);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, new EventListFragment())
+                    .commit();
+        }
+
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+
+    }
+
+
+
+}
