@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="lottery_guidelines_title">What is Mangos Shop?</string>
+    <string name="lottery_guidelines_description">Mango shop allows you to sign up for events in your local area fairly! Not everyone is able to constantly refresh the app when an event launches hoping they get a spot. So Mango Shop fixes that.\n\nHow? Using the lottery system! When you register for an event, you are put onto a waiting list with all others who register, everyone having an equal chance of being selected.Once the deadline to register is over, a draw occurs where a specified number of entrants will be invited to register for the event. The entrants will than receive a notification informing them that they have been selected.\n\nIf a chosen entrant does not complete their registration within the required time period, or declines the invitation, another entrant may be randomly selected from the waiting list again. For each event, there is a specefic number of available spots chosen by the organizer, and the system is the one one who does random selection. </string>
+    <string name="scan_qr">Scan QR</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_image_string">Event Image</string>
 </resources>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E6E6E6">
+
+    <ScrollView
+        android:id="@+id/create_event_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F4E7E7"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="#F4E7E7"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/create_event_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Create Your Event"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/event_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Name"
+                    android:inputType="text"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/location_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Location"
+                    android:inputType="text"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/start_date_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Reg Start Date"
+                    android:inputType="text"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:focusable="false"
+                    android:clickable="true"/>
+
+                <EditText
+                    android:id="@+id/end_date_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Reg End Date"
+                    android:inputType="text"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:focusable="false"
+                    android:clickable="true"/>
+
+                <EditText
+                    android:id="@+id/event_date_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Date"
+                    android:inputType="text"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:focusable="false"
+                    android:clickable="true"/>
+
+                <EditText
+                    android:id="@+id/event_description_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Description"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/capacity_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Capacity"
+                    android:inputType="number"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+                <Button
+                    android:id="@+id/upload_poster_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/main_button_style"
+                    android:text="Upload Poster Image"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@null" />
+
+
+                <ImageView
+                    android:id="@+id/iv_poster_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="12dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/create_event_button"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="48dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/main_button_style"
+                    android:text="Create"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@null" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
