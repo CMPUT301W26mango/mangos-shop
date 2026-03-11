@@ -71,22 +71,16 @@ public class GeolocationSettingActivity extends AppCompatActivity {
         // --- Disable switch until we load current value ---
         switchGeolocation.setEnabled(false);
 
-        // --- Check test/demo modes ---
+        // --- Check test mode ---
         boolean testMode = getIntent().getBooleanExtra("testMode", false);
-        boolean demoMode = getIntent().getBooleanExtra("demoMode", false);
-
-        if (demoMode) {
-            // Demo mode — just enable the switch with a default value
-            switchGeolocation.setEnabled(true);
-            switchGeolocation.setChecked(false);
-            updateStatusText(false);
-            setupToggleListener();
-            return;
-        }
 
         if (testMode) {
-            // Test mode — skip Firestore for automated UI tests
+            // Test mode — skip Firestore, but set up UI so toggle tests work
             switchGeolocation.setEnabled(true);
+            updateStatusText(false);
+            switchGeolocation.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                updateStatusText(isChecked);
+            });
             return;
         }
 
@@ -159,13 +153,6 @@ public class GeolocationSettingActivity extends AppCompatActivity {
      * This is the core of US 02.02.03 — criteria #4.
      */
     private void saveGeolocationSetting(boolean isEnabled) {
-        // Skip Firestore write in demo mode
-        boolean demoMode = getIntent().getBooleanExtra("demoMode", false);
-        if (demoMode) {
-            Toast.makeText(this, "Demo: Geolocation " + (isEnabled ? "ENABLED" : "DISABLED"), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         db.collection("events").document(eventId)
                 .update("geolocationRequired", isEnabled)
                 .addOnSuccessListener(aVoid -> {

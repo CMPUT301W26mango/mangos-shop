@@ -158,8 +158,6 @@ public class GeolocationSettingActivityTest {
 
     /**
      * Test that the switch defaults to OFF (unchecked).
-     * This ensures geolocation is disabled by default — no location
-     * data is collected unless the organizer explicitly turns it on.
      */
     @Test
     public void testSwitchDefaultsToOff() {
@@ -185,12 +183,13 @@ public class GeolocationSettingActivityTest {
         ActivityScenario.launch(intent);
 
         onView(withId(R.id.tvGeoStatus))
-                .check(matches(withText("Geolocation is currently DISABLED for this event.")));
+                .check(matches(withText(
+                        "Geolocation is currently DISABLED for this event.\nNo location data will be collected."
+                )));
     }
 
     // =====================================================
     // CRITERIA #1 — Toggle can be switched on and off
-    //               (using demoMode since it sets up the listener)
     // =====================================================
 
     /**
@@ -200,11 +199,11 @@ public class GeolocationSettingActivityTest {
     public void testCanToggleSwitchOn() {
         Intent intent = new Intent(context, GeolocationSettingActivity.class);
         intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("demoMode", true);
+        intent.putExtra("testMode", true);
 
         ActivityScenario.launch(intent);
 
-        // Switch starts OFF in demo mode — tap to turn ON
+        // Switch starts OFF — tap to turn ON
         onView(withId(R.id.switchGeolocation))
                 .perform(click());
 
@@ -219,7 +218,7 @@ public class GeolocationSettingActivityTest {
     public void testCanToggleSwitchBackOff() {
         Intent intent = new Intent(context, GeolocationSettingActivity.class);
         intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("demoMode", true);
+        intent.putExtra("testMode", true);
 
         ActivityScenario.launch(intent);
 
@@ -239,7 +238,7 @@ public class GeolocationSettingActivityTest {
     public void testStatusTextUpdatesWhenEnabled() {
         Intent intent = new Intent(context, GeolocationSettingActivity.class);
         intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("demoMode", true);
+        intent.putExtra("testMode", true);
 
         ActivityScenario.launch(intent);
 
@@ -260,7 +259,7 @@ public class GeolocationSettingActivityTest {
     public void testStatusTextUpdatesWhenDisabled() {
         Intent intent = new Intent(context, GeolocationSettingActivity.class);
         intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("demoMode", true);
+        intent.putExtra("testMode", true);
 
         ActivityScenario.launch(intent);
 

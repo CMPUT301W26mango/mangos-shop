@@ -85,22 +85,7 @@ public class WaitingListActivity extends AppCompatActivity {
         rvEntrants.setAdapter(adapter);
 
         // --- Verify ownership, then load waiting list ---
-        // Test mode: skip Firestore check so UI tests can verify layout
-        // without needing real Firestore data. In production, this extra
-        // is never set, so ownership is always verified.
         boolean testMode = getIntent().getBooleanExtra("testMode", false);
-        boolean demoMode = getIntent().getBooleanExtra("demoMode", false);
-        if (demoMode) {
-            // Demo mode — load dummy data for manual visual testing
-            // Remove this before merging to main branch
-            entrantNames.add("Oakley");
-            entrantNames.add("Santan Dave");
-            entrantNames.add("Julia");
-            entrantNames.add("Chris");
-            tvEntrantCount.setText("Total Entrants: " + entrantNames.size());
-            adapter.notifyDataSetChanged();
-            return;
-        }
         if (testMode) {
             // Skip ownership check — used only for automated UI tests
             return;
