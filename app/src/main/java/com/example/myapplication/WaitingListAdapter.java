@@ -14,14 +14,15 @@ import java.util.List;
  * US 02.02.01 - WaitingListAdapter
  *
  * Displays entrant names in a RecyclerView. Display only — no action buttons.
- * (Replace/Cancel buttons belong to US 02.05.03 and US 02.06.04)
+ * Uses EnrolledEntrant objects so the full data (name, email, phone, date)
+ * is available for CSV export (US 02.06.05), but only name is shown in the UI.
  */
 public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.ViewHolder> {
 
-    private final List<String> entrantNames;
+    private final List<EnrolledEntrant> entrants;
 
-    public WaitingListAdapter(List<String> entrantNames) {
-        this.entrantNames = entrantNames;
+    public WaitingListAdapter(List<EnrolledEntrant> entrants) {
+        this.entrants = entrants;
     }
 
     @NonNull
@@ -34,12 +35,12 @@ public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.tvEntrantName.setText(entrantNames.get(position));
+        holder.tvEntrantName.setText(entrants.get(position).getName());
     }
 
     @Override
     public int getItemCount() {
-        return entrantNames.size();
+        return entrants.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

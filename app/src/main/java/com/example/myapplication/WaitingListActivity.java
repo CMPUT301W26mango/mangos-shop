@@ -1,8 +1,10 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,14 +22,16 @@ import java.util.List;
 
 /**
  * US 02.02.01 — View the list of entrants who joined the waiting list.
+ * US 02.06.05 — Export entrants as CSV.
  *
  * Displays a real-time list of all entrants on the waiting list for a
  * specific event. Only the organizer who owns the event (matched by
- * device ID) can view it.
+ * device ID) can view it. Includes a CSV export button.
  *
  * HOW TO LAUNCH (for teammates during merge):
  *     Intent intent = new Intent(context, WaitingListActivity.class);
  *     intent.putExtra("eventId", "your_event_id_here");
+ *     intent.putExtra("eventName", "Swimming Lessons");
  *     startActivity(intent);
  *
  * ASSUMED FIRESTORE STRUCTURE:
@@ -36,10 +40,14 @@ import java.util.List;
  *
  *     events/{eventId}/waitingList/{entrantId}
  *         - name: String
+ *         - email: String
+ *         - phone: String (optional, may be null)
+ *         - enrolmentDate: String
  */
 public class WaitingListActivity extends AppCompatActivity {
 
     private static final String TAG = "WaitingListActivity";
+    private static final int CSV_EXPORT_REQUEST = 1001;
 
     private FirebaseFirestore db;
     private ListenerRegistration waitingListListener;
@@ -47,11 +55,13 @@ public class WaitingListActivity extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvEntrantCount;
     private RecyclerView rvEntrants;
+    private Button btnExportCsv;
 
-    private List<String> entrantNames;
+    private List<EnrolledEntrant> entrants;
     private WaitingListAdapter adapter;
 
     private String eventId;
+    private String eventName;
     private String deviceId;
 
     @Override
@@ -59,12 +69,16 @@ public class WaitingListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_list);
 
-        // --- Get event ID from intent ---
+        // --- Get event ID and name from intent ---
         eventId = getIntent().getStringExtra("eventId");
         if (eventId == null) {
             Toast.makeText(this, "Error: No event ID provided.", Toast.LENGTH_SHORT).show();
             finish();
             return;
+        }
+        eventName = getIntent().getStringExtra("eventName");
+        if (eventName == null) {
+            eventName = "Event";
         }
 
         // --- Get this device's ID (used for ownership check) ---
@@ -77,26 +91,42 @@ public class WaitingListActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.tvWaitingListTitle);
         tvEntrantCount = findViewById(R.id.tvEntrantCount);
         rvEntrants = findViewById(R.id.rvEntrants);
+        btnExportCsv = findViewById(R.id.btnExportCsv);
 
         // --- Setup RecyclerView ---
-        entrantNames = new ArrayList<>();
-        adapter = new WaitingListAdapter(entrantNames);
+        entrants = new ArrayList<>();
+        adapter = new WaitingListAdapter(entrants);
         rvEntrants.setLayoutManager(new LinearLayoutManager(this));
         rvEntrants.setAdapter(adapter);
+
+        // --- Setup CSV export button (US 02.06.05) ---
+        btnExportCsv.setOnClickListener(v -> {
+            Intent intent = CsvExportHelper.createExportIntent(eventName);
+            startActivityForResult(intent, CSV_EXPORT_REQUEST);
+        });
 
         // --- Verify ownership, then load waiting list ---
         boolean testMode = getIntent().getBooleanExtra("testMode", false);
         if (testMode) {
-            // Skip ownership check — used only for automated UI tests
             return;
         }
         verifyOwnershipAndLoad();
     }
 
     /**
+     * Handles the result from the CSV file picker.
+     * When the user picks a save location, writes the CSV there.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CSV_EXPORT_REQUEST && resultCode == RESULT_OK && data != null) {
+            CsvExportHelper.writeCsvToUri(this, data.getData(), entrants);
+        }
+    }
+
+    /**
      * Checks that the current device owns this event before showing data.
-     * This satisfies acceptance criteria #5: organizers can only see
-     * waiting lists for their own events.
      */
     private void verifyOwnershipAndLoad() {
         db.collection("events").document(eventId).get()
@@ -115,7 +145,6 @@ public class WaitingListActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Ownership confirmed — start listening to waiting list
                     attachWaitingListListener();
                 })
                 .addOnFailureListener(e -> {
@@ -127,8 +156,8 @@ public class WaitingListActivity extends AppCompatActivity {
 
     /**
      * Attaches a real-time snapshot listener to the waitingList subcollection.
-     * This satisfies acceptance criteria #4: list updates when entrants
-     * join or leave.
+     * Reads all four fields: name, email, phone, enrolmentDate.
+     * UI shows name only; all fields are used for CSV export.
      */
     private void attachWaitingListListener() {
         waitingListListener = db.collection("events")
@@ -145,20 +174,19 @@ public class WaitingListActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Clear and rebuild the list from the snapshot
-                    entrantNames.clear();
+                    entrants.clear();
 
                     for (DocumentSnapshot doc : snapshots.getDocuments()) {
                         String name = doc.getString("name");
                         if (name != null) {
-                            entrantNames.add(name);
+                            String email = doc.getString("email");
+                            String phone = doc.getString("phone");
+                            String enrolmentDate = doc.getString("enrolmentDate");
+                            entrants.add(new EnrolledEntrant(name, email, phone, enrolmentDate));
                         }
                     }
 
-                    // Update count display (acceptance criteria #3)
-                    tvEntrantCount.setText("Total Entrants: " + entrantNames.size());
-
-                    // Refresh the list
+                    tvEntrantCount.setText("Total Entrants: " + entrants.size());
                     adapter.notifyDataSetChanged();
                 });
     }
@@ -166,7 +194,6 @@ public class WaitingListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Clean up the listener to avoid memory leaks
         if (waitingListListener != null) {
             waitingListListener.remove();
         }

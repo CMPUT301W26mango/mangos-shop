@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class WaitingListAdapterTest {
 
-    private List<String> dummyNames;
+    private List<EnrolledEntrant> dummyEntrants;
     private WaitingListAdapter adapter;
     private RecyclerView recyclerView;
     private Context context;
@@ -39,16 +39,14 @@ public class WaitingListAdapterTest {
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
 
-        // Dummy data simulating entrants on the waiting list
-        dummyNames = new ArrayList<>();
-        dummyNames.add("Oakley");
-        dummyNames.add("Santan Dave");
-        dummyNames.add("Julia");
-        dummyNames.add("Chris");
+        dummyEntrants = new ArrayList<>();
+        dummyEntrants.add(new EnrolledEntrant("Oakley", "oakley@test.com", "111", "2025-01-15"));
+        dummyEntrants.add(new EnrolledEntrant("Santan Dave", "dave@test.com", "222", "2025-01-16"));
+        dummyEntrants.add(new EnrolledEntrant("Julia", "julia@test.com", null, "2025-01-17"));
+        dummyEntrants.add(new EnrolledEntrant("Chris", "chris@test.com", "444", "2025-01-18"));
 
-        adapter = new WaitingListAdapter(dummyNames);
+        adapter = new WaitingListAdapter(dummyEntrants);
 
-        // Create a RecyclerView and attach the adapter so ViewHolders can be created
         recyclerView = new RecyclerView(context);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
@@ -58,33 +56,24 @@ public class WaitingListAdapterTest {
     // CRITERIA #3 — Count matches total entrant count
     // =====================================================
 
-    /**
-     * Test that getItemCount returns the correct number of entrants.
-     */
     @Test
     public void testItemCountMatchesList() {
         assertEquals("Item count should match the number of entrants",
                 4, adapter.getItemCount());
     }
 
-    /**
-     * Test that an empty list returns a count of 0.
-     */
     @Test
     public void testEmptyListReturnsZeroCount() {
-        List<String> emptyList = new ArrayList<>();
+        List<EnrolledEntrant> emptyList = new ArrayList<>();
         WaitingListAdapter emptyAdapter = new WaitingListAdapter(emptyList);
         assertEquals("Empty list should return 0 count",
                 0, emptyAdapter.getItemCount());
     }
 
-    /**
-     * Test that a single entrant returns a count of 1.
-     */
     @Test
     public void testSingleEntrantCount() {
-        List<String> singleList = new ArrayList<>();
-        singleList.add("Solo Entrant");
+        List<EnrolledEntrant> singleList = new ArrayList<>();
+        singleList.add(new EnrolledEntrant("Solo", "solo@test.com", null, "2025-01-15"));
         WaitingListAdapter singleAdapter = new WaitingListAdapter(singleList);
         assertEquals("Single entrant should return count of 1",
                 1, singleAdapter.getItemCount());
@@ -94,12 +83,8 @@ public class WaitingListAdapterTest {
     // CRITERIA #2 — List shows entrant name
     // =====================================================
 
-    /**
-     * Test that the first entrant's name is correctly bound to the ViewHolder.
-     */
     @Test
     public void testFirstEntrantNameBinding() {
-        // Force the RecyclerView to layout so ViewHolders are created
         recyclerView.measure(
                 View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY)
@@ -115,9 +100,6 @@ public class WaitingListAdapterTest {
                 "Oakley", nameView.getText().toString());
     }
 
-    /**
-     * Test that the second entrant's name is correctly bound.
-     */
     @Test
     public void testSecondEntrantNameBinding() {
         recyclerView.measure(
@@ -134,9 +116,6 @@ public class WaitingListAdapterTest {
                 "Santan Dave", nameView.getText().toString());
     }
 
-    /**
-     * Test that the last entrant's name is correctly bound.
-     */
     @Test
     public void testLastEntrantNameBinding() {
         recyclerView.measure(
@@ -153,72 +132,75 @@ public class WaitingListAdapterTest {
                 "Chris", nameView.getText().toString());
     }
 
+    /**
+     * Test that only name is displayed — not email, phone, or date.
+     */
+    @Test
+    public void testOnlyNameIsDisplayed() {
+        recyclerView.measure(
+                View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY)
+        );
+        recyclerView.layout(0, 0, 1080, 1920);
+
+        RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(0);
+        assertNotNull(holder);
+
+        TextView nameView = holder.itemView.findViewById(R.id.tvEntrantName);
+        String displayed = nameView.getText().toString();
+
+        assertEquals("Only name should be displayed", "Oakley", displayed);
+        assertFalse("Email should not be displayed", displayed.contains("oakley@test.com"));
+        assertFalse("Phone should not be displayed", displayed.contains("111"));
+        assertFalse("Date should not be displayed", displayed.contains("2025-01-15"));
+    }
+
     // =====================================================
     // CRITERIA #4 — List updates when entrants join or leave
-    //               (adapter side — data change reflected)
     // =====================================================
 
-    /**
-     * Test that adding an entrant increases the count.
-     * Simulates a new entrant joining the waiting list.
-     */
     @Test
     public void testCountUpdatesWhenEntrantJoins() {
         assertEquals(4, adapter.getItemCount());
 
-        dummyNames.add("New Entrant");
+        dummyEntrants.add(new EnrolledEntrant("New", "new@test.com", null, "2025-01-20"));
         adapter.notifyDataSetChanged();
 
         assertEquals("Count should increase to 5 after adding an entrant",
                 5, adapter.getItemCount());
     }
 
-    /**
-     * Test that removing an entrant decreases the count.
-     * Simulates an entrant leaving the waiting list.
-     */
     @Test
     public void testCountUpdatesWhenEntrantLeaves() {
         assertEquals(4, adapter.getItemCount());
 
-        dummyNames.remove("Julia");
+        dummyEntrants.remove(2); // Remove Julia
         adapter.notifyDataSetChanged();
 
         assertEquals("Count should decrease to 3 after removing an entrant",
                 3, adapter.getItemCount());
     }
 
-    /**
-     * Test that clearing all entrants results in zero count.
-     * Simulates all entrants leaving.
-     */
     @Test
     public void testClearAllEntrants() {
-        dummyNames.clear();
+        dummyEntrants.clear();
         adapter.notifyDataSetChanged();
 
         assertEquals("Count should be 0 after clearing all entrants",
                 0, adapter.getItemCount());
     }
 
-    /**
-     * Test that rebuilding the list (clear + re-add) works correctly.
-     * This is exactly what happens when the Firestore snapshot listener fires:
-     * the Activity clears the list and rebuilds it from the new snapshot.
-     */
     @Test
     public void testRebuildListSimulatesSnapshotUpdate() {
-        // Simulate what the snapshot listener does: clear and rebuild
-        dummyNames.clear();
-        dummyNames.add("Alpha");
-        dummyNames.add("Bravo");
-        dummyNames.add("Charlie");
+        dummyEntrants.clear();
+        dummyEntrants.add(new EnrolledEntrant("Alpha", "alpha@test.com", "999", "2025-02-01"));
+        dummyEntrants.add(new EnrolledEntrant("Bravo", "bravo@test.com", null, "2025-02-02"));
+        dummyEntrants.add(new EnrolledEntrant("Charlie", "charlie@test.com", "777", "2025-02-03"));
         adapter.notifyDataSetChanged();
 
         assertEquals("After rebuild, count should be 3",
                 3, adapter.getItemCount());
 
-        // Force layout to verify binding
         recyclerView.measure(
                 View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY)

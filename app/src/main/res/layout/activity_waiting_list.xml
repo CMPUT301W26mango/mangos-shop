@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    US 02.02.01 - Waiting List screen for Organizers
-    Shows all entrants currently on the waiting list for a specific event.
-    This is the PRE-LOTTERY list only. No action buttons.
+    US 02.02.01 + US 02.06.05
+    Waiting List screen showing registered entrants with CSV export button.
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,7 +16,7 @@
         android:id="@+id/tvWaitingListTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Waiting List"
+        android:text="Registered Entrants"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#000000"
@@ -42,5 +41,15 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="16dp" />
+
+    <!-- Export CSV button (US 02.06.05) -->
+    <Button
+        android:id="@+id/btnExportCsv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Export users as CSV"
+        android:backgroundTint="#4A90D9"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>
