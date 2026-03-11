@@ -109,17 +109,10 @@ public class EventDetailsFragment extends DialogFragment {
         Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
         TextView textViewAlreadyRegistered = view.findViewById(R.id.alreadyRegisteredTextView);
 
-        int parsedId;
-        try {
-            parsedId = Integer.parseInt(eventId);
-        } catch (NumberFormatException e) {
-            Toast.makeText(getContext(), "Invalid QR code", Toast.LENGTH_SHORT).show();
-            dismiss();
-            return;
-        }
+
 
         db.collection("events")
-                .whereEqualTo("qrValue", parsedId)
+                .whereEqualTo("qrValue", db.collection(eventId))
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {

@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     private String selectedRole = "";
     private Profiles profiles;
     private String deviceId;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         userEmail = findViewById(R.id.userEmail);
         userPhone = findViewById(R.id.userPhone);
 
-        // US 01.07.01 - Auto-login check
         profiles.fetchUserRole(deviceId, user -> {
             if (user != null) redirectUser(user);
         });
@@ -44,9 +43,21 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnRoleOrganizer).setOnClickListener(v -> selectedRole = "Organizer");
         findViewById(R.id.btnRoleEntrant).setOnClickListener(v -> selectedRole = "Entrant");
         findViewById(R.id.saveButton).setOnClickListener(v -> saveAndRedirect());
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, new EventListFragment())
+                    .commit();
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
     }
 
-    // US 01.02.01 - Provide the information(signup)
     private void saveAndRedirect() {
         String name = userName.getText().toString().trim();
         String email = userEmail.getText().toString().trim();
@@ -57,10 +68,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        //inbuilt andriot studio(check if emial is emial or nah)
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             userEmail.setError("Please enter a valid email address");
-            userEmail.requestFocus(); // Pops the keyboard back open on this field
+            userEmail.requestFocus();
             return;
         }
 
@@ -75,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void redirectUser(UserProfiles user) {
         Intent intent;
-        // what profile view?
         if (user instanceof Admin) intent = new Intent(this, AdminAccount.class);
         else if (user instanceof Organizer) intent = new Intent(this, OrganizerAccount.class);
         else intent = new Intent(this, EntrantAccount.class);
@@ -83,34 +92,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-}
-
-
-// 1) email error -fixed
-//2) email checker
-// firebase delete (call live server again to make sure dleete is fast and doen) -done
-// do toggle for picking (colour)
-
-        Intent intent = new Intent(MainActivity.this, EventCreateActivity.class);
-        startActivity(intent);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, new EventListFragment())
-                    .commit();
-        }
-
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-
-    }
-
-
-
 }

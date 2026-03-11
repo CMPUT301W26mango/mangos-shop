@@ -58,7 +58,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/userPhone">
+        app:layout_constraintTop_toBottomOf="@id/userPhone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/btnRoleOrganizer"
@@ -88,24 +90,23 @@
         android:text="Save Changes"
         android:textColor="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/roleBox" />
-</androidx.constraintlayout.widget.ConstraintLayout>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/main"
-    android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        app:layout_constraintTop_toBottomOf="@id/saveButton"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="#E0E0E0"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:id="@+id/bottomNavigation"
@@ -113,7 +114,10 @@
         android:layout_height="56dp"
         android:orientation="horizontal"
         android:background="#FFFFFF"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:layout_width="0dp"
@@ -140,5 +144,4 @@
             android:textSize="12sp" />
 
     </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
