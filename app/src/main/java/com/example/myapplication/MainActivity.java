@@ -14,7 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     private EditText userName, userEmail, userPhone;
-    private String selectedRole = "Entrant";
+    private String selectedRole = "";
     private Profiles profiles;
     private String deviceId;
 
