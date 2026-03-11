@@ -21,7 +21,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".WaitingListActivity" />
-        <activity android:name=".GeolocationSettingActivity" />
     </application>
 
 </manifest>
