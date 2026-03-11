@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    US 02.02.03 - Geolocation toggle for Organizers
+    Allows organizer to enable or disable geolocation requirement for their event.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8E0E0"
+    android:padding="24dp">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvGeoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Geolocation Setting"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Toggle card -->
+    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#FFFFFF"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Require Geolocation"
+                android:textSize="16sp"
+                android:textColor="#333333" />
+
+            <Switch
+                android:id="@+id/switchGeolocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Status text -->
+    <TextView
+        android:id="@+id/tvGeoStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Geolocation is currently DISABLED for this event."
+        android:textSize="14sp"
+        android:textColor="#555555"
+        android:gravity="center" />
+
+</LinearLayout>
