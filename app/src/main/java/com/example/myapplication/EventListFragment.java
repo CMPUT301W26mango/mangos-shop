@@ -29,21 +29,24 @@ import java.util.List;
  * EventListFragment - Displays the list of events and provides QR scanning
  * and lottery info functionality for entrants.
  * Combines event list (teammate) with QR scanner and lottery info (US 01.06.01, US 01.05.05)
+ * Used Claude AI to merge my EventList code with Aditya's EventList code
+ * Prompt: "Help me integrate my info button and scan QR button onto this EventList page"
+ * Date: Tuesday, March 10, 2026
  */
 public class EventListFragment extends Fragment {
 
-    // Event list views (teammate's code)
+
     RecyclerView recyclerView;
     EventAdapter adapter;
     List<Event> eventList;
     FirebaseFirestore db;
 
-    // QR and lottery buttons (your code)
+
     ImageButton lotteryinfoButton;
     ImageButton scanQRButton;
     ImageButton closeInfoButton;
 
-    // ZXing QR scanner launcher - must be registered in onCreate
+    // ZXing QR scanner launcher
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
     public EventListFragment() {
@@ -54,7 +57,7 @@ public class EventListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Register the QR scanner launcher - must be done in onCreate not onCreateView
+        // Register the QR scanner launcher
         scannerLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
                 String scannedValue = result.getContents();
@@ -83,10 +86,10 @@ public class EventListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        // Use teammate's layout which has the RecyclerView
+
         View view = inflater.inflate(R.layout.whole_event_list, container, false);
 
-        // Setup RecyclerView (teammate's code)
+
         recyclerView = view.findViewById(R.id.recyclerViewEvents);
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getParentFragmentManager());
@@ -95,11 +98,11 @@ public class EventListFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         loadEvents();
 
-        // Setup your buttons (your code)
+        // Setup your buttons
         lotteryinfoButton = view.findViewById(R.id.lotteryinfoButton);
         scanQRButton = view.findViewById(R.id.scanQRButton);
 
-        // Lottery info button - shows guidelines dialog (US 01.05.05)
+        // Lottery info button
         lotteryinfoButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(requireContext());
             dialog.setContentView(R.layout.lottery_guidelines_dialog);
@@ -109,7 +112,7 @@ public class EventListFragment extends Fragment {
             dialog.show();
         });
 
-        // QR scan button - launches ZXing camera scanner (US 01.06.01)
+        // QR scan button
         scanQRButton.setOnClickListener(v -> launchQRScanner());
 
         return view;

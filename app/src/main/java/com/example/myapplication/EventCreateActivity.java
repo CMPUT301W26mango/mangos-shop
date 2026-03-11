@@ -1,4 +1,4 @@
-/*package com.example.myapplication;
+package com.example.myapplication;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.app.DatePickerDialog;
 import java.util.Calendar;
 import java.util.Date;
 import androidx.appcompat.app.AlertDialog;
+
+import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -237,11 +239,23 @@ public class EventCreateActivity extends AppCompatActivity {
             }
 
             if (!startDate.isEmpty()) {
-                event.setRegStart(startDate);
+                try {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                    Date date = formatter.parse(startDate);
+                    event.setRegStart(new Timestamp(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
             if (!endDate.isEmpty()) {
-                event.setRegEnd(endDate);
+                try {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                    Date date = formatter.parse(endDate);
+                    event.setRegEnd(new Timestamp(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
             if (!capacityText.isEmpty()) {
@@ -258,4 +272,4 @@ public class EventCreateActivity extends AppCompatActivity {
             capacityInput.setText("");
         });
     }
-}; */
+};

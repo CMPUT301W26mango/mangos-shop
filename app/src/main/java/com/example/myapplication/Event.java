@@ -3,7 +3,6 @@ package com.example.myapplication;
 import com.google.firebase.Timestamp;
 
 public class Event {
-
     private String id;
     private String title;
     private String descirption;
@@ -13,7 +12,7 @@ public class Event {
     private Timestamp regEnd;
 
     private String posterURL;
-    private int qrValue;
+    private String qrValue;
     private int capacity;
 
     private String dateEvent;
@@ -27,7 +26,7 @@ public class Event {
 
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
-                 int qrValue, int capacity, String dateEvent,
+                 String qrValue, int capacity, String dateEvent,
                  String organizerName, String eventType, int spotsToFill) {
 
         this.id = id;
@@ -104,11 +103,11 @@ public class Event {
         this.posterURL = posterURL;
     }
 
-    public int getQrValue() {
+    public String getQrValue() {
         return qrValue;
     }
 
-    public void setQrValue(int qrValue) {
+    public void setQrValue(String qrValue) {
         this.qrValue = qrValue;
     }
 
@@ -154,6 +153,9 @@ public class Event {
 
     // Logic from your class
     public boolean isRegistrationOpen() {
+
+
+
         if (regStart == null || regEnd == null) {
             return false;
         }

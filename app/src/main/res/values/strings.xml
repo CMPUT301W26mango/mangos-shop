@@ -6,4 +6,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="event_image_string">Event Image</string>
+    <string name="title_activity_event_creation">Event Creation</string>
+    <string name="first_fragment_label">Home</string>
+    <string name="second_fragment_label">Home</string>
+
 </resources>

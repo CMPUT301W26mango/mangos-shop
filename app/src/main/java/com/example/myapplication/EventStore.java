@@ -1,7 +1,8 @@
-/*package com.example.myapplication;
+package com.example.myapplication;
 
 import android.util.Log;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -34,6 +35,9 @@ public class EventStore {
         eventData.put("posterURL", event.getPosterURL());
         eventData.put("qrValue", eventId);
         eventData.put("capacity", event.getCapacity());
+        eventData.put("spotsToFill", event.getSpotsToFill());
+        eventData.put("eventType", event.getEventType());
+        eventData.put("organizerName", event.getOrganizerName());
         docRef.set(eventData);
     }
 
@@ -60,16 +64,19 @@ public class EventStore {
                             (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
 
                     Event event = new Event();
-                    event.setEventId(document.getString("id"));
+                    event.setId(document.getString("id"));
                     event.setTitle(document.getString("title"));
                     event.setDescirption(document.getString("description"));
                     event.setLocation(document.getString("location"));
-                    event.setRegStart(document.getString("regStart"));
-                    event.setRegEnd(document.getString("regEnd"));
+                    event.setRegStart(document.getTimestamp("regStart"));
+                    event.setRegEnd(document.getTimestamp("regEnd"));
                     event.setDateEvent(document.getString("eventStart"));
                     event.setPosterURL(document.getString("posterURL"));
                     event.setQrValue(document.getString("qrValue"));
                     event.setCapacity(document.getLong("capacity").intValue());
+                    event.setOrganizerName(document.getString("organizerName"));
+                    event.setEventType(document.getString("eventType"));
+
 
 
                     listener.onEventLoaded(event);
