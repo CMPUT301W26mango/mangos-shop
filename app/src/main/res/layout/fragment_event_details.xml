@@ -317,5 +317,40 @@
             android:textSize="16sp"
             android:layout_marginTop="4dp"/>
 
+        <TextView
+            android:id="@+id/alreadyRegisteredTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You have already signed up for this event.\nTo cancel or view your status, go to your events page."
+            android:textAlignment="center"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/registerBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Register Now!"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/blue"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/cancelRegisterBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Remove from Waitlist"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/red"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+
     </LinearLayout>
 </ScrollView>

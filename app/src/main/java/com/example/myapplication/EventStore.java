@@ -1,4 +1,4 @@
-package com.example.myapplication;
+/*package com.example.myapplication;
 
 import android.util.Log;
 
@@ -75,4 +75,4 @@ public class EventStore {
                     listener.onEventLoaded(event);
                 });
     }
-}
+} */

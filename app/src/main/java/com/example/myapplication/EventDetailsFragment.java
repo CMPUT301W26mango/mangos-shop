@@ -2,9 +2,12 @@ package com.example.myapplication;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,7 +23,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,7 +35,11 @@ import java.util.Objects;
  */
 public class EventDetailsFragment extends DialogFragment {
 
+    private final String logTag = "Fragment for event Details";
     private FirebaseFirestore db;
+
+    private String firestoreDocId;
+    private String deviceId;
 
     public EventDetailsFragment() {
 
@@ -51,6 +60,10 @@ public class EventDetailsFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_event_details, container, false);
 
         db = FirebaseFirestore.getInstance();
+
+
+        // Device Id
+        deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         ImageButton btnClose = view.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(v -> dismiss());
@@ -92,6 +105,10 @@ public class EventDetailsFragment extends DialogFragment {
         TextView tvDescription = view.findViewById(R.id.tv_event_description);
         ImageView ivPoster = view.findViewById(R.id.iv_event_poster);
 
+        Button registerBtn = view.findViewById(R.id.registerBtn);
+        Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
+        TextView textViewAlreadyRegistered = view.findViewById(R.id.alreadyRegisteredTextView);
+
         int parsedId;
         try {
             parsedId = Integer.parseInt(eventId);
@@ -109,6 +126,9 @@ public class EventDetailsFragment extends DialogFragment {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         QueryDocumentSnapshot document =
                                 (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
+
+                        // Firestore Document Id
+                        firestoreDocId = document.getId();
 
                         // Title
                         String title = document.getString("title");
@@ -171,6 +191,24 @@ public class EventDetailsFragment extends DialogFragment {
                                     .into(ivPoster);
                         }
 
+                        // Determine what button to show
+                        isRegistered(registerBtn, btnCancel, textViewAlreadyRegistered);
+
+                        // Create a listneer for the two buttons
+                        registerBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered);
+                            }
+                        });
+
+                        btnCancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                leaveWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered);
+                            }
+                        });
+
                     } else {
                         Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
                         dismiss();
@@ -182,4 +220,75 @@ public class EventDetailsFragment extends DialogFragment {
                     dismiss();
                 });
     }
+
+
+    // Register Button / Cancel Register button
+    private void isRegistered(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
+        db.collection("events").document(firestoreDocId)
+                .collection("waitingList").document(deviceId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        // If already reigsterd show cancel button
+                        registerBtn.setVisibility(View.GONE);
+                        cancelBtn.setVisibility(View.VISIBLE);
+                        textViewAlreadyRegistered.setVisibility(View.VISIBLE);
+                    } else {
+                        // If not registerd then show register button
+                        registerBtn.setVisibility(View.VISIBLE);
+                        cancelBtn.setVisibility(View.GONE);
+                        textViewAlreadyRegistered.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(logTag, "Something went wrong when checking registration status", e);
+                });
+    }
+
+    private void joinWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
+        Map<String, Object> entrantInfo = new HashMap<>();
+        entrantInfo.put("userId", deviceId);
+
+        db.collection("events").document(firestoreDocId).collection("waitingList").document(deviceId).set(entrantInfo).addOnSuccessListener( aVoid -> {
+            Log.d(logTag, "Successfully joined waiting list");
+            Toast.makeText(getContext(),
+                    "You've joined the waiting list!",
+                    Toast.LENGTH_SHORT).show();
+
+            // Swap buttons
+            registerBtn.setVisibility(View.GONE);
+            cancelBtn.setVisibility(View.VISIBLE);
+            textViewAlreadyRegistered.setVisibility(View.VISIBLE);
+        }).addOnFailureListener(e -> {
+            Log.d(logTag, "Something went wrong when registering");
+            Toast.makeText(getContext(), "Something went wrong when registering", Toast.LENGTH_SHORT).show();
+        });
+
+
+    }
+
+    private void leaveWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
+        db.collection("events").document(firestoreDocId)
+                .collection("waitingList").document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(logTag, "Successfully left waiting list");
+                    Toast.makeText(getContext(),
+                            "You've left the waiting list.",
+                            Toast.LENGTH_SHORT).show();
+
+                    // Swap buttons back
+                    registerBtn.setVisibility(View.VISIBLE);
+                    cancelBtn.setVisibility(View.GONE);
+                    textViewAlreadyRegistered.setVisibility(View.GONE);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(logTag, "Something went wrong when cancelling", e);
+                    Toast.makeText(getContext(),
+                            "Something went wrong when cancelling",
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
 }
