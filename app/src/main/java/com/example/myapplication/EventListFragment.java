@@ -61,8 +61,7 @@ public class EventListFragment extends Fragment {
         scannerLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
                 String scannedValue = result.getContents();
-                try {
-                    Integer.parseInt(scannedValue); // validate it's a number
+
                     Bundle bundle = new Bundle();
                     bundle.putString("eventId", scannedValue);
 
@@ -70,11 +69,6 @@ public class EventListFragment extends Fragment {
                     eventDetailsFragment.setArguments(bundle);
                     eventDetailsFragment.show(getParentFragmentManager(), "eventDetails");
 
-                } catch (NumberFormatException e) {
-                    // Invalid QR code - not a number
-                    Toast.makeText(getContext(), "Invalid or unrecognized QR code",
-                            Toast.LENGTH_SHORT).show();
-                }
             } else {
                 Toast.makeText(getContext(), "Scan cancelled", Toast.LENGTH_SHORT).show();
             }
