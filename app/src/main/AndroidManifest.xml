@@ -15,13 +15,29 @@
         android:theme="@style/Theme.MyApplication">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".AdminProfileDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminBrowseProfilesActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".AdminEventDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminBrowseEventsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
 
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
