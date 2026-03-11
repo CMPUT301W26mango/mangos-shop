@@ -21,7 +21,10 @@ public class EventStore {
 
     public void addEvent(Event event) {
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("id", event.getEventId());
+        DocumentReference docRef = db.collection("events").document();
+        String eventId = docRef.getId();
+
+        eventData.put("id", eventId);
         eventData.put("title", event.getTitle());
         eventData.put("description", event.getDescirption());
         eventData.put("location", event.getLocation());
@@ -29,15 +32,12 @@ public class EventStore {
         eventData.put("regEnd", event.getRegEnd());
         eventData.put("eventStart", event.getDateEvent());
         eventData.put("posterURL", event.getPosterURL());
-        eventData.put("qrValue", event.getQrValue());
-        eventData.put("capacity", event.getQrValue());
-
-        db.collection("events")
-                .document()
-                .set(eventData);
+        eventData.put("qrValue", eventId);
+        eventData.put("capacity", event.getCapacity());
+        docRef.set(eventData);
     }
 
-    public void delEventById(int eventId) {
+    public void delEventById(String eventId) {
         db.collection("events")
                 .whereEqualTo("id", eventId)
                 .get()
@@ -50,7 +50,7 @@ public class EventStore {
                 });
     }
 
-    public void getEventById(int eventId, OnEventLoadedListener listener) {
+    public void getEventById(String eventId, OnEventLoadedListener listener) {
         db.collection("events")
                 .whereEqualTo("id", eventId)
                 .limit(1)
@@ -60,7 +60,7 @@ public class EventStore {
                             (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
 
                     Event event = new Event();
-                    event.setEventId(document.getLong("id").intValue());
+                    event.setEventId(document.getString("id"));
                     event.setTitle(document.getString("title"));
                     event.setDescirption(document.getString("description"));
                     event.setLocation(document.getString("location"));
@@ -68,11 +68,11 @@ public class EventStore {
                     event.setRegEnd(document.getString("regEnd"));
                     event.setDateEvent(document.getString("eventStart"));
                     event.setPosterURL(document.getString("posterURL"));
-                    event.setQrValue(document.getLong("qrValue").intValue());
-                    event.setQrValue(document.getLong("capacity").intValue());
+                    event.setQrValue(document.getString("qrValue"));
+                    event.setCapacity(document.getLong("capacity").intValue());
 
 
                     listener.onEventLoaded(event);
                 });
     }
-} */
+}
