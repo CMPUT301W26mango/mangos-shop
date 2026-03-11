@@ -7,7 +7,7 @@ package com.example.myapplication;
 
 public class Event {
     // class that holds all the data for Events
-    private int eventId;
+    private String eventId;
     private String title;
     private String descirption;
     // location is String for now, but maybe it should be coords or something? Change as needed
@@ -15,7 +15,7 @@ public class Event {
     private String regStart;
     private String regEnd;
     private String posterURL;
-    private int qrValue;
+    private String qrValue;
 
     private int capacity;
 
@@ -26,7 +26,7 @@ public class Event {
     public Event() {
     }
 
-    public Event(int eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, int qrValue, int capacity, String dateEvent) {
+    public Event(String eventId, String title, String descirption, String location, String regStart, String regEnd, String posterURL, String qrValue, int capacity, String dateEvent) {
         this.eventId = eventId;
         this.title = title;
         this.descirption = descirption;
@@ -47,7 +47,7 @@ public class Event {
         this.dateEvent = dateEvent;
     }
 
-    public int getEventId() {
+    public String getEventId() {
         return eventId;
     }
 
@@ -79,11 +79,11 @@ public class Event {
         return posterURL;
     }
 
-    public int getQrValue() {
+    public String getQrValue() {
         return qrValue;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
@@ -114,10 +114,8 @@ public class Event {
         this.regEnd = regEnd;
     }
 
-    public void setQrValue(int qrValue) {
+    public void setQrValue(String qrValue) {
         this.qrValue = qrValue;
     }
 }
 
-
-// test comment

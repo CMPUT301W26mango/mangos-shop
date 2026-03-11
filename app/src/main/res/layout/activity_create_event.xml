@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:xmlns.tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E6E6E6">
@@ -65,7 +65,6 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
-
                 <EditText
                     android:id="@+id/start_date_input"
                     android:layout_width="match_parent"
@@ -123,7 +122,7 @@
                     android:layout_marginTop="30dp"
                     android:background="@drawable/rounded_input_box"
                     android:hint="Event Capacity"
-                    android:inputType="textMultiLine"
+                    android:inputType="number"
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
@@ -138,6 +137,15 @@
                     android:textColor="#FFFFFF"
                     app:backgroundTint="@null" />
 
+
+                <ImageView
+                    android:id="@+id/iv_poster_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="12dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
+
                 <Button
                     android:id="@+id/create_event_button"
                     android:layout_width="100dp"
@@ -149,6 +157,7 @@
                     android:text="Create"
                     android:textColor="#FFFFFF"
                     app:backgroundTint="@null" />
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
