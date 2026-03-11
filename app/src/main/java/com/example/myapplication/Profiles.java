@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.Source;
@@ -24,21 +25,34 @@ public class Profiles {
     }
 
     public void fetchUserRole(String deviceId, OnSuccessListener<UserProfiles> listener) {
-        // check the server again this way everythign saves correctly
-
         db.collection("users").document(deviceId).get(Source.SERVER).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                String role = task.getResult().getString("role");
-                if ("Admin".equals(role)) listener.onSuccess(task.getResult().toObject(Admin.class));
-                else if ("Organizer".equals(role)) listener.onSuccess(task.getResult().toObject(Organizer.class));
-                else listener.onSuccess(task.getResult().toObject(Entrant.class));
+                DocumentSnapshot doc = task.getResult();
+                //admin greanted
+                Boolean isAdmin = doc.getBoolean("isAdmin");
+                if (Boolean.TRUE.equals(isAdmin)) {
+
+                    // so now whent the admin is requested and accepted role changes from Entrant to Admin
+                    if (!"Admin".equals(doc.getString("role"))){
+                        db.collection("users").document(deviceId).update("role", "Admin");
+                    }
+                    //now we are doing it so
+                    listener.onSuccess(doc.toObject(Admin.class));
+                    return;
+                }
+
+                //none admin roles
+                String role = doc.getString("role");
+                if ("Organizer".equals(role)) {
+                    listener.onSuccess(doc.toObject(Organizer.class));
+                } else {
+                    listener.onSuccess(doc.toObject(Entrant.class));
+                }
             } else {
-                // back if profile gone
                 listener.onSuccess(null);
             }
         });
     }
-
 
     public void deleteProfile(String deviceId, OnCompleteListener<Void> onComplete) {
         WriteBatch batch = db.batch();

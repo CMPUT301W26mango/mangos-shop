@@ -54,6 +54,8 @@
         <activity android:name=".WaitingList" />
         <activity android:name=".OrganizerAccount" />
         <activity android:name=".AdminAccount" />
+        <activity android:name=".WelcomeBack" />
+        <activity android:name=".CreateAccount" />
 
     </application>
 </manifest>
