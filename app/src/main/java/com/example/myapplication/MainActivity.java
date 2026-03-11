@@ -34,9 +34,26 @@ public class MainActivity extends AppCompatActivity {
 
         // US 01.07.01 - Auto-login check
         profiles.fetchUserRole(deviceId, user -> {
-            if (user != null) redirectUser(user);
+            if (user != null) {
+                //for if they rejoin then welcome back
+                Intent intent = new Intent(MainActivity.this, WelcomeBack.class);
+
+                // weclome back <name>
+                intent.putExtra("USER_NAME", user.getName());
+
+                // send to page
+                String nextActivity = EntrantAccount.class.getName();
+                if (user instanceof Admin) nextActivity = AdminAccount.class.getName();
+                else if (user instanceof Organizer) nextActivity = OrganizerAccount.class.getName();
+
+                intent.putExtra("NEXT_ACTIVITY", nextActivity);
+
+                startActivity(intent);
+                finish();
+            }
         });
 
+        findViewById(R.id.btnRoleAdmin).setOnClickListener(v -> selectedRole = "Admin");
         findViewById(R.id.btnRoleOrganizer).setOnClickListener(v -> selectedRole = "Organizer");
         findViewById(R.id.btnRoleEntrant).setOnClickListener(v -> selectedRole = "Entrant");
         findViewById(R.id.saveButton).setOnClickListener(v -> saveAndRedirect());
@@ -54,16 +71,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //inbuilt andriot studio(check if emial is emial or nah)
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             userEmail.setError("Please enter a valid email address");
             userEmail.requestFocus(); // Pops the keyboard back open on this field
             return;
         }
 
         UserProfiles user;
-        if ("Organizer".equals(selectedRole)) user = new Organizer(name, email, phone);
-        else if ("Admin".equals(selectedRole)) user = new Admin(name, email, phone);
-        else user = new Entrant(name, email, phone);
+        if ("Organizer".equals(selectedRole)) {
+            user = new Organizer(name, email, phone);
+        } else if ("Admin".equals(selectedRole)) {
+            // Default to entrnt
+            user = new Entrant(name, email, phone);
+            user.setAdminRequested(true);
+            Toast.makeText(this, "Admin requested. Defaulting to Entrant pending approval.", Toast.LENGTH_LONG).show();
+        } else {
+            user = new Entrant(name, email, phone);
+        }
 
         FirebaseFirestore.getInstance().collection("users").document(deviceId).set(user)
                 .addOnSuccessListener(aVoid -> redirectUser(user));

@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Mango Shop Profile"
+        android:text="Create Account"
         android:textColor="#000000"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -77,6 +77,15 @@
             android:text="Entrant"
             android:layout_marginStart="4dp"
             android:backgroundTint="#E5B35C"/>
+
+        <Button
+            android:id="@+id/btnRoleAdmin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Admin"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="#E5B35C"/>
     </LinearLayout>
 
     <Button
@@ -85,7 +94,7 @@
         android:layout_height="60dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="#3B71F3"
-        android:text="Save Changes"
+        android:text="Log In"
         android:textColor="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/roleBox" />
 </androidx.constraintlayout.widget.ConstraintLayout>
