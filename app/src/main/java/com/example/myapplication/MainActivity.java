@@ -7,10 +7,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 
+/**
+ * Starting point and redirecter for all activity for the app.
+ * Checks the deviceID and sees if user is new or already exists.
+ * Sends user to Welcome Back screen or the Create Account screen (depending on deviceID).
+ */
 
 public class MainActivity extends AppCompatActivity {
     private Profiles profiles;
     private String deviceId;
+
+    /**
+     * Initializes the application, connects to Firebase, and fetches the user's role.
+     * If the user exists, they are redirected to WelcomeBack.
+     * If they do not exist, they are sent to CreateAccount to register.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

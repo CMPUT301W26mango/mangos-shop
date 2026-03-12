@@ -13,12 +13,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity responsible for handling new user registration.
+ * Allows the user to input their name, email, phone, and select a role
+ * (Entrant, Organizer, or Admin). It then saves this data to Firestore.
+ */
+
 public class CreateAccount extends AppCompatActivity {
     private EditText userName, userEmail, userPhone;
     private String selectedRole = "";
     private Profiles profiles;
     private String deviceId;
     private Button entrantButton, organizerButton, adminButton;
+
+    /**
+     * Initalizes activity
+     * sets up all button on-click listeners (roles and login)
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
 
     //moved it from main to here
     @Override
@@ -37,7 +52,7 @@ public class CreateAccount extends AppCompatActivity {
         organizerButton = findViewById(R.id.btnRoleOrganizer);
         adminButton = findViewById(R.id.btnRoleAdmin);
 
-        //quick quality of life work
+        //quick quality of life work (for coloru toggle)
         entrantButton.setOnClickListener(v -> {
             selectedRole = "Entrant";
             updateRoleUI();
@@ -56,11 +71,16 @@ public class CreateAccount extends AppCompatActivity {
         findViewById(R.id.saveButton).setOnClickListener(v -> saveAndRedirect());
     }
 
+    /**
+     * Updates the visual state of the role buttons.
+     * The selected role button is darkened to indicate it is active,
+     * while the others are reset to the default color.
+     */
     private void updateRoleUI() {
-        String defaultMango = "#E5B35C";
+        String defaultMango = "#E5B35C";  //like mango shop
         String darkerPressedMango = "#B8862D";
 
-        // if one is selected make others the normal
+        // if one is selected make others the normal (default)
         entrantButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
         organizerButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
         adminButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
@@ -75,15 +95,26 @@ public class CreateAccount extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks the user's input
+     * Creates the UserProfiles object based on the what role they choose
+     * Saves it to Firestore
+     */
     private void saveAndRedirect() {
         String name = userName.getText().toString().trim();
         String email = userEmail.getText().toString().trim();
         String phone = userPhone.getText().toString().trim();
 
-        if (name.isEmpty() || email.isEmpty()) {
-            Toast.makeText(this, "Name and Email required", Toast.LENGTH_SHORT).show();
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Name required", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        if (email.isEmpty()) {
+            Toast.makeText(this, "Email required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             userEmail.setError("Please enter a valid email address");
@@ -111,6 +142,12 @@ public class CreateAccount extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> redirectUser(user));
     }
 
+    /**
+     * Redirects the user to their appropriate dashboard based on their profile type.
+     * If the user is an Entrant, sends to event lists (almost like home page).
+     *
+     * @param user User profile
+     */
     private void redirectUser(UserProfiles user) {
         if (user instanceof Admin) {
             Intent intent = new Intent(this, AdminAccount.class);
