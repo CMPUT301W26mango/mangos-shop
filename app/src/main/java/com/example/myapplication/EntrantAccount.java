@@ -22,25 +22,16 @@ public class EntrantAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entrant_account);
 
-        userName = findViewById(R.id.userName);
-        userEmail = findViewById(R.id.userEmail);
-        userPhone = findViewById(R.id.userPhone);
-
         profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();
 
-        loadEntrantData();
-
-        findViewById(R.id.updateButton).setOnClickListener(v -> updateProfile());
-        findViewById(R.id.deleteButton).setOnClickListener(v -> showDeleteConfirmation());
-
-        // event checker
-        findViewById(R.id.viewEventButton).setOnClickListener(v -> {
-            Intent intent = new Intent(this, WaitingList.class);
-            intent.putExtra("EVENT_ID", "sample_event_123");
-            startActivity(intent);
-        });
+        String loadFragment = getIntent().getStringExtra("loadFragment");
+        if ("eventList".equals(loadFragment)) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new EventListFragment())
+                    .commit();
+        }
     }
 
     private void loadEntrantData() {

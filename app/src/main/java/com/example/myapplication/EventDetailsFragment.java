@@ -112,7 +112,7 @@ public class EventDetailsFragment extends DialogFragment {
 
 
         db.collection("events")
-                .whereEqualTo("qrValue", db.collection(eventId))
+                .whereEqualTo("qrValue", eventId)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
