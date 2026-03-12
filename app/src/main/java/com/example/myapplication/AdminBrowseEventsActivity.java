@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
     private RecyclerView recyclerViewAdminEvents;
     private SearchView searchViewEvents;
     private TextView textViewEmptyEvents;
+    private Button buttonBrowseProfiles;
 
     private FirebaseFirestore db;
     private AdminEventAdapter adapter;
@@ -37,6 +39,12 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
         recyclerViewAdminEvents = findViewById(R.id.recyclerViewAdminEvents);
         searchViewEvents = findViewById(R.id.searchViewEvents);
         textViewEmptyEvents = findViewById(R.id.textViewEmptyEvents);
+        buttonBrowseProfiles = findViewById(R.id.buttonBrowseProfiles);
+
+        buttonBrowseProfiles.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminBrowseProfilesActivity.class);
+            startActivity(intent);
+        });
 
         db = FirebaseFirestore.getInstance();
 
