@@ -34,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String nextActivity = EntrantAccount.class.getName();
                 if (user instanceof Admin) nextActivity = AdminAccount.class.getName();
-                else if (user instanceof Organizer) nextActivity = OrganizerAccount.class.getName();
-
+                else if (user instanceof Organizer) nextActivity = EventCreateActivity.class.getName();
                 intent.putExtra("NEXT_ACTIVITY", nextActivity);
                 startActivity(intent);
             } else {
