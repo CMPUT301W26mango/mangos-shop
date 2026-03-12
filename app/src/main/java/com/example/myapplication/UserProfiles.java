@@ -1,5 +1,11 @@
 package com.example.myapplication;
 
+/**
+ * User information and roles description
+ * This is what takes in the user info for the profiles to be created.
+ * Also the info for admin requests
+ */
+
 public class UserProfiles {
     private String name;
     private String email;
@@ -8,8 +14,19 @@ public class UserProfiles {
     private boolean isAdmin = false;
     private boolean adminRequested = false;
 
+    // needed by Firestore (for data mapping)
     public UserProfiles() {}
 
+    /**
+     * Used for creating a new account for the user
+     * Users who want to be admin are not admin by default but rather entrants
+     * They will have to ask for admin, and then someone with access to the database will give them perms
+     *
+     * @param name Name of user (full name)
+     * @param email Email of user (correct format, needs @ and "."
+     * @param phone Phone number of user (optional)
+     * @param role What are they (Entrant, Organizer, or Admin)
+     */
     public UserProfiles(String name, String email, String phone, String role) {
         this.name = name;
         this.email = email;

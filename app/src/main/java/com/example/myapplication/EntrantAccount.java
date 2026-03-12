@@ -11,11 +11,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Dashboard activity for users with the "Entrant" role.
+ * Handles viewing and updating profile information, loading specific fragments
+ * (like the event list), and deleting the user account.
+ */
+
 public class EntrantAccount extends AppCompatActivity {
     private EditText userName, userEmail, userPhone;
     private Profiles profiles;
     private String deviceId;
     private FirebaseFirestore db;
+
+    /**
+     *
+     * Initializes the activity
+     * Sets up Firebase references
+     * Checks incoming intents to see if a specific fragment (like the Event List) should be loaded immediately.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +51,9 @@ public class EntrantAccount extends AppCompatActivity {
         }
     }
 
+    /**
+     * gets the entrant's current profile data from Firestore using their deviceID.
+     */
     private void loadEntrantData() {
         db.collection("users").document(deviceId).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
@@ -47,7 +67,13 @@ public class EntrantAccount extends AppCompatActivity {
         });
     }
 
-    // US 01.02.02 - Update the progile
+
+    /**
+     * US 01.02.02 - Update the profile
+     *
+     * Validates the input
+     * Saves the updated Entrant info back to Firestore.
+     */
     private void updateProfile() {
         String name = userName.getText().toString().trim();
         String email = userEmail.getText().toString().trim();
@@ -70,7 +96,10 @@ public class EntrantAccount extends AppCompatActivity {
         });
     }
 
-    // delte (wont work when testing try again)
+    /**
+     * Displays a warning dialog to the user before permanently deleting their profile.
+     * If confirmed, it removes their data from Firestore and redirects them to the Create Account screen
+     */
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Account")

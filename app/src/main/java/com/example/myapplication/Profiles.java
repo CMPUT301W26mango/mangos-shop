@@ -15,19 +15,37 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.WriteBatch;
 
+/**
+ * Helper class that manages user profile data and Firestore database interactions.
+ * Handles device identification, fetching user roles, deleting profiles,
+ * and aggregating waitlist counts.
+ */
 public class Profiles {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // US 01.07.01 - Identified by device
+    /**
+     * Identifies who the user is by the deviceID
+     *
+     * @param context  app
+     * @return  id of the device
+     */
     @SuppressLint("HardwareIds")
     public String getDeviceId(Context context) {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
+    /**
+     * Fetechs user role from database using deviceID then returns the correct profile role
+     * If given Admin roles, then the role is changed from Entrant to Admin
+     *
+     * @param deviceId  id of device (hardware)
+     * @param listener  when fetching complete
+     */
     public void fetchUserRole(String deviceId, OnSuccessListener<UserProfiles> listener) {
         db.collection("users").document(deviceId).get(Source.SERVER).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 DocumentSnapshot doc = task.getResult();
+
                 //admin greanted
                 Boolean isAdmin = doc.getBoolean("isAdmin");
                 if (Boolean.TRUE.equals(isAdmin)) {
@@ -54,6 +72,13 @@ public class Profiles {
         });
     }
 
+    /**
+     * Deletes users profile from the collection in the database
+     * Removes them from any event waiting list they joined before deleting account
+     *
+     * @param deviceId  device id (hardware)
+     * @param onComplete  when delete is completed
+     */
     public void deleteProfile(String deviceId, OnCompleteListener<Void> onComplete) {
         WriteBatch batch = db.batch();
         DocumentReference userRef = db.collection("users").document(deviceId);
@@ -77,13 +102,17 @@ public class Profiles {
     }
 
 
-    // US 01.05.04 - Waitlist count
+    /**
+     * Waitlist Count
+     * Uses query to go through the database to see how many entrants are in the waiting list for the event selected
+     *
+     * @param eventId  id of the event (like device id but for events)
+     * @param onSuccess  gives the final count of the users
+     */
     public void getWaitingListCount(String eventId, OnSuccessListener<Long> onSuccess) {
         AggregateQuery countQuery = db.collection("events_waitlist.xml").document(eventId).collection("waitingList").count();
         countQuery.get(AggregateSource.SERVER).addOnSuccessListener(snapshot -> {
             onSuccess.onSuccess(snapshot.getCount());
         });
-
-        //should be done all userstories but check again
     }
 }
