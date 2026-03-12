@@ -112,12 +112,18 @@ public class CreateAccount extends AppCompatActivity {
     }
 
     private void redirectUser(UserProfiles user) {
-        Intent intent;
-        if (user instanceof Admin) intent = new Intent(this, AdminAccount.class);
-        else if (user instanceof Organizer) intent = new Intent(this, OrganizerAccount.class);
-        else intent = new Intent(this, EntrantAccount.class);
+        if (user instanceof Admin) {
+            Intent intent = new Intent(this, AdminAccount.class);
+            startActivity(intent);
+        } else if (user instanceof Organizer) {
+            Intent intent = new Intent(this, OrganizerAccount.class);
+            startActivity(intent);
+        } else {
 
-        startActivity(intent);
+            Intent intent = new Intent(this, EntrantAccount.class);
+            intent.putExtra("loadFragment", "eventList");
+            startActivity(intent);
+        }
         finish();
     }
 }

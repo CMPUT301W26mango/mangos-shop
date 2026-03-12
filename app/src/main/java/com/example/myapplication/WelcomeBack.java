@@ -32,6 +32,7 @@ public class WelcomeBack extends AppCompatActivity {
             } catch (Exception e) {
                 intent = new Intent(WelcomeBack.this, EntrantAccount.class);
             }
+            intent.putExtra("loadFragment", "eventList");
             startActivity(intent);
             finish();
         });
