@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Button;
+import android.graphics.Color;
+import android.content.res.ColorStateList;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +18,7 @@ public class CreateAccount extends AppCompatActivity {
     private String selectedRole = "";
     private Profiles profiles;
     private String deviceId;
+    private Button entrantButton, organizerButton, adminButton;
 
     //moved it from main to here
     @Override
@@ -29,10 +33,46 @@ public class CreateAccount extends AppCompatActivity {
         userEmail = findViewById(R.id.userEmail);
         userPhone = findViewById(R.id.userPhone);
 
-        findViewById(R.id.btnRoleAdmin).setOnClickListener(v -> selectedRole = "Admin");
-        findViewById(R.id.btnRoleOrganizer).setOnClickListener(v -> selectedRole = "Organizer");
-        findViewById(R.id.btnRoleEntrant).setOnClickListener(v -> selectedRole = "Entrant");
+        entrantButton = findViewById(R.id.btnRoleEntrant);
+        organizerButton = findViewById(R.id.btnRoleOrganizer);
+        adminButton = findViewById(R.id.btnRoleAdmin);
+
+        //quick quality of life work
+        entrantButton.setOnClickListener(v -> {
+            selectedRole = "Entrant";
+            updateRoleUI();
+        });
+
+        organizerButton.setOnClickListener(v -> {
+            selectedRole = "Organizer";
+            updateRoleUI();
+        });
+
+        adminButton.setOnClickListener(v -> {
+            selectedRole = "Admin";
+            updateRoleUI();
+        });
+
         findViewById(R.id.saveButton).setOnClickListener(v -> saveAndRedirect());
+    }
+
+    private void updateRoleUI() {
+        String defaultMango = "#E5B35C";
+        String darkerPressedMango = "#B8862D";
+
+        // if one is selected make others the normal
+        entrantButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
+        organizerButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
+        adminButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(defaultMango)));
+
+        // Darken only the selected button
+        if ("Entrant".equals(selectedRole)) {
+            entrantButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(darkerPressedMango)));
+        } else if ("Organizer".equals(selectedRole)) {
+            organizerButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(darkerPressedMango)));
+        } else if ("Admin".equals(selectedRole)) {
+            adminButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(darkerPressedMango)));
+        }
     }
 
     private void saveAndRedirect() {
