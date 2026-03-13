@@ -116,4 +116,17 @@ public class EventListTest {
         onView(allOf(withText("Event Type"), isDisplayed()))
                 .check(matches(isDisplayed()));
     }
+
+    @Test
+    public void clickingProfileButtonOpensEditProfile() throws InterruptedException {
+        // Click the new Profile button in the top navigation bar
+        onView(withId(R.id.btn_to_edit_profile)).perform(click());
+
+        // Pause briefly to allow the screen transition to finish
+        Thread.sleep(1500);
+
+        // Verify we successfully landed on the EntrantAccount screen
+        onView(withId(R.id.profileTitle)).check(matches(isDisplayed()));
+        onView(withText("Edit Profile")).check(matches(isDisplayed()));
+    }
 }
