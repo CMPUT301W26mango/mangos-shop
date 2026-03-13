@@ -128,6 +128,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return eventList.size();
     }
 
+    /**
+     * Returns how many events right now
+     * */
+
     static class EventViewHolder extends RecyclerView.ViewHolder{
         ImageView imageViewPoster;
         TextView eventName;
