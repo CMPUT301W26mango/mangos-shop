@@ -127,6 +127,18 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
+
+                <EditText
+                    android:id="@+id/posterurl_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Poster Image URL"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
                 <Button
                     android:id="@+id/upload_poster_button"
                     android:layout_width="wrap_content"
