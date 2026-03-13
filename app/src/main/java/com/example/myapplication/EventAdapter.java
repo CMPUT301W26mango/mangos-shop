@@ -29,11 +29,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     List<Event> eventList;
     FragmentManager fragmentManager;
 
+    /**
+    * This is the Constructor for the Adapter, it initializes the event list and the fragment manager
+    * @param
+     * eventList:
+     *   The list of events
+     * @param fragmentManager
+     *          The fragment mangager for the eventDetails
+    * */
+
     public EventAdapter(List<Event> eventList, FragmentManager fragmentManager){
         this.eventList = eventList;
         this.fragmentManager = fragmentManager;
     }
 
+
+    /**
+     * This function makes the view for each item in the list
+     * @param
+     *  parent
+     *      Container that holds these events
+     * @param
+     *   ViewType
+     *      Type of view that is being shown
+     *
+     * @return
+     *  An instance of the holder for an EventsView
+     *
+     * */
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int ViewType){
@@ -42,6 +65,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return new EventViewHolder(view);
     }
 
+    /**
+     * This function fills a view with the correct data to show, it also detects the click on an event
+     * and opens the event details
+     * @param
+     *  holder
+     *      Holder that contains the element for the UI
+     * @param
+     *   position
+     *      Position of the event
+     *
+     * */
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull EventAdapter.EventViewHolder holder, int position) {
@@ -84,6 +118,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     }
 
+    /**
+     * Returns how many events right now
+     * @return eventList
+     *      Size of the test
+     * */
     @Override
     public int getItemCount() {
         return eventList.size();

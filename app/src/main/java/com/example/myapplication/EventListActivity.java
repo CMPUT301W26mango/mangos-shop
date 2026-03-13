@@ -21,6 +21,14 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Activity that displays a list of currently active events fetched from Firestore.
+ * Users can browse events in a RecyclerView, and view lottery information and
+ * scan a QR code to navigate directly to a specific event's details.
+ */
+
+
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
