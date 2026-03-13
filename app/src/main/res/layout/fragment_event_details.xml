@@ -338,7 +338,7 @@
             android:textSize="10sp"
             android:textColor="#666666"
             android:layout_marginTop="16dp"
-            android:visibility="gone"/>
+            android:visibility=""/>
 
         <Button
             android:id="@+id/registerBtn"
@@ -349,7 +349,8 @@
             android:textColor="#FFFFFF"
             android:backgroundTint="@color/blue"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/cancelRegisterBtn"
@@ -361,7 +362,7 @@
             android:backgroundTint="@color/red"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
+            android:visibility=""/>
 
 
     </LinearLayout>
