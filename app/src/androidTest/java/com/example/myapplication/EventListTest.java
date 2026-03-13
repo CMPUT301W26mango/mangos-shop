@@ -33,10 +33,7 @@ public class EventListTest {
     @Rule
     public ActivityScenarioRule<EntrantAccount> activityRule =
             new ActivityScenarioRule<>(
-                    new Intent(
-                            ApplicationProvider.getApplicationContext(),
-                            EntrantAccount.class
-                    ).putExtra("loadFragment", "eventList")
+                    new Intent(ApplicationProvider.getApplicationContext(), EventListActivity.class)
             );
 
 
@@ -61,7 +58,7 @@ public class EventListTest {
     public void clickingEventOpensDetails() throws InterruptedException {
         Thread.sleep(3000); // wait 3 seconds for events to load
 
-        onView(withText("Tech Workshop"))
+        onView(withId(R.id.recyclerViewEvents))
                 .perform(click());
 
         Thread.sleep(1500); // wait for popup to appear

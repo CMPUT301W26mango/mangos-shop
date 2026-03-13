@@ -157,8 +157,7 @@ public class CreateAccount extends AppCompatActivity {
             startActivity(intent);
         } else {
 
-            Intent intent = new Intent(this, EntrantAccount.class);
-            intent.putExtra("loadFragment", "eventList");
+            Intent intent = new Intent(this, EventListActivity.class);
             startActivity(intent);
         }
         finish();
