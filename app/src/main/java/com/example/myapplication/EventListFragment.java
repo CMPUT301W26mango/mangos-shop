@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EventListFragment - Displays the list of events and provides QR scanning
- * and lottery info functionality for entrants.
- * Combines event list (teammate) with QR scanner and lottery info (US 01.06.01, US 01.05.05)
- * Used Claude AI to merge my EventList code with Aditya's EventList code
+ * Displays the list of events and provides QR scanning and lottery info functionality for entrants
+ * Used Claude AI to merge my EventList code including QR scanner button and info button with Aditya's EventList code
  * Prompt: "Help me integrate my info button and scan QR button onto this EventList page"
  * Date: Tuesday, March 10, 2026
+ * @author Aditya
+ * @author Ali
  */
 public class EventListFragment extends Fragment {
 
@@ -50,7 +50,6 @@ public class EventListFragment extends Fragment {
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
     public EventListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -140,12 +139,13 @@ public class EventListFragment extends Fragment {
     }
 
     /**
-     * Configures and launches the ZXing QR code scanner.
-     * Called when the scan QR button is clicked.
+     * Configures and launches the ZXing QR code scanner
+     * Called when the scan QR button is clicked
+     * @author Ali
      */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
-        options.setPrompt("");
+        options.setPrompt("Press back to cancel");
         options.setBeepEnabled(false);
         options.setOrientationLocked(false);
         options.setBarcodeImageEnabled(false);
