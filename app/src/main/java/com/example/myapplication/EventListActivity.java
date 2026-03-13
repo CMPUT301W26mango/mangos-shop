@@ -21,13 +21,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Activity that displays a list of currently active events fetched from Firestore.
- * Users can browse events in a RecyclerView, and view lottery information and
- * scan a QR code to navigate directly to a specific event's details.
- */
-
+import android.content.Intent;
 
 public class EventListActivity extends AppCompatActivity {
 
@@ -39,6 +33,7 @@ public class EventListActivity extends AppCompatActivity {
     private ImageButton lotteryinfoButton;
     private ImageButton scanQRButton;
     private ImageButton closeInfoButton;
+    private ImageButton profileButton; // go to edit profile
 
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
@@ -65,6 +60,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewEvents);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
+        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getSupportFragmentManager());
@@ -88,11 +84,13 @@ public class EventListActivity extends AppCompatActivity {
         });
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
     }
 
-    /**
-     * Queries the Firebase Database and loads the events
-     * */
     private void loadEvents() {
         Timestamp now = Timestamp.now();
         db.collection("events")
@@ -114,9 +112,6 @@ public class EventListActivity extends AppCompatActivity {
                         Log.e("EventListActivity", "Error loading events", e));
     }
 
-    /**
-     * Configures and launches the QR scanner
-     * */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Press back to cancel");
