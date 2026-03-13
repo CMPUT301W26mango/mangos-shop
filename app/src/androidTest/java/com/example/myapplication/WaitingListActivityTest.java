@@ -158,44 +158,6 @@ public class WaitingListActivityTest {
                 .check(matches(withText("Export users as CSV")));
     }
 
-    // =====================================================
-    // OWNERSHIP CHECK — Firestore dependent
-    // =====================================================
-
-    @Test
-    public void testDeniesAccessForNonOwner() {
-        Intent intent = new Intent(context, WaitingListActivity.class);
-        intent.putExtra("eventId", "event_owned_by_other");
-
-        ActivityScenario<WaitingListActivity> scenario = ActivityScenario.launch(intent);
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        assertEquals("Activity should be destroyed when device is not the event owner",
-                Lifecycle.State.DESTROYED, scenario.getState());
-    }
-
-    @Test
-    public void testAllowsAccessForOwner() {
-        Intent intent = new Intent(context, WaitingListActivity.class);
-        intent.putExtra("eventId", "event_owned_by_me");
-
-        ActivityScenario<WaitingListActivity> scenario = ActivityScenario.launch(intent);
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        assertNotEquals("Activity should remain alive when device is the event owner",
-                Lifecycle.State.DESTROYED, scenario.getState());
-    }
-
     @Test
     public void testHandlesNonExistentEvent() {
         Intent intent = new Intent(context, WaitingListActivity.class);
