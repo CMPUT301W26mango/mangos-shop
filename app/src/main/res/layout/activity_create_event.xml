@@ -127,6 +127,19 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
+                <EditText
+                    android:id="@+id/max_waitingList_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Waitinglist Capacity (optional)"
+                    android:inputType="number"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+
+
 
                 <EditText
                     android:id="@+id/posterurl_input"

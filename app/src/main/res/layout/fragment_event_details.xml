@@ -318,6 +318,18 @@
             android:layout_marginTop="4dp"/>
 
         <TextView
+            android:id="@+id/registerLimitReached"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="The registration Spots for this is full.\nPlease try again later"
+            android:textAlignment="center"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+
+        <TextView
             android:id="@+id/alreadyRegisteredTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
