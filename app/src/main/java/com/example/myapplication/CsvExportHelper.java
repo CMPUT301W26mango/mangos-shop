@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * US 02.06.05 — Export enrolled entrants list to CSV.
+ * US 02.06.05 - Export enrolled entrants list to CSV.
  *
  * Uses ACTION_CREATE_DOCUMENT so the user picks where to save.
  * No FileProvider, no manifest changes, no extra XML files needed.
@@ -21,7 +21,7 @@ public class CsvExportHelper {
 
     /**
      * Generates CSV content as a String.
-     * This is the core logic — separated from file I/O so it can be unit tested.
+     * This is the core logic - separated from file I/O so it can be unit tested.
      *
      * Criteria #4: Properly formatted with headers.
      * Criteria #5: Works for 0 or more enrolled entrants.
