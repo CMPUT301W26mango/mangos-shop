@@ -38,14 +38,17 @@ public class WelcomeBack extends AppCompatActivity {
         findViewById(R.id.rootLayout).setOnClickListener(v -> {
             Intent intent;
             try {
-
-                //who they are and where to go next.
                 Class<?> nextClass = Class.forName(nextActivityClassName);
-                intent = new Intent(WelcomeBack.this, nextClass);
+
+                if (nextClass == EntrantAccount.class) {
+                    intent = new Intent(WelcomeBack.this, EventListActivity.class);
+                } else {
+                    intent = new Intent(WelcomeBack.this, nextClass);
+                }
             } catch (Exception e) {
-                intent = new Intent(WelcomeBack.this, EntrantAccount.class);
+                intent = new Intent(WelcomeBack.this, EventListActivity.class);
             }
-            intent.putExtra("loadFragment", "eventList");
+
             startActivity(intent);
             finish();
         });

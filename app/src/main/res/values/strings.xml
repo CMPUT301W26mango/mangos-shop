@@ -9,5 +9,6 @@
     <string name="title_activity_event_creation">Event Creation</string>
     <string name="first_fragment_label">Home</string>
     <string name="second_fragment_label">Home</string>
+    <string name="mango_shop_title">Mango Shop</string>
 
 </resources>
