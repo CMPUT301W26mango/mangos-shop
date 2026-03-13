@@ -10,7 +10,7 @@
         android:id="@+id/recyclerViewEvents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="70dp"
+        android:paddingTop="95dp"
         android:clipToPadding="false" />
 
     <TextView
@@ -24,10 +24,22 @@
         android:textColor="#999999"
         android:visibility="gone" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="12dp"
+        android:text="@string/mango_shop_title"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:textColor="@color/darkergray" />
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_marginTop="35dp"
         android:layout_gravity="top"
         android:orientation="horizontal"
         android:elevation="4dp"
