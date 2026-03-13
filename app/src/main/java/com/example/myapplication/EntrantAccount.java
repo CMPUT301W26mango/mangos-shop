@@ -45,6 +45,15 @@ public class EntrantAccount extends AppCompatActivity {
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();
 
+        userName = findViewById(R.id.userName);
+        userEmail = findViewById(R.id.userEmail);
+        userPhone = findViewById(R.id.userPhone);
+
+        findViewById(R.id.saveButton).setOnClickListener(v -> updateProfile());
+        findViewById(R.id.deleteButton).setOnClickListener(v -> showDeleteConfirmation());
+
+        loadEntrantData();
+
         roleCheckerListener();
     }
 
@@ -132,9 +141,14 @@ public class EntrantAccount extends AppCompatActivity {
             return;
         }
 
-        Entrant updatedEntrant = new Entrant(name, email, phone);
-        db.collection("users").document(deviceId).set(updatedEntrant).addOnSuccessListener(aVoid -> {
+        db.collection("users").document(deviceId).update(
+                "name", name,
+                "email", email,
+                "phone", phone
+        ).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
         });
     }
 

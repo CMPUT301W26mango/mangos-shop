@@ -21,6 +21,8 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
+
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -31,6 +33,7 @@ public class EventListActivity extends AppCompatActivity {
     private ImageButton lotteryinfoButton;
     private ImageButton scanQRButton;
     private ImageButton closeInfoButton;
+    private ImageButton profileButton; // go to edit profile
 
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
@@ -57,6 +60,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewEvents);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
+        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getSupportFragmentManager());
@@ -80,6 +84,11 @@ public class EventListActivity extends AppCompatActivity {
         });
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
     }
 
     private void loadEvents() {
