@@ -9,17 +9,42 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data access class responsible for all Firestore operations related to events.
+ *
+ * This class abstracts all Firebase Firestore read/write/delete operations for the "events" collection
+ * so that Activities and Fragments do not interact with Firestore directly.
+ * @author Sayuj
+ */
+
 public class EventStore {
     private final FirebaseFirestore db;
 
+    /**
+     * Callback interface for when an event has been loaded from Firestore.
+     */
     public interface OnEventLoadedListener {
+        /**
+         * Called when the event has been successfully loaded.
+         *
+         * @param event the loaded Event object
+         */
         void onEventLoaded(Event event);
     }
 
+    /**
+     * Constructs a new EventStore and initializes the Firestore instance.
+     */
     public EventStore() {
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Saves a new event to the Firestore "events" collection.
+     * Automatically generates a unique document ID which is also used as the qrValue.
+     *
+     * @param event the Event object to save
+     */
     public void addEvent(Event event) {
         Map<String, Object> eventData = new HashMap<>();
         DocumentReference docRef = db.collection("events").document();
@@ -42,6 +67,12 @@ public class EventStore {
         docRef.set(eventData);
     }
 
+    /**
+     * Deletes an event from Firestore by its event ID field.
+     * Queries for documents where "id" matches the given eventId and deletes them.
+     *
+     * @param eventId the event ID to search for and delete
+     */
     public void delEventById(String eventId) {
         db.collection("events")
                 .whereEqualTo("id", eventId)
@@ -55,6 +86,16 @@ public class EventStore {
                 });
     }
 
+    /**
+     * Retrieves a single event from Firestore by its event ID field.
+     * Calls the listener with the loaded Event object on success.
+     *
+     * Outstanding issue: will throw IndexOutOfBoundsException if no
+     * matching event is found in Firestore.
+     *
+     * @param eventId  the event ID to search for
+     * @param listener callback to receive the loaded Event object
+     */
     public void getEventById(String eventId, OnEventLoadedListener listener) {
         db.collection("events")
                 .whereEqualTo("id", eventId)
