@@ -18,6 +18,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 
 /**
  * The following test file was written with the guidance of Claude AI
@@ -212,6 +213,16 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.switchGeolocation)).perform(scrollTo(), click());
         onView(withId(R.id.switchGeolocation)).perform(scrollTo(), click());
         onView(withId(R.id.switchGeolocation)).check(matches(isNotChecked()));
+    }
+
+    @Test
+    public void testProfileButtonIsDisplayed() {
+        onView(withId(R.id.btn_to_edit_profile)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testProfileButtonIsClickable() {
+        onView(withId(R.id.btn_to_edit_profile)).check(matches(isClickable()));
     }
 
     @Test

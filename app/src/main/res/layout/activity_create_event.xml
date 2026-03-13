@@ -181,6 +181,16 @@
                     android:clickable="true"
                     android:focusable="true" />
 
+                <ImageButton
+                    android:id="@+id/btn_to_edit_profile"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="16dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    android:contentDescription="Edit Profile" />
+
                 <Button
                     android:id="@+id/create_event_button"
                     android:layout_width="100dp"

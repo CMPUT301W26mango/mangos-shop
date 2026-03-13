@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
+import android.widget.ImageButton;
 import android.widget.Switch;
 
 import java.util.Calendar;
@@ -22,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import android.content.Intent;
+import android.widget.ImageButton;
 
 
 /**
@@ -56,6 +60,7 @@ public class EventCreateActivity extends AppCompatActivity {
     private EditText eventType;
     private EditText  organizerName;
     private Switch geoSwitch;
+    private ImageButton profileButton;
 
 
     @Override
@@ -76,6 +81,13 @@ public class EventCreateActivity extends AppCompatActivity {
         eventType = findViewById(R.id.event_type);
         organizerName = findViewById(R.id.organizer_name);
         geoSwitch = findViewById(R.id.switchGeolocation);
+        profileButton = findViewById(R.id.btn_to_edit_profile);
+
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(EventCreateActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
 
 
         // using time picker and date picker (event date logic)
