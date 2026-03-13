@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration; // testing for now if this works, for admin change
 
 /**
  * Dashboard activity for users with the "Entrant" role.
@@ -22,6 +23,7 @@ public class EntrantAccount extends AppCompatActivity {
     private Profiles profiles;
     private String deviceId;
     private FirebaseFirestore db;
+    private ListenerRegistration roleChecker;
 
     /**
      *
@@ -43,6 +45,52 @@ public class EntrantAccount extends AppCompatActivity {
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();
 
+        roleCheckerListener();
+    }
+
+
+    //https://gotodba.com/2015/03/09/listener-registration-explained/
+    //https://firebase.google.com/docs/firestore/query-data/listen
+    /**
+     * Real time updater with Firestore
+     * If the admin boolean goes to true in the database, this will auto make them admin(send them to the page, without having to reload the app)
+     */
+    private void roleCheckerListener() {
+        //https://gotodba.com/2015/03/09/listener-registration-explained/
+        //https://firebase.google.com/docs/firestore/query-data/listen
+        roleChecker = db.collection("users").document(deviceId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null || snapshot == null || !snapshot.exists()) {
+                        return;
+                    }
+
+                    Boolean isAdmin = snapshot.getBoolean("isAdmin");
+                    String currentRole = snapshot.getString("role");
+
+                    if (Boolean.TRUE.equals(isAdmin) || "Admin".equals(currentRole)) {
+                        if (!"Admin".equals(currentRole)) {
+                            db.collection("users").document(deviceId).update("role", "Admin");
+                        }
+
+                        Toast.makeText(EntrantAccount.this, "Admin Access Granted!", Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(EntrantAccount.this, AdminBrowseEventsActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
+
+    /**
+     * An auto storage cleaner/memory cleaner
+     * For any memory leaks(just in case).
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (roleChecker != null) {
+            roleChecker.remove(); // according to google this is a good practice
+        }
     }
 
     /**
