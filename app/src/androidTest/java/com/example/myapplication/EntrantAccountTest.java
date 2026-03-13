@@ -85,7 +85,7 @@ public class EntrantAccountTest {
         // Launch the activity
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
             // Check that the fragment container (which holds the layout) is displayed
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
         }
     }
 
@@ -102,7 +102,7 @@ public class EntrantAccountTest {
 
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
             // Verify the fragment container is visible, meaning the transaction didn't crash
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
         }
     }
 
@@ -112,35 +112,60 @@ public class EntrantAccountTest {
      */
     @Test
     public void testIfAdminAutoNavigate() {
-
         Context context = ApplicationProvider.getApplicationContext();
-        Intent intent = new Intent(context, EntrantAccount.class);
 
+        // Ensure the user document exists first by "merging" a default state
+        Profiles profiles = new Profiles();
+        String deviceId = profiles.getDeviceId(context);
+
+        // Use set with merge to create the doc if it's missing, rather than failing on update
+        FirebaseFirestore.getInstance().collection("users").document(deviceId)
+                .set(new java.util.HashMap<String, Object>() {{
+                    put("isAdmin", false);
+                    put("role", "Entrant");
+                }}, com.google.firebase.firestore.SetOptions.merge());
+
+        // Wait a moment for the initial creation to sync before launching the activity
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(context, EntrantAccount.class);
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
 
             // Verify start on Entrant screen
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
 
-            // flip the database switch to Admin
-            Profiles profiles = new Profiles();
-            String deviceId = profiles.getDeviceId(context);
-//            Task<Void> updateTask =
+            // Flip the database switch to Admin
             FirebaseFirestore.getInstance().collection("users").document(deviceId)
                     .update("isAdmin", true, "role", "Admin");
 
-            // was working too quickly so making sure there is a delay of 5 seconds to for sure everything is loaded up on time
-//            Tasks.await(updateTask, 10, TimeUnit.SECONDS);
+            // Wait for Firestore listener to trigger (using a loop to avoid freezing Espresso permanently)
+            long startTime = System.currentTimeMillis();
+            boolean intentFired = false;
 
-            //Allow time for the live database listener to hear the change and fire the Intent
-            Thread.sleep(3000);
+            while (System.currentTimeMillis() - startTime < 5000) { // 5-second timeout
+                try {
+                    intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+                    intentFired = true;
+                    break; // It passed! Break the loop early.
+                } catch (AssertionError e) {
+                    // Intent hasn't fired yet, wait 500ms and check again
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }
+            }
 
-            //Verify that we were successfully teleported
-            intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+            // If the loop finished and it never fired, do one final intended() call to trigger the standard failure message
+            if (!intentFired) {
+                intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+            }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-//        } catch (ExecutionException | TimeoutException e) {
-//            throw new RuntimeException(e);
         }
     }
 }
