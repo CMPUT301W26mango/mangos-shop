@@ -171,6 +171,16 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
+                <Switch
+                    android:id="@+id/switchGeolocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:paddingStart="30dp"
+                    android:text="Require Geolocation"
+                    android:clickable="true"
+                    android:focusable="true" />
+
                 <Button
                     android:id="@+id/create_event_button"
                     android:layout_width="100dp"

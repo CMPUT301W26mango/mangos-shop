@@ -20,6 +20,7 @@ public class Event {
     private String organizerName;
     private String eventType;
     private int maxWaitingListSize;
+    private boolean geolocationRequired;
 
     // Empty constructor for Firebase
     public Event(){}
@@ -149,6 +150,14 @@ public class Event {
 
     public void setMaxWaitingListSize(int spotsToFill) {
         this.maxWaitingListSize = spotsToFill;
+    }
+
+    public boolean getGeolocationRequired() {
+        return geolocationRequired;
+    }
+
+    public void setGeolocationRequired(boolean geolocationRequired) {
+        this.geolocationRequired = geolocationRequired;
     }
 
     // Logic from your class
