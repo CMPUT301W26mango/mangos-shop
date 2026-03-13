@@ -45,12 +45,6 @@ public class EntrantAccount extends AppCompatActivity {
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();
 
-        String loadFragment = getIntent().getStringExtra("loadFragment");
-        if ("eventList".equals(loadFragment)) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new EventListFragment())
-                    .commit();
-        }
         roleCheckerListener();
     }
 
