@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 /**
+This test file was created using Claude AI.
+prompt: Generate test cases for GeoLocationHelper.
+
  * US 02.02.03 — Enable or disable the geolocation requirement for an event.
  *
  * Geolocation is handled in two places:
