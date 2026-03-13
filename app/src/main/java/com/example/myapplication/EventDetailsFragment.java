@@ -234,7 +234,16 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
 
-    // Register Button / Cancel Register button
+    /**
+     * This Method manages the checking of whether the user has already joined the waiting list, it shows the correct view
+     * depending on if the user is signed up or not
+     * @param registerBtn
+     *  The instance of the register button, needs to be shown or hidden
+     * @param cancelBtn
+     *  The instance of the cancel button, needs to be shown or hidden
+     * @param textViewAlreadyRegistered
+     *  This is a text view to show that they are already registered and can cancel
+     * */
     private void isRegistered(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
         db.collection("events")
                 .document(firestoreDocId)
@@ -261,6 +270,17 @@ public class EventDetailsFragment extends DialogFragment {
                 });
     }
 
+    /**
+     * This Method manages the entering of the event for the user, it queries the firebase to ensure there is enough capacity/ room to sign up
+     * @param registerBtn
+     *  The instance of the register button, needs to be shown or hidden
+     * @param cancelBtn
+     *  The instance of the cancel button, needs to be shown or hidden
+     * @param textViewAlreadyRegistered
+     *  This is a text view to show that they are already registered and can cancel
+     * @param eventFull
+     *  This is the text view to show that the event is full and the user can't join the waiting list
+     * */
     private void joinWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered, TextView eventFull){
         Map<String, Object> entrantInfo = new HashMap<>();
         entrantInfo.put("userId", deviceId);
@@ -311,6 +331,15 @@ public class EventDetailsFragment extends DialogFragment {
 
     }
 
+    /**
+     * This Method manages the leaving of the waiting list of for a user, it deletes the device from the collection on firebase
+     * @param registerBtn
+     *  The instance of the register button, needs to be shown or hidden
+     * @param cancelBtn
+     *  The instance of the cancel button, needs to be shown or hidden
+     * @param textViewAlreadyRegistered
+     *  This is a text view to show that they are already registered and can cancel
+     * */
     private void leaveWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
         db.collection("events")
                 .document(firestoreDocId)

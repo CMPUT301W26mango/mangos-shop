@@ -23,6 +23,18 @@ import java.util.List;
 
 import android.content.Intent;
 
+
+/**
+ * This is an activity that shows all events to entrants
+ * It queries the firebase databse for load events
+ * This enables it so that the users can:
+ * - View event details by selecting an event
+ * - Scan a QR code to open the corresponding event
+ * - View lottery guidelines
+ * - Navigate to their profile editing screen
+ * The activity also filters events based on their registration start
+ * and end times so that only currently active events are displayed.
+ */
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;

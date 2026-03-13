@@ -21,7 +21,9 @@ import java.util.Locale;
 /**
  * This Class was written with the help of the Android Developer documentation, <a href="https://developer.android.com/develop/ui/views/layout/recyclerview#java">...</a>
  * This Class was written with the help of Professor SluitIer from YouTube, <a href="https://www.youtube.com/watch?v=4-hK6qZv56U&list=PLhPyEFL5u-i1jAc79cJ2j8pDZFEyvpoH_&index=5">...</a>
- * It allows for a scrollable list of events
+ * This is a RecyclerView adapter that allows for a scrollable list of events
+ * This loads the event information that will be showed on the event card
+ * Also Listens for a click of the event and opens the event details
  * */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
