@@ -27,6 +27,10 @@ public class AdminEventDetailActivityTest {
         );
 
         intent.putExtra("eventId", "rWdDQCowQGTIhMWInBJS");
+        intent.putExtra("title", "basketball");
+        intent.putExtra("location", "school");
+        intent.putExtra("organizer", "Johny");
+        intent.putExtra("posterURL", "https://i.pinimg.com/474x/70/a3/0d/70a30d722a74911e.jpg");
 
         try (ActivityScenario<AdminEventDetailActivity> scenario =
                      ActivityScenario.launch(intent)) {
@@ -45,8 +49,11 @@ public class AdminEventDetailActivityTest {
                 AdminEventDetailActivity.class
         );
 
-        // Use a real event ID from your Firebase if possible
         intent.putExtra("eventId", "rWdDQCowQGTIhMWInBJS");
+        intent.putExtra("title", "basketball");
+        intent.putExtra("location", "school");
+        intent.putExtra("organizer", "Johny");
+        intent.putExtra("posterURL", "https://i.pinimg.com/474x/70/a3/0d/70a30d722a74911e.jpg");
 
         try (ActivityScenario<AdminEventDetailActivity> scenario =
                      ActivityScenario.launch(intent)) {
