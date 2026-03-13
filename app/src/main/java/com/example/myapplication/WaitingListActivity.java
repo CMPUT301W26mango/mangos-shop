@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * US 02.02.01 — View the list of entrants who joined the waiting list.
- * US 02.06.05 — Export entrants as CSV.
+ * US 02.02.01 - View the list of entrants who joined the waiting list.
+ * US 02.06.05 - Export entrants as CSV.
  *
  * Displays a real-time list of all entrants on the waiting list for a
  * specific event. Only the organizer who owns the event (matched by
