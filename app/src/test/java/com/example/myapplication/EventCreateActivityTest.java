@@ -8,6 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * The following test file was written with the guidance of Claude AI
+ * Prompt: "Guide me with writing tests for EventCreateActivity" March 12, 2026
+ */
+
 public class EventCreateActivityTest {
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -66,38 +71,5 @@ public class EventCreateActivityTest {
         Date regEnd = formatter.parse("2030-01-02 10:00");
         Date eventDate = formatter.parse("2030-01-02 10:00");
         assertFalse(eventDate.after(regEnd));
-    }
-
-    @Test
-    public void testCapacityValidNumber() {
-        String capacityText = "50";
-        int capacity = Integer.parseInt(capacityText);
-        assertEquals(50, capacity);
-    }
-
-    @Test
-    public void testCapacityEmpty_skipped() {
-        String capacityText = "";
-        assertTrue(capacityText.isEmpty());
-    }
-
-
-    @Test
-    public void testPosterURLEmpty_skipped() {
-        String posterURL = "";
-        assertTrue(posterURL.isEmpty());
-    }
-
-    @Test
-    public void testEventTypeEmpty_skipped() {
-        String eventType = "";
-        assertTrue(eventType.isEmpty());
-    }
-
-
-    @Test
-    public void testOrganizerNameEmpty_skipped() {
-        String organizerName = "";
-        assertTrue(organizerName.isEmpty());
     }
 }

@@ -19,6 +19,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 
+/**
+ * The following test file was written with the guidance of Claude AI
+ * Prompt: "Guide me with writing UI tests for EventCreateActivity" March 12, 2026
+ */
+
 @RunWith(AndroidJUnit4.class)
 public class EventCreateActivityUITest {
 

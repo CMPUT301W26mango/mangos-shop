@@ -24,6 +24,19 @@ import java.util.Locale;
 import java.util.Map;
 
 
+/**
+ * Activity that provides the event creation form for organizers.
+ *
+ * This screen allows an organizer to fill in all event details including
+ * name, location, registration dates, event date, description, capacity,
+ * poster URL, event type, organizer name, and whether geolocation is required.
+ * On clicking Create, the event is saved to Firestore via EventStore.
+ *
+ * Date pickers and time pickers are used for all date fields, with validation
+ * to ensure reg end is after reg start, and event date is after reg end.
+ * @author Sayuj
+ */
+
 public class EventCreateActivity extends AppCompatActivity {
     private EditText eventNameInput;
     private EditText locationInput;
@@ -32,7 +45,6 @@ public class EventCreateActivity extends AppCompatActivity {
     private EditText eventDescriptionInput;
 
     private EditText posterURLInput;
-    private Button uploadPosterButton;
     private Button createEventButton;
 
     private EditText eventDateInput;
@@ -58,7 +70,6 @@ public class EventCreateActivity extends AppCompatActivity {
         endDateInput = findViewById(R.id.end_date_input);
         eventDescriptionInput = findViewById(R.id.event_description_input);
         posterURLInput = findViewById(R.id.posterurl_input);
-//        uploadPosterButton = findViewById(R.id.upload_poster_button);
         createEventButton = findViewById(R.id.create_event_button);
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
