@@ -27,10 +27,7 @@ public class EventRegistrationTest {
     @Rule
     public ActivityScenarioRule<EntrantAccount> activityRule =
             new ActivityScenarioRule<>(
-                    new Intent(
-                            ApplicationProvider.getApplicationContext(),
-                            EntrantAccount.class
-                    ).putExtra("loadFragment", "eventList")
+                    new Intent(ApplicationProvider.getApplicationContext(), EventListActivity.class)
             );
 
 
