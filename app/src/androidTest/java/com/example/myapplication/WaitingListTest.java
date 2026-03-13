@@ -19,6 +19,12 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
 
 /**
+* Asked Gemini AI to assist in helping write the tests.
+* The prompt used: 
+* Can you please help me in ideas for what should be tested for this file <the file of code for this page> and generate some ideal test cases please.
+*/
+
+/**
  *
  * Tests that the WaitingList Activity:
  * - Can launch successfully with the event id.
