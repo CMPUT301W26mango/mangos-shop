@@ -29,9 +29,11 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * EventDetailsFragment - Displays event details as a popup dialog.
- * Handles US 01.05.05 (lottery info display) and US 01.06.01 (navigate from QR scan).
- * Receives eventId via Bundle from QR scan result in EventListFragment.
+ * Displays event details as a popup dialog
+ * Receives eventId via Bundle from QR scan result or event being clicked from EventListFragment
+ * Uses respective eventId to fetch data from Firebase and display in a popup
+ * @author Ali
+ * @author Aditya
  */
 public class EventDetailsFragment extends DialogFragment {
 
@@ -90,8 +92,15 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     /**
-     * Loads event data from Firestore using qrValue and populates the popup UI.
-     * Handles regStart/regEnd as Timestamp or String, dateEvent as String.
+     * Loads event data from Firestore using qrValue and populates the popup UI
+     * Matches eventId encoded in QR Code with corresponding event document in db
+     * Extracts event details from db including title, location, capacity, image poster, etc.
+     * regStart/regEnd handled as timestamp and event date handled as string
+     * Shows different buttons depending on user registration status
+     * @author Ali
+     * @author Aditya
+     * @param eventId Id used to fetch correct event from db
+     * @param view  UI layout of screen to display details
      */
     private void loadEventFromFirestore(String eventId, View view) {
         TextView tvTitle = view.findViewById(R.id.tv_event_title);
@@ -143,7 +152,7 @@ public class EventDetailsFragment extends DialogFragment {
                         String eventDate = document.getString("dateEvent");
                         tvEventDate.setText(eventDate != null ? eventDate : "TBD");
 
-                        // Registration dates - handle Timestamp or String
+                        // Registration dates
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
                         Object regStartObj = document.get("regStart");
@@ -187,7 +196,7 @@ public class EventDetailsFragment extends DialogFragment {
                         // Determine what button to show
                         isRegistered(registerBtn, btnCancel, textViewAlreadyRegistered);
 
-                        // Create a listneer for the two buttons
+                        // Create a listener for the two buttons
                         registerBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
