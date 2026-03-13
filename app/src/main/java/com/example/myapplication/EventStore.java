@@ -20,10 +20,6 @@ public class EventStore {
         db = FirebaseFirestore.getInstance();
     }
 
-    public interface OnEventSavedListener {
-        void onEventSaved(String eventId);
-    }
-
     public void addEvent(Event event) {
         Map<String, Object> eventData = new HashMap<>();
         DocumentReference docRef = db.collection("events").document();
