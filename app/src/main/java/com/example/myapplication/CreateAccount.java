@@ -149,17 +149,14 @@ public class CreateAccount extends AppCompatActivity {
      * @param user User profile
      */
     private void redirectUser(UserProfiles user) {
-        if (user instanceof Admin) {
-            Intent intent = new Intent(this, AdminAccount.class);
-            startActivity(intent);
-        } else if (user instanceof Organizer) {
-            Intent intent = new Intent(this, OrganizerAccount.class);
-            startActivity(intent);
-        } else {
-
-            Intent intent = new Intent(this, EventListActivity.class);
-            startActivity(intent);
+        Intent intent;
+        if (user instanceof Admin) intent = new Intent(this, AdminBrowseEventsActivity.class);
+        else if (user instanceof Organizer) intent = new Intent(this, EventCreateActivity.class);
+        else {
+            intent = new Intent(this, EntrantAccount.class);
+            intent.putExtra("loadFragment", "eventList");
         }
+        startActivity(intent);
         finish();
     }
 }
