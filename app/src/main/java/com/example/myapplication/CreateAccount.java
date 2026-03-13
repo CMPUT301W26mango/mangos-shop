@@ -150,11 +150,13 @@ public class CreateAccount extends AppCompatActivity {
      */
     private void redirectUser(UserProfiles user) {
         Intent intent;
-        if (user instanceof Admin) intent = new Intent(this, AdminBrowseEventsActivity.class);
-        else if (user instanceof Organizer) intent = new Intent(this, EventCreateActivity.class);
-        else {
-            intent = new Intent(this, EntrantAccount.class);
-            intent.putExtra("loadFragment", "eventList");
+        if (user instanceof Admin) {
+            intent = new Intent(this, AdminBrowseEventsActivity.class);
+        } else if (user instanceof Organizer) {
+            intent = new Intent(this, EventCreateActivity.class);
+        } else {
+            // The default fallback ensures 'intent' is ALWAYS initialized
+            intent = new Intent(this, EventListActivity.class);
         }
         startActivity(intent);
         finish();
