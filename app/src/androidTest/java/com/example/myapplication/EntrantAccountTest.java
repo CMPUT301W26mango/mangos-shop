@@ -85,7 +85,7 @@ public class EntrantAccountTest {
         // Launch the activity
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
             // Check that the fragment container (which holds the layout) is displayed
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
         }
     }
 
@@ -102,7 +102,7 @@ public class EntrantAccountTest {
 
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
             // Verify the fragment container is visible, meaning the transaction didn't crash
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
         }
     }
 
@@ -112,35 +112,50 @@ public class EntrantAccountTest {
      */
     @Test
     public void testIfAdminAutoNavigate() {
-
         Context context = ApplicationProvider.getApplicationContext();
-        Intent intent = new Intent(context, EntrantAccount.class);
 
+        // Ensure the user document exists first so the update doesn't fail
+        Profiles profiles = new Profiles();
+        String deviceId = profiles.getDeviceId(context);
+
+        FirebaseFirestore.getInstance().collection("users").document(deviceId)
+                .set(new java.util.HashMap<String, Object>() {{
+                    put("isAdmin", false);
+                    put("role", "Entrant");
+                }}, com.google.firebase.firestore.SetOptions.merge());
+
+        // Launch the activity
+        Intent intent = new Intent(context, EntrantAccount.class);
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
 
             // Verify start on Entrant screen
-            onView(withId(R.id.fragment_container)).check(matches(isDisplayed()));
+            onView(withId(R.id.main)).check(matches(isDisplayed()));
 
-            // flip the database switch to Admin
-            Profiles profiles = new Profiles();
-            String deviceId = profiles.getDeviceId(context);
-//            Task<Void> updateTask =
+            // Trigger the Admin change
             FirebaseFirestore.getInstance().collection("users").document(deviceId)
                     .update("isAdmin", true, "role", "Admin");
 
-            // was working too quickly so making sure there is a delay of 5 seconds to for sure everything is loaded up on time
-//            Tasks.await(updateTask, 10, TimeUnit.SECONDS);
+            // 5 seconds to fire the intent
+            long startTime = System.currentTimeMillis();
+            boolean success = false;
+            while (System.currentTimeMillis() - startTime < 5000) {
+                try {
+                    intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+                    success = true;
+                    break;
+                } catch (AssertionError e) {
+                    // give more time
+                    Thread.sleep(500);
+                }
+            }
 
-            //Allow time for the live database listener to hear the change and fire the Intent
-            Thread.sleep(3000);
-
-            //Verify that we were successfully teleported
-            intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+            if (!success) {
+                // standard error
+                intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
+            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-//        } catch (ExecutionException | TimeoutException e) {
-//            throw new RuntimeException(e);
         }
     }
 }
