@@ -14,28 +14,6 @@ import java.util.List;
  * Uses ACTION_CREATE_DOCUMENT so the user picks where to save.
  * No FileProvider, no manifest changes, no extra XML files needed.
  *
- * HOW TO USE (for teammates during merge):
- *
- * Step 1 — Launch the save dialog when export button is clicked:
- *
- *     public static final int CSV_EXPORT_REQUEST = 1001;
- *     private List<EnrolledEntrant> entrantsToExport;
- *
- *     exportButton.setOnClickListener(v -> {
- *         entrantsToExport = ... ; // your list from Firestore
- *         Intent intent = CsvExportHelper.createExportIntent("Swimming Lessons");
- *         startActivityForResult(intent, CSV_EXPORT_REQUEST);
- *     });
- *
- * Step 2 — Handle the result in onActivityResult:
- *
- *     @Override
- *     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
- *         super.onActivityResult(requestCode, resultCode, data);
- *         if (requestCode == CSV_EXPORT_REQUEST && resultCode == RESULT_OK && data != null) {
- *             CsvExportHelper.writeCsvToUri(this, data.getData(), entrantsToExport);
- *         }
- *     }
  */
 public class CsvExportHelper {
 
