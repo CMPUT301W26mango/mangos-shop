@@ -23,10 +23,7 @@ public class EventListButtonsUITest {
     @Rule
     public ActivityScenarioRule<EntrantAccount> activityRule =
             new ActivityScenarioRule<>(
-                    new Intent(
-                            ApplicationProvider.getApplicationContext(),
-                            EntrantAccount.class
-                    ).putExtra("loadFragment", "eventList")
+                    new Intent(ApplicationProvider.getApplicationContext(), EventListActivity.class)
             );
 
     // Checks if lottery info button is displayed on event lists page

@@ -33,6 +33,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     * This is the Constructor for the Adapter, it initializes the event list and the fragment manager
     * @param
      * eventList:
+     *   The list of events
+     * @param fragmentManager
+     *          The fragment mangager for the eventDetails
     * */
 
     public EventAdapter(List<Event> eventList, FragmentManager fragmentManager){
@@ -115,6 +118,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     }
 
+    /**
+     * Returns how many events right now
+     * @return eventList
+     *      Size of the test
+     * */
     @Override
     public int getItemCount() {
         return eventList.size();
