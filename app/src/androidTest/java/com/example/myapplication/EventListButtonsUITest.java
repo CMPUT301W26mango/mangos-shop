@@ -7,9 +7,6 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-import android.content.Intent;
-
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -17,14 +14,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
+/**
+ * The following test file was written with the guidance of Claude AI
+ * Prompt: "Help me with writing UI tests for the buttons on EventListActivity" March 12, 2026
+ */
+
 @RunWith(AndroidJUnit4.class)
 public class EventListButtonsUITest {
 
     @Rule
-    public ActivityScenarioRule<EntrantAccount> activityRule =
-            new ActivityScenarioRule<>(
-                    new Intent(ApplicationProvider.getApplicationContext(), EventListActivity.class)
-            );
+    public ActivityScenarioRule<EventListActivity> activityRule =
+            new ActivityScenarioRule<>(EventListActivity.class);
 
     // Checks if lottery info button is displayed on event lists page
     @Test
@@ -57,7 +58,7 @@ public class EventListButtonsUITest {
                 .check(doesNotExist());
     }
 
-    // Checks if QR scanner button appears on EventList fragment
+    // Checks if QR scanner button appears on EventList page
     @Test
     public void testScanQRButtonIsVisible() {
         onView(withId(R.id.scanQRButton))

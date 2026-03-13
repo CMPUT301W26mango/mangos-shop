@@ -10,9 +10,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-import android.content.Intent;
-
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -21,14 +18,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
+/**
+ * The following test file was written with the guidance of Claude AI
+ * Prompt: "Help me with writing UI tests for EventDetailsFragment" March 12, 2026
+ */
+
 @RunWith(AndroidJUnit4.class)
 public class EventDetailsDialogueTest {
 
     @Rule
-    public ActivityScenarioRule<EntrantAccount> activityRule =
-            new ActivityScenarioRule<>(
-                    new Intent(ApplicationProvider.getApplicationContext(), EventListActivity.class)
-            );
+    public ActivityScenarioRule<EventListActivity> activityRule =
+            new ActivityScenarioRule<>(EventListActivity.class);
 
     private void openEventDetailsDialog(String eventId) {
         activityRule.getScenario().onActivity(activity -> {
@@ -38,6 +39,7 @@ public class EventDetailsDialogueTest {
             fragment.setArguments(args);
             fragment.show(activity.getSupportFragmentManager(), "eventDetails");
         });
+
 
     }
 
@@ -69,7 +71,6 @@ public class EventDetailsDialogueTest {
             EventDetailsFragment fragment = new EventDetailsFragment();
             fragment.show(activity.getSupportFragmentManager(), "eventDetails");
         });
-
 
 
         onView(withId(R.id.btn_close)).check(doesNotExist());
