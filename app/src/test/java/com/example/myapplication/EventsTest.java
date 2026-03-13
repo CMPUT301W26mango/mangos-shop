@@ -6,6 +6,11 @@ import static org.junit.Assert.*;
 import com.google.firebase.Timestamp;
 import java.util.Date;
 
+/**
+ * The following test file was written with the guidance of Claude AI
+ * Prompt: "Guide me with writing tests for Event" March 12, 2026
+ */
+
 public class EventsTest {
 
     @Test
