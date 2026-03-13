@@ -59,6 +59,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation("androidx.test:core:1.5.0")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.6.2")
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
     implementation("com.google.firebase:firebase-analytics")

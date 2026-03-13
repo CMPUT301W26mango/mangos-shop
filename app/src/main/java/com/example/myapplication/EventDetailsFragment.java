@@ -127,6 +127,7 @@ public class EventDetailsFragment extends DialogFragment {
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!isAdded() || getContext() == null) return;
                     if (!queryDocumentSnapshots.isEmpty()) {
                         QueryDocumentSnapshot document =
                                 (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
@@ -219,11 +220,13 @@ public class EventDetailsFragment extends DialogFragment {
                         });
 
                     } else {
+                        if (!isAdded() || getContext() == null) return;
                         Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
                         dismiss();
                     }
                 })
                 .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
                     Toast.makeText(getContext(), "Failed to load event: " + e.getMessage(),
                             Toast.LENGTH_SHORT).show();
                     dismiss();
@@ -239,6 +242,8 @@ public class EventDetailsFragment extends DialogFragment {
                 .document(deviceId)
                 .get()
                 .addOnSuccessListener(doc -> {
+
+                    if (!isAdded() || getContext() == null) return;
                     if (doc.exists()) {
                         // If already reigsterd show cancel button
                         registerBtn.setVisibility(View.GONE);
@@ -264,9 +269,11 @@ public class EventDetailsFragment extends DialogFragment {
 
 
         db.collection("events").document(firestoreDocId).collection("waitingList").get().addOnSuccessListener(waitingListCount -> {
+            if (!isAdded() || getContext() == null) return;
             int currentWaitingListSize = waitingListCount.size();
 
             db.collection("events").document(firestoreDocId).get().addOnSuccessListener(eventListInfo -> {
+                if (!isAdded() || getContext() == null) return;
                 Long maxWaitingListSize = eventListInfo.getLong("maxWaitingListSize");
                 if (maxWaitingListSize == null || maxWaitingListSize == -1 || currentWaitingListSize < maxWaitingListSize){
 
@@ -275,7 +282,7 @@ public class EventDetailsFragment extends DialogFragment {
                             .collection("waitingList")
                             .document(deviceId).set(entrantInfo)
                             .addOnSuccessListener( waitingList -> {
-
+                                if (!isAdded() || getContext() == null) return;
                                 Log.d(logTag, "Successfully joined waiting list");
                                 Toast.makeText(getContext(),
                                         "You've joined the waiting list!",
@@ -286,6 +293,7 @@ public class EventDetailsFragment extends DialogFragment {
                                 cancelBtn.setVisibility(View.VISIBLE);
                                 textViewAlreadyRegistered.setVisibility(View.VISIBLE);
                     }).addOnFailureListener(e -> {
+                            if (!isAdded() || getContext() == null) return;
                             Log.d(logTag, "Something went wrong when registering");
                                 Toast.makeText(getContext(), "Something went wrong when registering", Toast.LENGTH_SHORT).show();
                     });
@@ -310,6 +318,7 @@ public class EventDetailsFragment extends DialogFragment {
                 .document(deviceId)
                 .delete()
                 .addOnSuccessListener(waitingList -> {
+                    if (!isAdded() || getContext() == null) return;
                     Log.d(logTag, "Successfully left waiting list");
 
 
@@ -323,6 +332,7 @@ public class EventDetailsFragment extends DialogFragment {
                     textViewAlreadyRegistered.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
                     Log.e(logTag, "Something went wrong when cancelling", e);
                     Toast.makeText(getContext(),
                             "Something went wrong when cancelling",
