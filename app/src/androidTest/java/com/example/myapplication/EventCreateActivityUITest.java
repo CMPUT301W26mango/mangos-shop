@@ -217,6 +217,7 @@ public class EventCreateActivityUITest {
 
     @Test
     public void testProfileButtonIsDisplayed() {
+        onView(withId(R.id.btn_to_edit_profile)).perform(scrollTo());
         onView(withId(R.id.btn_to_edit_profile)).check(matches(isDisplayed()));
     }
 
