@@ -28,21 +28,6 @@ import java.util.List;
  * specific event. Only the organizer who owns the event (matched by
  * device ID) can view it. Includes a CSV export button.
  *
- * HOW TO LAUNCH (for teammates during merge):
- *     Intent intent = new Intent(context, WaitingListActivity.class);
- *     intent.putExtra("eventId", "your_event_id_here");
- *     intent.putExtra("eventName", "Swimming Lessons");
- *     startActivity(intent);
- *
- * ASSUMED FIRESTORE STRUCTURE:
- *     events/{eventId}
- *         - organizerDeviceId: String
- *
- *     events/{eventId}/waitingList/{entrantId}
- *         - name: String
- *         - email: String
- *         - phone: String (optional, may be null)
- *         - enrolmentDate: String
  */
 public class WaitingListActivity extends AppCompatActivity {
 
