@@ -21,28 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * US 02.02.01 — View the list of entrants who joined the waiting list.
- * US 02.06.05 — Export entrants as CSV.
+ * US 02.02.01 - View the list of entrants who joined the waiting list.
+ * US 02.06.05 - Export entrants as CSV.
  *
  * Displays a real-time list of all entrants on the waiting list for a
  * specific event. Only the organizer who owns the event (matched by
  * device ID) can view it. Includes a CSV export button.
  *
- * HOW TO LAUNCH (for teammates during merge):
- *     Intent intent = new Intent(context, WaitingListActivity.class);
- *     intent.putExtra("eventId", "your_event_id_here");
- *     intent.putExtra("eventName", "Swimming Lessons");
- *     startActivity(intent);
- *
- * ASSUMED FIRESTORE STRUCTURE:
- *     events/{eventId}
- *         - organizerDeviceId: String
- *
- *     events/{eventId}/waitingList/{entrantId}
- *         - name: String
- *         - email: String
- *         - phone: String (optional, may be null)
- *         - enrolmentDate: String
  */
 public class WaitingListActivity extends AppCompatActivity {
 

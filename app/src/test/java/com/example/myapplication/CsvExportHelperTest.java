@@ -12,13 +12,13 @@ import static org.junit.Assert.*;
  *
  * Tests the CSV generation logic against all acceptance criteria.
  * These are plain JUnit tests (not instrumented) because
- * generateCsvContent() and escapeCsv() are pure Java — no Android APIs.
+ * generateCsvContent() and escapeCsv() are pure Java - no Android APIs.
  *
  */
 public class CsvExportHelperTest {
 
     // =====================================================
-    // CRITERIA #4 — Properly formatted with headers
+    // CRITERIA #4 - Properly formatted with headers
     // =====================================================
 
     /**
@@ -48,11 +48,11 @@ public class CsvExportHelperTest {
     }
 
     // =====================================================
-    // CRITERIA #5 — Works for 0 or more enrolled entrants
+    // CRITERIA #5 - Works for 0 or more enrolled entrants
     // =====================================================
 
     /**
-     * Test CSV output with zero entrants — should have header only.
+     * Test CSV output with zero entrants - should have header only.
      */
     @Test
     public void testEmptyListProducesHeaderOnly() {
@@ -112,7 +112,7 @@ public class CsvExportHelperTest {
     }
 
     // =====================================================
-    // CRITERIA #2 — CSV includes name, email, phone, date
+    // CRITERIA #2 - CSV includes name, email, phone, date
     // =====================================================
 
     /**
@@ -133,7 +133,7 @@ public class CsvExportHelperTest {
     }
 
     /**
-     * Test that phone is optional — null phone produces empty field.
+     * Test that phone is optional - null phone produces empty field.
      */
     @Test
     public void testNullPhoneProducesEmptyField() {
@@ -164,7 +164,7 @@ public class CsvExportHelperTest {
     }
 
     // =====================================================
-    // CSV ESCAPING — Proper formatting edge cases
+    // CSV ESCAPING - Proper formatting edge cases
     // =====================================================
 
     /**
@@ -224,7 +224,7 @@ public class CsvExportHelperTest {
     }
 
     // =====================================================
-    // LARGE LIST — Performance sanity check
+    // LARGE LIST - Performance sanity check
     // =====================================================
 
     /**
