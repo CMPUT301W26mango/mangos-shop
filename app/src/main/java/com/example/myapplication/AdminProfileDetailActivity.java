@@ -1,3 +1,14 @@
+/**
+ * Activity that displays detailed information for a selected user profile.
+ *
+ * Role in application:
+ * - Admin inspection screen for user information.
+ *
+ * Outstanding issues:
+ * - Profile detail currently supports viewing only and does not include delete actions as it's not
+ * part of the halfway checkpoint.
+ */
+
 package com.example.myapplication;
 
 import android.os.Bundle;

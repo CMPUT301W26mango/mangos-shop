@@ -1,3 +1,10 @@
+/**
+ * RecyclerView adapter for displaying profile items on the admin browse profiles screen.
+ *
+ * Role in application:
+ * - Presentation-layer adapter for admin profile browsing.
+ */
+
 package com.example.myapplication;
 
 import android.view.LayoutInflater;

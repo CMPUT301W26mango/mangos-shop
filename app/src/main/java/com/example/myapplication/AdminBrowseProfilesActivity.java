@@ -1,3 +1,14 @@
+/**
+ * Activity that allows an administrator to browse user profiles, search by
+ * name or email, and open profile details.
+ *
+ * Role in application:
+ * - Admin control screen for viewing user records.
+ *
+ * Outstanding issues:
+ * - None for now
+ */
+
 package com.example.myapplication;
 
 import android.content.Intent;

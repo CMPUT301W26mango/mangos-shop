@@ -1,3 +1,14 @@
+/**
+ * Activity that allows an administrator to browse all events,
+ * search for events by title, and navigate to the admin event detail screen.
+ *
+ * Role in application:
+ * - Admin control screen for viewing events.
+ *
+ * Outstanding issues:
+ * - UI currently depends on Firestore field names remaining consistent.
+ */
+
 package com.example.myapplication;
 
 import android.content.Intent;
