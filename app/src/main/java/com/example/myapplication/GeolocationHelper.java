@@ -15,20 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * on the Event Settings screen (built by another teammate). This class
  * provides methods they can call to wire up the toggle.
  *
- * HOW TO USE (for teammates during merge):
- *
- * In the Event Settings Activity, after finding the Switch in their layout:
- *
- *     Switch geoSwitch = findViewById(R.id.switchGeolocation);
- *     GeolocationHelper.loadSetting(this, eventId, geoSwitch);
- *     GeolocationHelper.setupToggle(this, eventId, geoSwitch);
- *
- * That's it. loadSetting reads the current value from Firestore and sets
- * the switch. setupToggle writes to Firestore whenever the switch is flipped.
- *
- * ASSUMED FIRESTORE STRUCTURE:
- *     events/{eventId}
- *         - geolocationRequired: Boolean
  */
 public class GeolocationHelper {
 
