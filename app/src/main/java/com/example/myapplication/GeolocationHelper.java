@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * US 02.02.03 — Enable or disable geolocation requirement for an event.
+ * US 02.02.03 - Enable or disable geolocation requirement for an event.
  *
- * Utility class — not a separate screen. The geolocation toggle lives
+ * Utility class - not a separate screen. The geolocation toggle lives
  * on the Event Settings screen (built by another teammate). This class
  * provides methods they can call to wire up the toggle.
  *
