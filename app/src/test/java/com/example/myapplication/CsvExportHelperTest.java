@@ -14,8 +14,6 @@ import static org.junit.Assert.*;
  * These are plain JUnit tests (not instrumented) because
  * generateCsvContent() and escapeCsv() are pure Java — no Android APIs.
  *
- * Put this file in: app/src/test/java/com/example/myapplication/
- * (NOT androidTest — these run on your machine, no emulator needed)
  */
 public class CsvExportHelperTest {
 
