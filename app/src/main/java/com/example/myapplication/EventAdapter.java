@@ -129,7 +129,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     /**
-     * Returns how many events right now
+     * Creates the object for the view that the user sees with all the UI elements
      * */
 
     static class EventViewHolder extends RecyclerView.ViewHolder{
@@ -139,6 +139,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView deadline;
 
         TextView organizer;
+
+        /**
+         * Initializes all the UI elements in this object
+         * @param itemView
+         *  View of all the UI elements thaat the user should see
+         * */
         public EventViewHolder(@NonNull View itemView){
             super(itemView);
             imageViewPoster = itemView.findViewById(R.id.imageViewPoster);
