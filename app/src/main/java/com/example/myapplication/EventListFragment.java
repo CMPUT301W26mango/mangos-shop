@@ -145,7 +145,7 @@ public class EventListFragment extends Fragment {
      */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
-        options.setPrompt("");
+        options.setPrompt("Press back to cancel");
         options.setBeepEnabled(false);
         options.setOrientationLocked(false);
         options.setBarcodeImageEnabled(false);
