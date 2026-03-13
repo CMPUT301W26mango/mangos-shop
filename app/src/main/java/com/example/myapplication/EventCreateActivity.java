@@ -37,6 +37,9 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText capacityInput;
 
+    private EditText eventType;
+    private EditText  organizerName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,9 @@ public class EventCreateActivity extends AppCompatActivity {
         createEventButton = findViewById(R.id.create_event_button);
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
+        eventType = findViewById(R.id.event_type);
+        organizerName = findViewById(R.id.organizer_name);
+
 
 
         // using time picker and date picker (event date logic)
@@ -235,6 +241,8 @@ public class EventCreateActivity extends AppCompatActivity {
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
             String posterImageURL = posterURLInput.getText().toString().trim();
+            String organizerNameInput = organizerName.getText().toString().trim();
+            String eventTypeInput = eventType.getText().toString().trim();
 
             Event event = new Event();
             event.setTitle(eventName);
@@ -248,6 +256,14 @@ public class EventCreateActivity extends AppCompatActivity {
 
             if (!eventDate.isEmpty()) {
                 event.setDateEvent(eventDate);
+            }
+
+            if (!organizerNameInput.isEmpty()) {
+                event.setOrganizerName(organizerNameInput);
+            }
+
+            if (!eventTypeInput.isEmpty()) {
+                event.setEventType(eventTypeInput);
             }
 
             if (!startDate.isEmpty()) {
@@ -283,6 +299,8 @@ public class EventCreateActivity extends AppCompatActivity {
             eventDescriptionInput.setText("");
             capacityInput.setText("");
             posterURLInput.setText("");
+            organizerName.setText("");
+            eventType.setText("");
         });
     }
 };

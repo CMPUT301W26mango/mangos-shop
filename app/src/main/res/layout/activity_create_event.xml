@@ -138,9 +138,6 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
-
-
-
                 <EditText
                     android:id="@+id/posterurl_input"
                     android:layout_width="match_parent"
