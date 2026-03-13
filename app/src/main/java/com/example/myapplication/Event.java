@@ -19,7 +19,7 @@ public class Event {
 
     private String organizerName;
     private String eventType;
-    private int spotsToFill;
+    private int maxWaitingListSize;
 
     // Empty constructor for Firebase
     public Event(){}
@@ -27,7 +27,7 @@ public class Event {
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
                  String qrValue, int capacity, String dateEvent,
-                 String organizerName, String eventType, int spotsToFill) {
+                 String organizerName, String eventType, int maxWaitingListSize) {
 
         this.id = id;
         this.title = title;
@@ -41,7 +41,7 @@ public class Event {
         this.dateEvent = dateEvent;
         this.organizerName = organizerName;
         this.eventType = eventType;
-        this.spotsToFill = spotsToFill;
+        this.maxWaitingListSize = maxWaitingListSize;
     }
 
     // Getters and Setters
@@ -143,12 +143,12 @@ public class Event {
         this.eventType = eventType;
     }
 
-    public int getSpotsToFill() {
-        return spotsToFill;
+    public int getMaxWaitingListSize() {
+        return maxWaitingListSize;
     }
 
-    public void setSpotsToFill(int spotsToFill) {
-        this.spotsToFill = spotsToFill;
+    public void setMaxWaitingListSize(int spotsToFill) {
+        this.maxWaitingListSize = spotsToFill;
     }
 
     // Logic from your class
