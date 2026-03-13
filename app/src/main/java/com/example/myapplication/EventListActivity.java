@@ -90,6 +90,9 @@ public class EventListActivity extends AppCompatActivity {
         scanQRButton.setOnClickListener(v -> launchQRScanner());
     }
 
+    /**
+     * Queries the Firebase Database and loads the events
+     * */
     private void loadEvents() {
         Timestamp now = Timestamp.now();
         db.collection("events")
@@ -111,6 +114,9 @@ public class EventListActivity extends AppCompatActivity {
                         Log.e("EventListActivity", "Error loading events", e));
     }
 
+    /**
+     * Configures and launches the QR scanner
+     * */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Press back to cancel");
