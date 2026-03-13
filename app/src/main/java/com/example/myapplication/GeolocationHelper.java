@@ -9,26 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * US 02.02.03 — Enable or disable geolocation requirement for an event.
+ * US 02.02.03 - Enable or disable geolocation requirement for an event.
  *
- * Utility class — not a separate screen. The geolocation toggle lives
+ * Utility class - not a separate screen. The geolocation toggle lives
  * on the Event Settings screen (built by another teammate). This class
  * provides methods they can call to wire up the toggle.
  *
- * HOW TO USE (for teammates during merge):
- *
- * In the Event Settings Activity, after finding the Switch in their layout:
- *
- *     Switch geoSwitch = findViewById(R.id.switchGeolocation);
- *     GeolocationHelper.loadSetting(this, eventId, geoSwitch);
- *     GeolocationHelper.setupToggle(this, eventId, geoSwitch);
- *
- * That's it. loadSetting reads the current value from Firestore and sets
- * the switch. setupToggle writes to Firestore whenever the switch is flipped.
- *
- * ASSUMED FIRESTORE STRUCTURE:
- *     events/{eventId}
- *         - geolocationRequired: Boolean
  */
 public class GeolocationHelper {
 
