@@ -5,7 +5,7 @@ import com.google.firebase.Timestamp;
 public class Event {
     private String id;
     private String title;
-    private String descirption;
+    private String description;
     private String location;
 
     private Timestamp regStart;
@@ -31,7 +31,7 @@ public class Event {
 
         this.id = id;
         this.title = title;
-        this.descirption = descirption;
+        this.description = descirption;
         this.location = location;
         this.regStart = regStart;
         this.regEnd = regEnd;
@@ -63,12 +63,12 @@ public class Event {
         this.title = title;
     }
 
-    public String getDescirption() {
-        return descirption;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescirption(String descirption) {
-        this.descirption = descirption;
+    public void setDescription(String descirption) {
+        this.description = descirption;
     }
 
     public String getLocation() {

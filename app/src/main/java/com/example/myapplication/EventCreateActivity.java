@@ -26,6 +26,8 @@ public class EventCreateActivity extends AppCompatActivity {
     private EditText startDateInput;
     private EditText endDateInput;
     private EditText eventDescriptionInput;
+
+    private EditText posterURLInput;
     private Button uploadPosterButton;
     private Button createEventButton;
 
@@ -47,7 +49,8 @@ public class EventCreateActivity extends AppCompatActivity {
         startDateInput = findViewById(R.id.start_date_input);
         endDateInput = findViewById(R.id.end_date_input);
         eventDescriptionInput = findViewById(R.id.event_description_input);
-        uploadPosterButton = findViewById(R.id.upload_poster_button);
+        posterURLInput = findViewById(R.id.posterurl_input);
+//        uploadPosterButton = findViewById(R.id.upload_poster_button);
         createEventButton = findViewById(R.id.create_event_button);
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
@@ -219,6 +222,9 @@ public class EventCreateActivity extends AppCompatActivity {
             dialog.show();
         });
 
+
+
+
         eventStore = new EventStore();
         createEventButton.setOnClickListener(v -> {
             String eventName = eventNameInput.getText().toString().trim();
@@ -228,11 +234,17 @@ public class EventCreateActivity extends AppCompatActivity {
             String description = eventDescriptionInput.getText().toString().trim();
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
+            String posterImageURL = posterURLInput.getText().toString().trim();
 
             Event event = new Event();
             event.setTitle(eventName);
             event.setLocation(location);
-            event.setDescirption(description);
+            event.setDescription(description);
+
+            if (!posterImageURL.isEmpty()) {
+
+                event.setPosterURL(posterImageURL);
+            }
 
             if (!eventDate.isEmpty()) {
                 event.setDateEvent(eventDate);
@@ -270,6 +282,7 @@ public class EventCreateActivity extends AppCompatActivity {
             endDateInput.setText("");
             eventDescriptionInput.setText("");
             capacityInput.setText("");
+            posterURLInput.setText("");
         });
     }
 };

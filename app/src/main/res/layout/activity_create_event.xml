@@ -152,16 +152,27 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
-                <Button
-                    android:id="@+id/upload_poster_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/main_button_style"
-                    android:text="Upload Poster Image"
-                    android:textColor="#FFFFFF"
-                    app:backgroundTint="@null" />
+                <EditText
+                    android:id="@+id/event_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Type"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
+
+                <EditText
+                    android:id="@+id/organizer_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_input_box"
+                    android:hint="Event Author"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp" />
 
                 <Button
                     android:id="@+id/create_event_button"

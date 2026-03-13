@@ -27,7 +27,7 @@ public class EventStore {
 
         eventData.put("id", eventId);
         eventData.put("title", event.getTitle());
-        eventData.put("description", event.getDescirption());
+        eventData.put("description", event.getDescription());
         eventData.put("location", event.getLocation());
         eventData.put("regStart", event.getRegStart());
         eventData.put("regEnd", event.getRegEnd());
@@ -66,7 +66,7 @@ public class EventStore {
                     Event event = new Event();
                     event.setId(document.getString("id"));
                     event.setTitle(document.getString("title"));
-                    event.setDescirption(document.getString("description"));
+                    event.setDescription(document.getString("description"));
                     event.setLocation(document.getString("location"));
                     event.setRegStart(document.getTimestamp("regStart"));
                     event.setRegEnd(document.getTimestamp("regEnd"));
