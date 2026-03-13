@@ -19,6 +19,9 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
+This test file was generated using Claude AI
+Prompt: Generate test cases for the WaitingListAdapater file.
+
  * US 02.02.01 - Tests for WaitingListAdapter
  *
  * Tests that the adapter correctly:

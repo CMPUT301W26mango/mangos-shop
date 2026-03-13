@@ -8,6 +8,9 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
+This test file was generated using Claude AI
+Prompt: Generate test cases for the file CsvExportHelper. 
+
  * US 02.06.05 - Tests for CsvExportHelper
  *
  * Tests the CSV generation logic against all acceptance criteria.
