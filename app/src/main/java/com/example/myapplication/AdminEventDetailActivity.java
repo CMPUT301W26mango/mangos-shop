@@ -1,3 +1,14 @@
+/**
+ * Activity that displays detailed information for a selected event and allows
+ * the administrator to remove the event poster image.
+ *
+ * Role in application:
+ * - Admin moderation screen for event content.
+ *
+ * Outstanding issues:
+ * - Remove-image depends on valid posterURL data in Firestore.
+ */
+
 package com.example.myapplication;
 
 import android.app.AlertDialog;

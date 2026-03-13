@@ -1,3 +1,10 @@
+/**
+ * RecyclerView adapter for displaying event items on the admin browse events screen.
+ *
+ * Role in application:
+ * - Presentation-layer adapter for admin event browsing.
+ */
+
 package com.example.myapplication;
 
 import android.view.LayoutInflater;
