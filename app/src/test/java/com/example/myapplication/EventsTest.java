@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import com.google.firebase.Timestamp;
 import java.util.Date;
 
-public class EventStoreTest {
+public class EventsTest {
 
     @Test
     public void testEventTitleSetCorrectly() {
@@ -117,5 +117,26 @@ public class EventStoreTest {
         assertEquals(50, event.getCapacity());
         assertNotNull(event.getOrganizerName());
         assertNotNull(event.getQrValue());
+    }
+
+    @Test
+    public void testGeolocationRequiredDefaultsFalse() {
+        Event event = new Event();
+        assertFalse(event.getGeolocationRequired());
+    }
+
+    @Test
+    public void testGeolocationRequiredSetTrue() {
+        Event event = new Event();
+        event.setGeolocationRequired(true);
+        assertTrue(event.getGeolocationRequired());
+    }
+
+    @Test
+    public void testGeolocationRequiredSetFalse() {
+        Event event = new Event();
+        event.setGeolocationRequired(true);
+        event.setGeolocationRequired(false);
+        assertFalse(event.getGeolocationRequired());
     }
 }

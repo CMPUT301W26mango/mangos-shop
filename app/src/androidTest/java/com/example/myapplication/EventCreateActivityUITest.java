@@ -16,6 +16,8 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 
 @RunWith(AndroidJUnit4.class)
 public class EventCreateActivityUITest {
@@ -183,6 +185,31 @@ public class EventCreateActivityUITest {
     }
 
     @Test
+    public void testGeoSwitchIsDisplayed() {
+        onView(withId(R.id.switchGeolocation)).perform(scrollTo());
+        onView(withId(R.id.switchGeolocation)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testGeoSwitchDefaultsOff() {
+        onView(withId(R.id.switchGeolocation)).perform(scrollTo());
+        onView(withId(R.id.switchGeolocation)).check(matches(isNotChecked()));
+    }
+
+    @Test
+    public void testGeoSwitchCanBeToggledOn() {
+        onView(withId(R.id.switchGeolocation)).perform(scrollTo(), click());
+        onView(withId(R.id.switchGeolocation)).check(matches(isChecked()));
+    }
+
+    @Test
+    public void testGeoSwitchCanBeToggledOff() {
+        onView(withId(R.id.switchGeolocation)).perform(scrollTo(), click());
+        onView(withId(R.id.switchGeolocation)).perform(scrollTo(), click());
+        onView(withId(R.id.switchGeolocation)).check(matches(isNotChecked()));
+    }
+
+    @Test
     public void testCreateFullEvent_clearsAllFields() {
         onView(withId(R.id.event_name_input))
                 .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
@@ -206,4 +233,5 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.capacity_input)).check(matches(withText("")));
         onView(withId(R.id.posterurl_input)).check(matches(withText("")));
     }
+
 }

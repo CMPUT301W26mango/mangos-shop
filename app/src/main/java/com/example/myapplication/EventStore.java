@@ -20,6 +20,10 @@ public class EventStore {
         db = FirebaseFirestore.getInstance();
     }
 
+    public interface OnEventSavedListener {
+        void onEventSaved(String eventId);
+    }
+
     public void addEvent(Event event) {
         Map<String, Object> eventData = new HashMap<>();
         DocumentReference docRef = db.collection("events").document();
@@ -38,6 +42,7 @@ public class EventStore {
         eventData.put("maxWaitingListSize", event.getMaxWaitingListSize());
         eventData.put("eventType", event.getEventType());
         eventData.put("organizerName", event.getOrganizerName());
+        eventData.put("geolocationRequired", event.getGeolocationRequired());
         docRef.set(eventData);
     }
 

@@ -83,34 +83,9 @@ public class EventCreateActivityTest {
 
 
     @Test
-    public void testEventFieldsSetCorrectly() {
-        Event event = new Event();
-        event.setTitle("Test Event");
-        event.setLocation("Edmonton");
-        event.setDescription("A test event");
-
-        assertEquals("Test Event", event.getTitle());
-        assertEquals("Edmonton", event.getLocation());
-        assertEquals("A test event", event.getDescription());
-    }
-
-    @Test
-    public void testPosterURLSetCorrectly() {
-        Event event = new Event();
-        event.setPosterURL("https://example.com/poster.jpg");
-        assertEquals("https://example.com/poster.jpg", event.getPosterURL());
-    }
-
-    @Test
     public void testPosterURLEmpty_skipped() {
         String posterURL = "";
         assertTrue(posterURL.isEmpty());
-    }
-    @Test
-    public void testEventTypeSetCorrectly() {
-        Event event = new Event();
-        event.setEventType("Sports");
-        assertEquals("Sports", event.getEventType());
     }
 
     @Test
@@ -119,12 +94,6 @@ public class EventCreateActivityTest {
         assertTrue(eventType.isEmpty());
     }
 
-    @Test
-    public void testOrganizerNameSetCorrectly() {
-        Event event = new Event();
-        event.setOrganizerName("Test Name");
-        assertEquals("Test Name", event.getOrganizerName());
-    }
 
     @Test
     public void testOrganizerNameEmpty_skipped() {

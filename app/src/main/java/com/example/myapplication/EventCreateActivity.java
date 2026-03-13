@@ -8,16 +8,20 @@ import android.widget.EditText;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
+import android.widget.Switch;
 
 import java.util.Calendar;
 import java.util.Date;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class EventCreateActivity extends AppCompatActivity {
@@ -39,6 +43,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText eventType;
     private EditText  organizerName;
+    private Switch geoSwitch;
 
 
     @Override
@@ -59,7 +64,7 @@ public class EventCreateActivity extends AppCompatActivity {
         capacityInput = findViewById(R.id.capacity_input);
         eventType = findViewById(R.id.event_type);
         organizerName = findViewById(R.id.organizer_name);
-
+        geoSwitch = findViewById(R.id.switchGeolocation);
 
 
         // using time picker and date picker (event date logic)
@@ -290,6 +295,8 @@ public class EventCreateActivity extends AppCompatActivity {
                 event.setCapacity(Integer.parseInt(capacityText));
             }
 
+            boolean geoRequired = geoSwitch.isChecked();
+            event.setGeolocationRequired(geoRequired);
             eventStore.addEvent(event);
             eventDateInput.setText("");
             eventNameInput.setText("");
@@ -303,4 +310,4 @@ public class EventCreateActivity extends AppCompatActivity {
             eventType.setText("");
         });
     }
-};
+}
