@@ -35,7 +35,7 @@ public class EventStore {
         eventData.put("posterURL", event.getPosterURL());
         eventData.put("qrValue", eventId);
         eventData.put("capacity", event.getCapacity());
-        eventData.put("spotsToFill", event.getSpotsToFill());
+        eventData.put("maxWaitingListSize", event.getMaxWaitingListSize());
         eventData.put("eventType", event.getEventType());
         eventData.put("organizerName", event.getOrganizerName());
         docRef.set(eventData);
