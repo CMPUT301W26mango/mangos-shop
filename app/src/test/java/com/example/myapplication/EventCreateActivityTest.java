@@ -72,4 +72,37 @@ public class EventCreateActivityTest {
         Date eventDate = formatter.parse("2030-01-02 10:00");
         assertFalse(eventDate.after(regEnd));
     }
+
+
+    @Test
+    public void testPosterUrl_valid_savedToEvent() {
+        String posterDownloadUrl = "https://firebase.storage/poster.jpg";
+        Event event = new Event();
+        if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
+            event.setPosterURL(posterDownloadUrl);
+        }
+        assertEquals("Poster URL should be saved",
+                "https://firebase.storage/poster.jpg", event.getPosterURL());
+    }
+
+
+    @Test
+    public void testPosterUrl_null_notSavedToEvent() {
+        String posterDownloadUrl = null;
+        Event event = new Event();
+        if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
+            event.setPosterURL(posterDownloadUrl);
+        }
+        assertNull("Poster URL should not be set when null", event.getPosterURL());
+    }
+
+    @Test
+    public void testPosterUrl_empty_notSavedToEvent() {
+        String posterDownloadUrl = "";
+        Event event = new Event();
+        if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
+            event.setPosterURL(posterDownloadUrl);
+        }
+        assertNull("Poster URL should not be set when empty", event.getPosterURL());
+    }
 }
