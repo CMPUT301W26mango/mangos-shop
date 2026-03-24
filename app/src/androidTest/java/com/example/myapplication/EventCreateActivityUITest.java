@@ -19,6 +19,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
+import static org.hamcrest.CoreMatchers.not;
 
 /**
  * The following test file was written with the guidance of Claude AI
@@ -66,11 +67,7 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.capacity_input)).check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testPosterURLFieldIsDisplayed() {
-        onView(withId(R.id.posterurl_input)).perform(scrollTo());
-        onView(withId(R.id.posterurl_input)).check(matches(isDisplayed()));
-    }
+
 
     @Test
     public void testEventTypeFieldIsDisplayed() {
@@ -111,13 +108,7 @@ public class EventCreateActivityUITest {
                 .check(matches(withText("50")));
     }
 
-    @Test
-    public void testTypePosterURL() {
-        onView(withId(R.id.posterurl_input))
-                .perform(scrollTo(), typeText("https://example.com/poster.jpg"), closeSoftKeyboard());
-        onView(withId(R.id.posterurl_input))
-                .check(matches(withText("https://example.com/poster.jpg")));
-    }
+
 
     @Test
     public void testTypeEventType() {
@@ -125,6 +116,39 @@ public class EventCreateActivityUITest {
                 .perform(scrollTo(), typeText("Sports"), closeSoftKeyboard());
         onView(withId(R.id.event_type))
                 .check(matches(withText("Sports")));
+    }
+
+    @Test
+    public void testTypeOrganizerName() {
+        onView(withId(R.id.organizer_name))
+                .perform(scrollTo(), typeText("Test Name"), closeSoftKeyboard());
+        onView(withId(R.id.organizer_name))
+                .check(matches(withText("Test Name")));
+    }
+
+
+    @Test
+    public void testCreateButtonClearsEventName() {
+        onView(withId(R.id.event_name_input))
+                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+        onView(withId(R.id.event_name_input)).check(matches(withText("")));
+    }
+
+    @Test
+    public void testCreateButtonClearsLocation() {
+        onView(withId(R.id.location_input))
+                .perform(typeText("Old Trafford"), closeSoftKeyboard());
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+        onView(withId(R.id.location_input)).check(matches(withText("")));
+    }
+
+    @Test
+    public void testCreateButtonClearsCapacity() {
+        onView(withId(R.id.capacity_input))
+                .perform(scrollTo(), typeText("100"), closeSoftKeyboard());
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+        onView(withId(R.id.capacity_input)).check(matches(withText("")));
     }
 
 
@@ -205,27 +229,65 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.btn_to_edit_profile)).check(matches(isClickable()));
     }
 
-//    @Test
-//    public void testCreateFullEvent_clearsAllFields() {
-//        onView(withId(R.id.event_name_input))
-//                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
-//        onView(withId(R.id.location_input))
-//                .perform(typeText("Old Trafford"), closeSoftKeyboard());
-//        onView(withId(R.id.event_description_input))
-//                .perform(typeText("A fun event for everyone"), closeSoftKeyboard());
-//        onView(withId(R.id.capacity_input))
-//                .perform(scrollTo(), typeText("50"), closeSoftKeyboard());
-//        onView(withId(R.id.posterurl_input))
-//                .perform(scrollTo(), typeText("https://example.com/poster.jpg"), closeSoftKeyboard());
-//        onView(withId(R.id.event_type))
-//                .perform(scrollTo(), typeText("Test Name"), closeSoftKeyboard());
-//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-//
-//        onView(withId(R.id.event_name_input)).check(matches(withText("")));
-//        onView(withId(R.id.location_input)).check(matches(withText("")));
-//        onView(withId(R.id.event_description_input)).check(matches(withText("")));
-//        onView(withId(R.id.capacity_input)).check(matches(withText("")));
-//        onView(withId(R.id.posterurl_input)).check(matches(withText("")));
-//    }
+/*    @Test
+    public void testCreateFullEvent_clearsAllFields() {
+        onView(withId(R.id.event_name_input))
+                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
+        onView(withId(R.id.location_input))
+                .perform(typeText("Old Trafford"), closeSoftKeyboard());
+        onView(withId(R.id.event_description_input))
+                .perform(typeText("A fun event for everyone"), closeSoftKeyboard());
+        onView(withId(R.id.capacity_input))
+                .perform(scrollTo(), typeText("50"), closeSoftKeyboard());
+        onView(withId(R.id.event_type))
+                .perform(scrollTo(), typeText("Sports"), closeSoftKeyboard());
+        onView(withId(R.id.organizer_name))
+                .perform(scrollTo(), typeText("Test Name"), closeSoftKeyboard());
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+
+        onView(withId(R.id.event_name_input)).check(matches(withText("")));
+        onView(withId(R.id.location_input)).check(matches(withText("")));
+        onView(withId(R.id.event_description_input)).check(matches(withText("")));
+        onView(withId(R.id.capacity_input)).check(matches(withText("")));
+
+    }*/
+
+
+    @Test
+    public void testUploadPosterButtonIsDisplayed() {
+        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
+        onView(withId(R.id.upload_poster_button)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testUploadPosterButtonIsClickable() {
+        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
+        onView(withId(R.id.upload_poster_button)).check(matches(isClickable()));
+    }
+
+    @Test
+    public void testUploadPosterButtonDefaultText() {
+        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
+        onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
+    }
+
+    @Test
+    public void testPosterPreviewDefaultNotVisible() {
+        onView(withId(R.id.poster_image_preview)).perform(scrollTo());
+        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void testCreateButtonResetsPosterButtonText() {
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
+        onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
+    }
+
+    @Test
+    public void testCreateButtonHidesPosterPreview() {
+        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
+    }
 
 }
