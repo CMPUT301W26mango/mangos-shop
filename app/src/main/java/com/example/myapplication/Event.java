@@ -31,6 +31,8 @@ public class Event {
     private int maxWaitingListSize;
     private boolean geolocationRequired;
 
+    private String deviceId;
+
     /**
      * Empty constructor required by Firebase Firestore for
      * automatic deserialization of documents into Event objects.
@@ -54,11 +56,12 @@ public class Event {
      * @param organizerName   the name of the event organizer
      * @param eventType       the type/category of the event
      * @param maxWaitingListSize maximum number of entrants allowed on the waiting list
+     * @param deviceId        the users device id they use to log into the app
      */
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
                  String qrValue, int capacity, String dateEvent,
-                 String organizerName, String eventType, int maxWaitingListSize) {
+                 String organizerName, String eventType, int maxWaitingListSize, String deviceId) {
 
         this.id = id;
         this.title = title;
@@ -73,9 +76,25 @@ public class Event {
         this.organizerName = organizerName;
         this.eventType = eventType;
         this.maxWaitingListSize = maxWaitingListSize;
+        this.deviceId = deviceId;
     }
 
     // Getters and Setters
+
+    /**
+     * @return the unique device id of the user
+     */
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    /**
+     *
+     * @param deviceId the device id of the user to set
+     */
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 
     /**
      * @return the unique Firestore document ID for this event

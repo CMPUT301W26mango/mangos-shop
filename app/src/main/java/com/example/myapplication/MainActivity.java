@@ -41,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
         // Auto-login
         profiles.fetchUserRole(deviceId, user -> {
             if (user != null) {
-                // User exists go tr0 Welcome Back screen
+                // User exists go to Welcome Back screen
                 Intent intent = new Intent(MainActivity.this, WelcomeBack.class);
                 intent.putExtra("USER_NAME", user.getName());
 
                 String nextActivity = EventListActivity.class.getName();
                 if (user instanceof Admin) nextActivity = AdminBrowseEventsActivity.class.getName();
-                else if (user instanceof Organizer) nextActivity = EventCreateActivity.class.getName();
+                else if (user instanceof Organizer) nextActivity = OrganizerDashboardActivity.class.getName();
                 intent.putExtra("NEXT_ACTIVITY", nextActivity);
                 startActivity(intent);
             } else {

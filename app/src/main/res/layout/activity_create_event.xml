@@ -162,17 +162,6 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
-                <EditText
-                    android:id="@+id/organizer_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="30dp"
-                    android:background="@drawable/rounded_input_box"
-                    android:hint="Event Author"
-                    android:inputType="textMultiLine"
-                    android:paddingStart="30dp"
-                    android:paddingEnd="30dp" />
-
                 <Switch
                     android:id="@+id/switchGeolocation"
                     android:layout_width="match_parent"

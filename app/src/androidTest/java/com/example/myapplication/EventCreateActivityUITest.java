@@ -75,12 +75,6 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.event_type)).check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testOrganizerNameFieldIsDisplayed() {
-        onView(withId(R.id.organizer_name)).perform(scrollTo());
-        onView(withId(R.id.organizer_name)).check(matches(isDisplayed()));
-    }
-
 
     @Test
     public void testTypeEventName() {
@@ -158,21 +152,46 @@ public class EventCreateActivityUITest {
     }
 
 
-    @Test
-    public void testCreateButtonClearsEventType() {
-        onView(withId(R.id.event_type))
-                .perform(scrollTo(), typeText("Sports"), closeSoftKeyboard());
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.event_type)).check(matches(withText("")));
-    }
+//    @Test
+//    public void testCreateButtonClearsEventName() {
+//        onView(withId(R.id.event_name_input))
+//                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.event_name_input)).check(matches(withText("")));
+//    }
+//
+//    @Test
+//    public void testCreateButtonClearsLocation() {
+//        onView(withId(R.id.location_input))
+//                .perform(typeText("Old Trafford"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.location_input)).check(matches(withText("")));
+//    }
+//
+//    @Test
+//    public void testCreateButtonClearsCapacity() {
+//        onView(withId(R.id.capacity_input))
+//                .perform(scrollTo(), typeText("100"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.capacity_input)).check(matches(withText("")));
+//    }
+//
+//    @Test
+//    public void testCreateButtonClearsPosterURL() {
+//        onView(withId(R.id.posterurl_input))
+//                .perform(scrollTo(), typeText("https://example.com/poster.jpg"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.posterurl_input)).check(matches(withText("")));
+//    }
+//
+//    @Test
+//    public void testCreateButtonClearsEventType() {
+//        onView(withId(R.id.event_type))
+//                .perform(scrollTo(), typeText("Sports"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.event_type)).check(matches(withText("")));
+//    }
 
-    @Test
-    public void testCreateButtonClearsOrganizerName() {
-        onView(withId(R.id.organizer_name))
-                .perform(scrollTo(), typeText("Test Name"), closeSoftKeyboard());
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.organizer_name)).check(matches(withText("")));
-    }
 
     @Test
     public void testGeoSwitchIsDisplayed() {
@@ -210,7 +229,7 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.btn_to_edit_profile)).check(matches(isClickable()));
     }
 
-    @Test
+/*    @Test
     public void testCreateFullEvent_clearsAllFields() {
         onView(withId(R.id.event_name_input))
                 .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
@@ -231,7 +250,7 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.event_description_input)).check(matches(withText("")));
         onView(withId(R.id.capacity_input)).check(matches(withText("")));
 
-    }
+    }*/
 
 
     @Test

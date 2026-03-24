@@ -84,7 +84,6 @@ public class EventCreateActivity extends AppCompatActivity {
     private EditText capacityInput;
 
     private EditText eventType;
-    private EditText  organizerName;
     private Switch geoSwitch;
     private ImageButton profileButton;
 
@@ -141,7 +140,6 @@ public class EventCreateActivity extends AppCompatActivity {
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
         eventType = findViewById(R.id.event_type);
-        organizerName = findViewById(R.id.organizer_name);
         geoSwitch = findViewById(R.id.switchGeolocation);
         profileButton = findViewById(R.id.btn_to_edit_profile);
 
@@ -338,14 +336,21 @@ public class EventCreateActivity extends AppCompatActivity {
             String description = eventDescriptionInput.getText().toString().trim();
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
-           // String posterImageURL = posterURLInput.getText().toString().trim();
-            String organizerNameInput = organizerName.getText().toString().trim();
+            String posterImageURL = posterURLInput.getText().toString().trim();
             String eventTypeInput = eventType.getText().toString().trim();
+
+            Profiles profilesHelper = new Profiles();
+            String myId = profilesHelper.getDeviceId(this);
+
+
+            String autoName = getIntent().getStringExtra("USER_NAME");
 
             Event event = new Event();
             event.setTitle(eventName);
             event.setLocation(location);
             event.setDescription(description);
+            event.setDeviceId(myId);
+            event.setOrganizerName(autoName);
 
            /* if (!posterImageURL.isEmpty()) {
 
@@ -362,9 +367,6 @@ public class EventCreateActivity extends AppCompatActivity {
                 event.setDateEvent(eventDate);
             }
 
-            if (!organizerNameInput.isEmpty()) {
-                event.setOrganizerName(organizerNameInput);
-            }
 
             if (!eventTypeInput.isEmpty()) {
                 event.setEventType(eventTypeInput);
@@ -402,20 +404,7 @@ public class EventCreateActivity extends AppCompatActivity {
             boolean geoRequired = geoSwitch.isChecked();
             event.setGeolocationRequired(geoRequired);
             eventStore.addEvent(event);
-            eventDateInput.setText("");
-            eventNameInput.setText("");
-            locationInput.setText("");
-            startDateInput.setText("");
-            endDateInput.setText("");
-            eventDescriptionInput.setText("");
-            capacityInput.setText("");
-            //posterURLInput.setText("");
-            organizerName.setText("");
-            eventType.setText("");
-            posterPreview.setVisibility(View.GONE);
-            uploadPosterButton.setText("Upload Poster Image");
-            posterDownloadUrl = null;
-            image = null;
+            finish();
         });
     }
 
