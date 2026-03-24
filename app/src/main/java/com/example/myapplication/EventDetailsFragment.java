@@ -284,6 +284,7 @@ public class EventDetailsFragment extends DialogFragment {
     private void joinWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered, TextView eventFull){
         Map<String, Object> entrantInfo = new HashMap<>();
         entrantInfo.put("userId", deviceId);
+        entrantInfo.put("status", "waiting");
 
 
 
