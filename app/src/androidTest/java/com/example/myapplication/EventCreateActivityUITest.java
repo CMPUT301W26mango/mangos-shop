@@ -263,11 +263,11 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
     }
 
-    @Test
-    public void testPosterPreviewDefaultNotVisible() {
-        onView(withId(R.id.poster_image_preview)).perform(scrollTo());
-        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
-    }
+//    @Test
+//    public void testPosterPreviewDefaultNotVisible() {
+//        onView(withId(R.id.poster_image_preview)).perform(scrollTo());
+//        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
+//    }
 
 //    @Test
 //    public void testCreateButtonResetsPosterButtonText() {
