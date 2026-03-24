@@ -336,7 +336,6 @@ public class EventCreateActivity extends AppCompatActivity {
             String description = eventDescriptionInput.getText().toString().trim();
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
-            String posterImageURL = posterURLInput.getText().toString().trim();
             String eventTypeInput = eventType.getText().toString().trim();
 
             Profiles profilesHelper = new Profiles();

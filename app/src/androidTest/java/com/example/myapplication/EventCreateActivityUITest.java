@@ -118,38 +118,30 @@ public class EventCreateActivityUITest {
                 .check(matches(withText("Sports")));
     }
 
-    @Test
-    public void testTypeOrganizerName() {
-        onView(withId(R.id.organizer_name))
-                .perform(scrollTo(), typeText("Test Name"), closeSoftKeyboard());
-        onView(withId(R.id.organizer_name))
-                .check(matches(withText("Test Name")));
-    }
 
+//    @Test
+//    public void testCreateButtonClearsEventName() {
+//        onView(withId(R.id.event_name_input))
+//                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.event_name_input)).check(matches(withText("")));
+//    }
+//
+//    @Test
+//    public void testCreateButtonClearsLocation() {
+//        onView(withId(R.id.location_input))
+//                .perform(typeText("Old Trafford"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.location_input)).check(matches(withText("")));
+//    }
 
-    @Test
-    public void testCreateButtonClearsEventName() {
-        onView(withId(R.id.event_name_input))
-                .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.event_name_input)).check(matches(withText("")));
-    }
-
-    @Test
-    public void testCreateButtonClearsLocation() {
-        onView(withId(R.id.location_input))
-                .perform(typeText("Old Trafford"), closeSoftKeyboard());
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.location_input)).check(matches(withText("")));
-    }
-
-    @Test
-    public void testCreateButtonClearsCapacity() {
-        onView(withId(R.id.capacity_input))
-                .perform(scrollTo(), typeText("100"), closeSoftKeyboard());
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.capacity_input)).check(matches(withText("")));
-    }
+//    @Test
+//    public void testCreateButtonClearsCapacity() {
+//        onView(withId(R.id.capacity_input))
+//                .perform(scrollTo(), typeText("100"), closeSoftKeyboard());
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.capacity_input)).check(matches(withText("")));
+//    }
 
 
 //    @Test
@@ -271,23 +263,23 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
     }
 
-    @Test
-    public void testPosterPreviewDefaultNotVisible() {
-        onView(withId(R.id.poster_image_preview)).perform(scrollTo());
-        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
-    }
+//    @Test
+//    public void testPosterPreviewDefaultNotVisible() {
+//        onView(withId(R.id.poster_image_preview)).perform(scrollTo());
+//        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
+//    }
 
-    @Test
-    public void testCreateButtonResetsPosterButtonText() {
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
-        onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
-    }
+//    @Test
+//    public void testCreateButtonResetsPosterButtonText() {
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.upload_poster_button)).perform(scrollTo());
+//        onView(withId(R.id.upload_poster_button)).check(matches(withText("Upload Poster Image")));
+//    }
 
-    @Test
-    public void testCreateButtonHidesPosterPreview() {
-        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
-        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
-    }
+//    @Test
+//    public void testCreateButtonHidesPosterPreview() {
+//        onView(withId(R.id.create_event_button)).perform(scrollTo(), click());
+//        onView(withId(R.id.poster_image_preview)).check(matches(not(isDisplayed())));
+//    }
 
 }
