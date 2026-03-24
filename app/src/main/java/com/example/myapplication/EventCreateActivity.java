@@ -83,6 +83,9 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText capacityInput;
 
+    private EditText waitingListInput;
+
+
     private EditText eventType;
     private Switch geoSwitch;
     private ImageButton profileButton;
@@ -139,6 +142,7 @@ public class EventCreateActivity extends AppCompatActivity {
         createEventButton = findViewById(R.id.create_event_button);
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
+        waitingListInput = findViewById(R.id.max_waitingList_size);
         eventType = findViewById(R.id.event_type);
         geoSwitch = findViewById(R.id.switchGeolocation);
         profileButton = findViewById(R.id.btn_to_edit_profile);
@@ -336,6 +340,7 @@ public class EventCreateActivity extends AppCompatActivity {
             String description = eventDescriptionInput.getText().toString().trim();
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
+            String waitingListText = waitingListInput.getText().toString().trim();
             String eventTypeInput = eventType.getText().toString().trim();
 
             Profiles profilesHelper = new Profiles();
@@ -396,6 +401,12 @@ public class EventCreateActivity extends AppCompatActivity {
             if (!capacityText.isEmpty()) {
                 event.setCapacity(Integer.parseInt(capacityText));
             }
+
+
+            if (!waitingListText.isEmpty()) {
+                event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
+            }
+
 
 
 
