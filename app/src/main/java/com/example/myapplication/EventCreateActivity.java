@@ -414,6 +414,16 @@ public class EventCreateActivity extends AppCompatActivity {
             boolean geoRequired = geoSwitch.isChecked();
             event.setGeolocationRequired(geoRequired);
             eventStore.addEvent(event);
+
+            if (image != null && posterDownloadUrl == null) {
+                Toast.makeText(this, "Please wait for poster to finish uploading...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            posterPreview.setVisibility(View.GONE);
+            uploadPosterButton.setText("Upload Poster Image");
+            posterDownloadUrl = null;
+            image = null;
             finish();
         });
     }

@@ -3,10 +3,13 @@ package com.example.myapplication;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 /**
@@ -54,6 +57,15 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         holder.titleText.setText(event.getTitle());
         holder.locationText.setText("Location: " + event.getLocation());
         holder.capacityText.setText("Capacity: " + event.getCapacity());
+
+        if (event.getPosterURL() != null && !event.getPosterURL().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(event.getPosterURL())
+                    .centerCrop()
+                    .into(holder.imagePoster);
+        } else {
+            holder.imagePoster.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
     }
 
     /**
@@ -73,6 +85,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
      */
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView titleText, locationText, capacityText;
+        ImageView imagePoster;
         /**
          * Initializes the components found in the event card layout.
          * @param itemView The view of the individual event card.
@@ -82,6 +95,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             titleText = itemView.findViewById(R.id.card_event_name);
             locationText = itemView.findViewById(R.id.card_event_location);
             capacityText = itemView.findViewById(R.id.card_event_capacity);
+            imagePoster = itemView.findViewById(R.id.card_event_image);
         }
     }
 }
