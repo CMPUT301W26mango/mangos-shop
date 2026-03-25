@@ -2,7 +2,9 @@ package com.example.myapplication;
 
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -30,6 +33,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     // The events
     List<Event> eventList;
     FragmentManager fragmentManager;
+    private FirebaseFirestore db;
 
     /**
     * This is the Constructor for the Adapter, it initializes the event list and the fragment manager
@@ -41,8 +45,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     * */
 
     public EventAdapter(List<Event> eventList, FragmentManager fragmentManager){
+
+
         this.eventList = eventList;
         this.fragmentManager = fragmentManager;
+        this.db = FirebaseFirestore.getInstance();
     }
 
 
@@ -106,6 +113,60 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.imageViewPoster.setBackgroundColor(0xFFE8E8E8);
         }
 
+        holder.eventStatus.setVisibility(View.GONE);
+
+        String deviceId = Settings.Secure.getString(
+                holder.itemView.getContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        String firestoreDocId = event.getId();
+        if (firestoreDocId != null && !firestoreDocId.isEmpty()) {
+            db.collection("events")
+                    .document(firestoreDocId)
+                    .collection("waitingList")
+                    .document(deviceId)
+                    .addSnapshotListener((doc, e) -> {
+
+                        if (e != null || doc == null) return;
+
+                        if (doc.exists()) {
+                            String status = doc.getString("status");
+                            if (status == null) status = "waiting";
+
+                            holder.eventStatus.setVisibility(View.VISIBLE);
+
+                            if (status.equals("selected")) {
+
+                                holder.eventStatus.setText("Status: Selected");
+                                holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
+                                holder.eventCardRoot.setBackgroundResource(R.drawable.yellow_border);
+
+                            } else if (status.equals("accepted")) {
+
+                                holder.eventStatus.setText("Status: Accepted");
+                                holder.eventStatus.setTextColor(Color.parseColor("#008000"));
+                                holder.eventCardRoot.setBackgroundResource(R.drawable.green_border);
+
+                            } else if (status.equals("rejected")) {
+
+                                holder.eventStatus.setText("Status: Rejected");
+                                holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
+                                holder.eventCardRoot.setBackgroundResource(R.drawable.red_border);
+
+                            } else {
+
+                                holder.eventStatus.setText("Status: Waiting");
+                                holder.eventStatus.setTextColor(Color.parseColor("#000000"));
+                                holder.eventCardRoot.setBackgroundResource(R.drawable.black_border);
+                            }
+
+                        } else {
+                            holder.eventStatus.setVisibility(View.GONE);
+                            holder.eventCardRoot.setBackgroundResource(R.drawable.rounded_card);
+                        }
+                    });
+        }
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +201,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView location;
         TextView deadline;
 
+        View eventCardRoot;
+
         TextView organizer;
+        TextView eventStatus;
 
         /**
          * Initializes all the UI elements in this object
@@ -154,8 +218,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             location = itemView.findViewById(R.id.textViewLocation);
             deadline = itemView.findViewById(R.id.textViewDeadline);
             organizer = itemView.findViewById(R.id.textViewOrganizer);
+            eventStatus = itemView.findViewById(R.id.eventStatus);
+            eventCardRoot = itemView.findViewById(R.id.eventCardRoot);
+
         }
     }
-
 
 }
