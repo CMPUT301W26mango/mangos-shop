@@ -41,6 +41,56 @@
             android:text="Event Name"
             android:textColor="@color/darkergray"/>
 
+
+        <TextView
+            android:id="@+id/tv_selected_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Congratulations, you were chosen to sign up!"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textColor="#008000"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_accepted_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You have accepted the invitation!"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textColor="#008000"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_rejected_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Unfortunately, you were not chosen in the lottery."
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textColor="#FF0000"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_lottery_redraw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="It is not completely over, someone else\nmay reject their oppurtunity and you may be selected instead.\nPlease do not give up hope!"
+            android:textAlignment="center"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            />
+
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -352,16 +402,30 @@
             android:layout_marginBottom="8dp" />
 
         <Button
+            android:id="@+id/acceptBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Accept invitation!"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#008000"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            />
+
+        <Button
             android:id="@+id/cancelRegisterBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Remove from Waitlist"
+            android:text="Leave waiting list"
             android:textSize="16sp"
             android:textColor="#FFFFFF"
             android:backgroundTint="@color/red"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:visibility="gone"/>
+
 
 
     </LinearLayout>
