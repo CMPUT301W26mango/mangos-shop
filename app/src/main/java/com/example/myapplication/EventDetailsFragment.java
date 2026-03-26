@@ -21,8 +21,10 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
@@ -43,6 +45,7 @@ public class EventDetailsFragment extends DialogFragment {
 
     private String firestoreDocId;
     private String deviceId;
+    private ListenerRegistration statusListener;
 
     public EventDetailsFragment() {
 
@@ -105,6 +108,10 @@ public class EventDetailsFragment extends DialogFragment {
      */
     private void loadEventFromFirestore(String eventId, View view) {
         TextView tvTitle = view.findViewById(R.id.tv_event_title);
+        TextView selectedMsg = view.findViewById(R.id.tv_selected_message);
+        TextView acceptedMsg = view.findViewById(R.id.tv_accepted_message);
+        TextView rejectedMsg = view.findViewById(R.id.tv_rejected_message);
+        TextView lotteryRedrawMsg = view.findViewById(R.id.tv_lottery_redraw);
         TextView tvLocation = view.findViewById(R.id.tv_event_location);
         TextView tvSpots = view.findViewById(R.id.tv_spots_available);
         TextView tvOrganizer = view.findViewById(R.id.tv_organizer);
@@ -117,6 +124,7 @@ public class EventDetailsFragment extends DialogFragment {
         ImageView ivPoster = view.findViewById(R.id.iv_event_poster);
 
         Button registerBtn = view.findViewById(R.id.registerBtn);
+        Button acceptBtn = view.findViewById(R.id.acceptBtn);
         Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
         TextView textViewAlreadyRegistered = view.findViewById(R.id.alreadyRegisteredTextView);
 
@@ -202,7 +210,13 @@ public class EventDetailsFragment extends DialogFragment {
                         }
 
                         // Determine what button to show
-                        isRegistered(registerBtn, btnCancel, textViewAlreadyRegistered);
+                       // isRegistered(registerBtn, btnCancel, textViewAlreadyRegistered);
+
+
+                        // Check registration status and show correct UI
+                        checkStatusAndShowUI(registerBtn, btnCancel, acceptBtn,
+                                textViewAlreadyRegistered, selectedMsg,
+                                acceptedMsg, rejectedMsg, lotteryRedrawMsg,eventFull);
 
                         // Create a listener for the two buttons
                         registerBtn.setOnClickListener(new View.OnClickListener() {
@@ -212,12 +226,24 @@ public class EventDetailsFragment extends DialogFragment {
                             }
                         });
 
+
+                       acceptBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                acceptInvitation(acceptBtn, selectedMsg, acceptedMsg);
+                            }
+                        });
+
+
                         btnCancel.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                leaveWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered);
+                                leaveWaitingList(registerBtn, btnCancel, acceptBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg);
                             }
                         });
+
+
+
 
                     } else {
                         if (!isAdded() || getContext() == null) return;
@@ -232,6 +258,8 @@ public class EventDetailsFragment extends DialogFragment {
                     dismiss();
                 });
     }
+
+
 
 
     /**
@@ -312,6 +340,7 @@ public class EventDetailsFragment extends DialogFragment {
                                 // Swap buttons
                                 registerBtn.setVisibility(View.GONE);
                                 cancelBtn.setVisibility(View.VISIBLE);
+                                cancelBtn.setText("Leave waiting list");
                                 textViewAlreadyRegistered.setVisibility(View.VISIBLE);
                     }).addOnFailureListener(e -> {
                             if (!isAdded() || getContext() == null) return;
@@ -341,7 +370,7 @@ public class EventDetailsFragment extends DialogFragment {
      * @param textViewAlreadyRegistered
      *  This is a text view to show that they are already registered and can cancel
      * */
-    private void leaveWaitingList(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
+    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage){
         db.collection("events")
                 .document(firestoreDocId)
                 .collection("waitingList")
@@ -357,6 +386,9 @@ public class EventDetailsFragment extends DialogFragment {
                             Toast.LENGTH_SHORT).show();
 
                     // Swap buttons back
+                    acceptBtn.setVisibility(View.GONE);
+                    tvSelectedMessage.setVisibility(View.GONE);
+                    tvAcceptedMessage.setVisibility(View.GONE);
                     registerBtn.setVisibility(View.VISIBLE);
                     cancelBtn.setVisibility(View.GONE);
                     textViewAlreadyRegistered.setVisibility(View.GONE);
@@ -370,5 +402,109 @@ public class EventDetailsFragment extends DialogFragment {
                 });
     }
 
+
+    /**
+     * Checks the entrant's current status in the waiting list and shows the correct UI.
+     */
+    private void checkStatusAndShowUI(Button registerBtn, Button cancelBtn,
+                                      Button acceptBtn,
+                                      TextView tvAlreadyRegistered,
+                                      TextView tvSelectedMessage,
+                                      TextView tvAcceptedMessage,
+                                      TextView tvRejectedMessage,
+                                      TextView tvRedrawMessage,
+                                      TextView eventFull) {
+
+            statusListener = db.collection("events")
+                    .document(firestoreDocId)
+                    .collection("waitingList")
+                    .document(deviceId)
+                    .addSnapshotListener((doc, e) -> {
+
+                        if (e != null) {
+                            Log.e(logTag, "Listener failed", e);
+                            return;
+                        }
+
+                        if (!isAdded() || getContext() == null) return;
+
+                        // Reset UI
+                        registerBtn.setVisibility(View.GONE);
+                        cancelBtn.setVisibility(View.GONE);
+                        acceptBtn.setVisibility(View.GONE);
+
+                        tvAlreadyRegistered.setVisibility(View.GONE);
+                        tvSelectedMessage.setVisibility(View.GONE);
+                        tvAcceptedMessage.setVisibility(View.GONE);
+                        tvRejectedMessage.setVisibility(View.GONE);
+                        tvRedrawMessage.setVisibility(View.GONE);
+
+                        if (doc != null && doc.exists()) {
+                            String status = doc.getString("status");
+                            if (status == null) status = "waiting";
+
+                            switch (status) {
+                                case "selected":
+                                    tvSelectedMessage.setVisibility(View.VISIBLE);
+                                    acceptBtn.setVisibility(View.VISIBLE);
+                                    cancelBtn.setVisibility(View.VISIBLE);
+                                    cancelBtn.setText("Decline invitation");
+                                    break;
+
+                                case "accepted":
+                                    tvAcceptedMessage.setVisibility(View.VISIBLE);
+                                    cancelBtn.setVisibility(View.VISIBLE);
+                                    cancelBtn.setText("Cancel");
+                                    break;
+
+                                case "rejected":
+                                    tvRejectedMessage.setVisibility(View.VISIBLE);
+                                    tvRedrawMessage.setVisibility(View.VISIBLE);
+                                    cancelBtn.setVisibility(View.VISIBLE);
+                                    cancelBtn.setText("Leave waiting list");
+                                    break;
+
+                                default:
+                                    cancelBtn.setVisibility(View.VISIBLE);
+                                    tvAlreadyRegistered.setVisibility(View.VISIBLE);
+                                    break;
+                            }
+                        } else {
+                            registerBtn.setVisibility(View.VISIBLE);
+                        }
+                    });
+        }
+
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            if (statusListener != null) {
+                statusListener.remove();
+            }
+
+
+    }
+
+
+    /**
+     * Updates status to "accepted" when entrant accepts the invitation
+     */
+    private void acceptInvitation(Button acceptBtn, TextView tvSelectedMessage, TextView tvAcceptedMessage) {
+        db.collection("events").document(firestoreDocId)
+                .collection("waitingList").document(deviceId)
+                .update("status", "accepted")
+                .addOnSuccessListener(v -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "You've accepted the invitation!",
+                            Toast.LENGTH_SHORT).show();
+                    acceptBtn.setVisibility(View.GONE);
+                    tvSelectedMessage.setVisibility(View.GONE);
+                    tvAcceptedMessage.setVisibility(View.VISIBLE);
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                });
+    }
 
 }
