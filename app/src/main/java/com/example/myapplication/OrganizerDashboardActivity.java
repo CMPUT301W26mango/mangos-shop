@@ -65,10 +65,16 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
         String myId = profilesHelper.getDeviceId(this);
 
         EventStore eventStore = new EventStore();
+
+        // Only call this once!
         eventStore.getEventsByOrganizer(myId, events -> {
-            OrganizerEventAdapter adapter = new OrganizerEventAdapter(events);
+            // Pass the click listener (the interface we discussed)
+            OrganizerEventAdapter adapter = new OrganizerEventAdapter(events, event -> {
+                Intent intent = new Intent(this, EventDetailActivity.class);
+                intent.putExtra("EVENT_ID", event.getId());
+                startActivity(intent);
+            });
             recyclerView.setAdapter(adapter);
         });
     }
-
 }

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
 /**
  * Adapter class for the RecycleView used in the Organizer Dashboard.
  * This class handles the mapping of a list of Event objects into the
@@ -16,15 +17,22 @@ import java.util.List;
  * @author Sayuj
  */
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.EventViewHolder> {
-
     private List<Event> eventList;
+
+    public interface OnEventClickListener {
+        void onEventClick(Event event);
+    }
+
+    private OnEventClickListener clickListener;
 
     /**
      * Constructs a new OrganizerEventAdapter.
      * @param eventList The initial list of events to be displayed in the dashboard.
+     * @param clickListener The listener to handle event card click events.
      */
-    public OrganizerEventAdapter(List<Event> eventList) {
+    public OrganizerEventAdapter(List<Event> eventList, OnEventClickListener clickListener) {
         this.eventList = eventList;
+        this.clickListener = clickListener;
     }
 
     /**
@@ -54,6 +62,10 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         holder.titleText.setText(event.getTitle());
         holder.locationText.setText("Location: " + event.getLocation());
         holder.capacityText.setText("Capacity: " + event.getCapacity());
+
+        holder.itemView.setOnClickListener(v -> {
+            clickListener.onEventClick(event);
+        });
     }
 
     /**
@@ -65,7 +77,6 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         return eventList != null ? eventList.size() : 0;
     }
 
-
     /**
      * ViewHolder class that caches references to the components of an event card.
      * This improves performance by avoiding repeated calls to findViewById
@@ -73,6 +84,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
      */
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView titleText, locationText, capacityText;
+
         /**
          * Initializes the components found in the event card layout.
          * @param itemView The view of the individual event card.

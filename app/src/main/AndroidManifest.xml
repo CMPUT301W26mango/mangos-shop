@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".OrganizerDashboardActivity"
             android:exported="false" />
         <activity
