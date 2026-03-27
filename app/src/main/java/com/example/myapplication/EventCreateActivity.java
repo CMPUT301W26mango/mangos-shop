@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -43,6 +44,7 @@ import java.util.UUID;
 
 import android.content.Intent;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -127,6 +129,50 @@ public class EventCreateActivity extends AppCompatActivity {
                 }
             });
 
+
+    private void fetchEventDataForEditing(String eventId) {
+        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Event event = documentSnapshot.toObject(Event.class);
+                    if (event != null) {
+                        // pre fill
+                        eventNameInput.setText(event.getTitle());
+                        locationInput.setText(event.getLocation());
+                        eventDescriptionInput.setText(event.getDescription());
+                        capacityInput.setText(String.valueOf(event.getCapacity()));
+                        waitingListInput.setText(String.valueOf(event.getMaxWaitingListSize()));
+                        eventType.setText(event.getEventType());
+                        eventDateInput.setText(event.getDateEvent());
+
+                        // geo logic
+                        geoSwitch.setChecked(event.getGeolocationRequired());
+
+                        // time logic
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                        if (event.getRegStart() != null) {
+                            startDateInput.setText(formatter.format(event.getRegStart().toDate()));
+                        }
+                        if (event.getRegEnd() != null) {
+                            endDateInput.setText(formatter.format(event.getRegEnd().toDate()));
+                        }
+
+                        // Poster Preview
+                        if (event.getPosterURL() != null && !event.getPosterURL().isEmpty()) {
+                            posterDownloadUrl = event.getPosterURL(); // Store the URL for saving later
+                            posterPreview.setVisibility(View.VISIBLE);
+                            Glide.with(this)
+                                    .load(posterDownloadUrl)
+                                    .into(posterPreview);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error loading event data", Toast.LENGTH_SHORT).show();
+                });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,7 +184,6 @@ public class EventCreateActivity extends AppCompatActivity {
         startDateInput = findViewById(R.id.start_date_input);
         endDateInput = findViewById(R.id.end_date_input);
         eventDescriptionInput = findViewById(R.id.event_description_input);
-        //posterURLInput = findViewById(R.id.posterurl_input);
         uploadPosterButton = findViewById(R.id.upload_poster_button);
         posterPreview = findViewById(R.id.poster_image_preview);
         createEventButton = findViewById(R.id.create_event_button);
@@ -148,6 +193,20 @@ public class EventCreateActivity extends AppCompatActivity {
         eventType = findViewById(R.id.event_type);
         geoSwitch = findViewById(R.id.switchGeolocation);
         profileButton = findViewById(R.id.btn_to_edit_profile);
+
+        String mode = getIntent().getStringExtra("MODE");
+        String eventId = getIntent().getStringExtra("EVENT_ID");
+
+        if ("EDIT".equals(mode) && eventId != null) {
+            // change ui text
+            TextView titleHeader = findViewById(R.id.create_event_title);
+            titleHeader.setText("Edit Your Event");
+
+            createEventButton.setText("Update");
+
+            // pull data
+            fetchEventDataForEditing(eventId);
+        }
 
 
         profileButton.setOnClickListener(v -> {
@@ -322,7 +381,6 @@ public class EventCreateActivity extends AppCompatActivity {
             dialog.show();
         });
 
-
         FirebaseApp.initializeApp(EventCreateActivity.this);
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -331,7 +389,6 @@ public class EventCreateActivity extends AppCompatActivity {
             intent.setType("image/*");
             activityResultLauncher.launch(intent);
         });
-
 
         eventStore = new EventStore();
         createEventButton.setOnClickListener(v -> {
@@ -361,27 +418,18 @@ public class EventCreateActivity extends AppCompatActivity {
             event.setDeviceId(myId);
             event.setOrganizerName(autoName);
 
-           /* if (!posterImageURL.isEmpty()) {
-
-                event.setPosterURL(posterImageURL);
-            } */
-
 
             if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
                 event.setPosterURL(posterDownloadUrl);
             }
 
-
             if (!eventDate.isEmpty()) {
                 event.setDateEvent(eventDate);
             }
 
-
             if (!eventTypeInput.isEmpty()) {
                 event.setEventType(eventTypeInput);
             }
-
-
 
             if (!startDate.isEmpty()) {
                 try {
@@ -412,21 +460,35 @@ public class EventCreateActivity extends AppCompatActivity {
                 event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
             }
 
-
-
-
-
             boolean geoRequired = geoSwitch.isChecked();
             event.setGeolocationRequired(geoRequired);
 
-            eventStore.addEvent(event);
-            posterPreview.setVisibility(View.GONE);
-            uploadPosterButton.setText("Upload Poster Image");
-            posterDownloadUrl = null;
-            image = null;
-            finish();
+            if (eventId != null) event.setId(eventId);
+
+            if ("EDIT".equals(mode) && eventId != null) {
+                createEventButton.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                // overwrite existing data
+                com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                        .collection("events")
+                        .document(eventId)
+                        .set(event)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
+                            posterPreview.setVisibility(View.GONE);
+                            uploadPosterButton.setText("Upload Poster Image");
+                            posterDownloadUrl = null;
+                            image = null;
+                            finish(); // Go back to the Detail page
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                // no edit mode
+                eventStore.addEvent(event);
+                finish();
+            }
         });
+
     }
-
-
 }
