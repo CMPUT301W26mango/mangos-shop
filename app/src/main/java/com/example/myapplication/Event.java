@@ -82,7 +82,7 @@ public class Event {
     // Getters and Setters
 
     /**
-     * @return the unique device id of the user
+     * @return the unique device id of the organizer
      */
     public String getDeviceId() {
         return deviceId;
@@ -90,7 +90,7 @@ public class Event {
 
     /**
      *
-     * @param deviceId the device id of the user to set
+     * @param deviceId the device id of the organizer to set
      */
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;

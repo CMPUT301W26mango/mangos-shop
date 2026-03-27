@@ -6,9 +6,6 @@ import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,10 +62,15 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
         String myId = profilesHelper.getDeviceId(this);
 
         EventStore eventStore = new EventStore();
+
+
         eventStore.getEventsByOrganizer(myId, events -> {
-            OrganizerEventAdapter adapter = new OrganizerEventAdapter(events);
+            OrganizerEventAdapter adapter = new OrganizerEventAdapter(events, event -> {
+                Intent intent = new Intent(this, EventDetailActivity.class);
+                intent.putExtra("EVENT_ID", event.getId());
+                startActivity(intent);
+            });
             recyclerView.setAdapter(adapter);
         });
     }
-
 }
