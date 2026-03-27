@@ -7,4 +7,35 @@
     android:layout_height="match_parent"
     tools:context=".EventDetailActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+
+
+        <ImageView
+            android:id="@+id/btn_settings_cog"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="16dp"
+            android:padding="8dp"
+            android:src="@drawable/settings_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Settings" />
+
+        <ImageView
+            android:id="@+id/btn_share_qr"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toStartOf="@id/btn_settings_cog"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:src="@drawable/share_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Share QR" />
+
+    </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,6 +26,8 @@ import java.util.List;
 @Config(sdk = 34)
 public class OrganizerEventAdapterTest {
 
+    private final OrganizerEventAdapter.OnEventClickListener noOpListener = event -> {};
+
     private Event makeEvent(String title, String location, int capacity) {
         Event e = new Event();
         e.setTitle(title);
@@ -40,26 +42,26 @@ public class OrganizerEventAdapterTest {
                 makeEvent("Event A", "Room 1", 50),
                 makeEvent("Event B", "Room 2", 100)
         );
-        OrganizerEventAdapter adapter = new OrganizerEventAdapter(events);
+        OrganizerEventAdapter adapter = new OrganizerEventAdapter(events, noOpListener);
         assertEquals(2, adapter.getItemCount());
     }
 
     @Test
     public void getItemCount_returnsZeroForEmptyList() {
-        OrganizerEventAdapter adapter = new OrganizerEventAdapter(new ArrayList<>());
+        OrganizerEventAdapter adapter = new OrganizerEventAdapter(new ArrayList<>(), noOpListener);
         assertEquals(0, adapter.getItemCount());
     }
 
     @Test
     public void getItemCount_returnsZeroForNullList() {
-        OrganizerEventAdapter adapter = new OrganizerEventAdapter(null);
+        OrganizerEventAdapter adapter = new OrganizerEventAdapter(null, noOpListener);
         assertEquals(0, adapter.getItemCount());
     }
 
     @Test
     public void getItemCount_singleItem() {
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(
-                Arrays.asList(makeEvent("Solo Event", "Hall A", 200))
+                Arrays.asList(makeEvent("Solo Event", "Hall A", 200)), noOpListener
         );
         assertEquals(1, adapter.getItemCount());
     }
@@ -67,7 +69,7 @@ public class OrganizerEventAdapterTest {
     @Test
     public void onBindViewHolder_setsTitle() {
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(
-                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30))
+                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30)), noOpListener
         );
         Context ctx = ApplicationProvider.getApplicationContext();
         OrganizerEventAdapter.EventViewHolder holder =
@@ -79,7 +81,7 @@ public class OrganizerEventAdapterTest {
     @Test
     public void onBindViewHolder_setsLocation() {
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(
-                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30))
+                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30)), noOpListener
         );
         Context ctx = ApplicationProvider.getApplicationContext();
         OrganizerEventAdapter.EventViewHolder holder =
@@ -91,7 +93,7 @@ public class OrganizerEventAdapterTest {
     @Test
     public void onBindViewHolder_setsCapacity() {
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(
-                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30))
+                Arrays.asList(makeEvent("Tech Talk", "Lab 3", 30)), noOpListener
         );
         Context ctx = ApplicationProvider.getApplicationContext();
         OrganizerEventAdapter.EventViewHolder holder =
@@ -106,7 +108,7 @@ public class OrganizerEventAdapterTest {
                 makeEvent("First Event", "Room A", 10),
                 makeEvent("Second Event", "Room B", 99)
         );
-        OrganizerEventAdapter adapter = new OrganizerEventAdapter(events);
+        OrganizerEventAdapter adapter = new OrganizerEventAdapter(events, noOpListener);
         Context ctx = ApplicationProvider.getApplicationContext();
         OrganizerEventAdapter.EventViewHolder holder =
                 adapter.onCreateViewHolder(new FrameLayout(ctx), 0);
@@ -114,5 +116,22 @@ public class OrganizerEventAdapterTest {
         assertEquals("Second Event", holder.titleText.getText().toString());
         assertEquals("Location: Room B", holder.locationText.getText().toString());
         assertEquals("Capacity: 99", holder.capacityText.getText().toString());
+    }
+
+    @Test
+    public void clickListener_isTriggeredOnItemClick() {
+        Event targetEvent = makeEvent("Clickable Event", "Room X", 20);
+        final Event[] clickedEvent = {null};
+
+        OrganizerEventAdapter adapter = new OrganizerEventAdapter(
+                Arrays.asList(targetEvent), event -> clickedEvent[0] = event
+        );
+        Context ctx = ApplicationProvider.getApplicationContext();
+        OrganizerEventAdapter.EventViewHolder holder =
+                adapter.onCreateViewHolder(new FrameLayout(ctx), 0);
+        adapter.onBindViewHolder(holder, 0);
+        holder.itemView.performClick();
+
+        assertEquals(targetEvent, clickedEvent[0]);
     }
 }
