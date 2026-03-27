@@ -96,6 +96,7 @@ public class EventCreateActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     image = result.getData().getData();
+                    createEventButton.setVisibility(View.GONE);
                     uploadPosterButton.setText("Uploading...");
                     uploadPosterButton.setEnabled(false);
 
@@ -110,6 +111,7 @@ public class EventCreateActivity extends AppCompatActivity {
                                     ref.getDownloadUrl().addOnSuccessListener(uri -> {
                                         posterDownloadUrl = uri.toString();
                                         uploadPosterButton.setText("Poster Uploaded ✓");
+                                        createEventButton.setVisibility((View.VISIBLE));
                                         uploadPosterButton.setEnabled(true);
                                         Toast.makeText(this, "Poster uploaded!", Toast.LENGTH_SHORT).show();
                                     })
@@ -348,6 +350,9 @@ public class EventCreateActivity extends AppCompatActivity {
 
 
             String autoName = getIntent().getStringExtra("USER_NAME");
+            if (autoName == null) {
+                autoName = "Organizer";
+            }
 
             Event event = new Event();
             event.setTitle(eventName);
@@ -413,7 +418,12 @@ public class EventCreateActivity extends AppCompatActivity {
 
             boolean geoRequired = geoSwitch.isChecked();
             event.setGeolocationRequired(geoRequired);
+
             eventStore.addEvent(event);
+            posterPreview.setVisibility(View.GONE);
+            uploadPosterButton.setText("Upload Poster Image");
+            posterDownloadUrl = null;
+            image = null;
             finish();
         });
     }
