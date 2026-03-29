@@ -27,7 +27,13 @@ public class Notification {
         this.timestamp = Timestamp.now();
     }
 
+    /**
+     * Gets the specific messages for the notifications
+     * @return Returns the notifications (text)
+     */
     public String getMessage() { return message; }
+
+
     public void setMessage(String message) { this.message = message; }
 
     public String getEventId() { return eventId; }
