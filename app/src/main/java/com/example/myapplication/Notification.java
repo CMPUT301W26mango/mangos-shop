@@ -33,12 +33,33 @@ public class Notification {
      */
     public String getMessage() { return message; }
 
-
+    /**
+     * Sets the content of the messages
+     * @param message This is the message
+     */
     public void setMessage(String message) { this.message = message; }
 
+    /**
+     * Gets the Event ID of the event that the notification is from
+     * @return The Event ID
+     */
     public String getEventId() { return eventId; }
+
+    /**
+     * Sets the ID of the event associated with this notification.
+     * @param eventId The event ID string.
+     */
     public void setEventId(String eventId) { this.eventId = eventId; }
 
+    /**
+     * Gets the exact time this notification was made.
+     * @return A Firebase Timestamp (the creation time).
+     */
     public Timestamp getTimestamp() { return timestamp; }
+
+    /**
+     * Sets the time this notification was made.
+     * @param timestamp A Firebase Timestamp object.
+     */
     public void setTimestamp(Timestamp timestamp) { this.timestamp = timestamp; }
 }
