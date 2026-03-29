@@ -117,4 +117,17 @@ public class Profiles {
             onSuccess.onSuccess(snapshot.getCount());
         });
     }
+
+    public void sendNotificationsToUser(String targetDeviceID, String message, String eventID) {
+        db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                // kinda like an off on switch
+                Boolean wantsNotification = doc.getBoolean("notifiationsEnabled");
+
+            }
+
+            Notification noti = new Notification(message, eventID);
+            db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
+        });
+    }
 }
