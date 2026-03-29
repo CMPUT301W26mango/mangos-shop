@@ -14,6 +14,13 @@ public class Notification {
     // firestore needs an empty constructor to map the data
     public Notification() {}
 
+    /**
+     * Makes Notifications (The specific messages, and according to the specific events)
+     * Time Stamp of the notification is also now a new one (current time)
+     *
+     * @param message This is the message of the notification (what the user sees)
+     * @param eventId This is the Event ID, (for the event the notification is from)
+     */
     public Notification(String message, String eventId) {
         this.message = message;
         this.eventId = eventId;
