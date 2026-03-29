@@ -23,6 +23,12 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+* Asked Gemini AI to assist in helping write the tests.
+* The prompt used: 
+* Can you please help me in ideas for what should be tested for this file <the file of code for this page> and generate some ideal test cases please.
+*/
+
 //import com.google.android.gms.tasks.Task;
 //import com.google.android.gms.tasks.Tasks;
 //

@@ -11,6 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
+* Asked Gemini AI to assist in helping write the tests.
+* The prompt used: 
+* Can you please help me in ideas for what should be tested for this file <the file of code for this page> and generate some ideal test cases please.
+*/
+
+/**
  * Tests that the Profiles class:
  * Retrieves the correct unique Device ID.
  * Handles database calls without crashing.
