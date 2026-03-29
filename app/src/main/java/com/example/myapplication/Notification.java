@@ -2,6 +2,10 @@ package com.example.myapplication;
 
 import com.google.firebase.Timestamp;
 
+/**
+ * Notifications sent to User.
+ * Used by organizers to announce lottery results (if the user has been selected or not), and to notify general updates.
+ */
 public class Notification {
     private String message;
     private String eventId;
