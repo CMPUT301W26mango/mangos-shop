@@ -153,7 +153,7 @@ public class CreateAccount extends AppCompatActivity {
         if (user instanceof Admin) {
             intent = new Intent(this, AdminBrowseEventsActivity.class);
         } else if (user instanceof Organizer) {
-            intent = new Intent(this, EventCreateActivity.class);
+            intent = new Intent(this, OrganizerDashboardActivity.class);
         } else {
             // The default fallback ensures 'intent' is ALWAYS initialized
             intent = new Intent(this, EventListActivity.class);

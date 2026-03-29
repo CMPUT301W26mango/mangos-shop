@@ -138,6 +138,8 @@
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
+
+                <!--
                 <EditText
                     android:id="@+id/posterurl_input"
                     android:layout_width="match_parent"
@@ -147,7 +149,7 @@
                     android:hint="Poster Image URL"
                     android:inputType="textMultiLine"
                     android:paddingStart="30dp"
-                    android:paddingEnd="30dp" />
+                    android:paddingEnd="30dp" /> -->
 
                 <EditText
                     android:id="@+id/event_type"
@@ -156,17 +158,6 @@
                     android:layout_marginTop="30dp"
                     android:background="@drawable/rounded_input_box"
                     android:hint="Event Type"
-                    android:inputType="textMultiLine"
-                    android:paddingStart="30dp"
-                    android:paddingEnd="30dp" />
-
-                <EditText
-                    android:id="@+id/organizer_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="30dp"
-                    android:background="@drawable/rounded_input_box"
-                    android:hint="Event Author"
                     android:inputType="textMultiLine"
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
@@ -191,12 +182,34 @@
                     android:src="@android:drawable/ic_menu_myplaces"
                     android:contentDescription="Edit Profile" />
 
+
+                <Button
+                    android:id="@+id/upload_poster_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/main_button_style"
+                    android:text="Upload Poster Image"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@null" />
+
+                <ImageView
+                    android:id="@+id/poster_image_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    android:background="#DDDDDD"
+                    android:contentDescription="Poster Preview"
+                    android:visibility="gone" />
+
                 <Button
                     android:id="@+id/create_event_button"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="48dp"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="24dp"
                     android:background="@drawable/main_button_style"
                     android:text="Create"

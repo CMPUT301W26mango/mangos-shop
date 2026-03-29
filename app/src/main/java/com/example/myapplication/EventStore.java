@@ -32,6 +32,10 @@ public class EventStore {
         void onEventLoaded(Event event);
     }
 
+    public interface OnMultipleEventsLoadedListener {
+        void onEventsLoaded(java.util.List<Event> events);
+    }
+
     /**
      * Constructs a new EventStore and initializes the Firestore instance.
      */
@@ -63,6 +67,7 @@ public class EventStore {
         eventData.put("maxWaitingListSize", event.getMaxWaitingListSize());
         eventData.put("eventType", event.getEventType());
         eventData.put("organizerName", event.getOrganizerName());
+        eventData.put("deviceId", event.getDeviceId());
         eventData.put("geolocationRequired", event.getGeolocationRequired());
         docRef.set(eventData);
     }
@@ -123,5 +128,28 @@ public class EventStore {
 
                     listener.onEventLoaded(event);
                 });
+    }
+
+    /**
+     * Retrieves a list of events created by a specific organizer.
+     * Main use for organizer dashboard to show event cards.
+     *
+     * @param deviceId the id of the organizer to filter by
+     * @param listener callback to receive the list of loaded Event objects
+     */
+    public void getEventsByOrganizer(String deviceId, OnMultipleEventsLoadedListener listener) {
+        db.collection("events")
+                .whereEqualTo("deviceId", deviceId) // Use the ID from your Profiles class
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    java.util.List<Event> events = new java.util.ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Event event = document.toObject(Event.class);
+                        event.setId(document.getId());
+                        events.add(event);
+                    }
+                    listener.onEventsLoaded(events);
+                });
+
     }
 }
