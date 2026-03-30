@@ -124,6 +124,10 @@ public class Profiles {
                 // kinda like an off on switch
                 Boolean wantsNotification = doc.getBoolean("notifiationsEnabled");
 
+                // Forgot that they might diable it, this is if they disable notis
+                if (wantsNotification != null && !wantsNotification) {
+                    return;
+                }
             }
 
             Notification noti = new Notification(message, eventID);
