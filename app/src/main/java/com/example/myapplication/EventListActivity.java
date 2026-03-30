@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -114,7 +115,24 @@ public class EventListActivity extends AppCompatActivity {
             Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
             startActivity(intent);
         });
+
+
+        LinearLayout myProfile = findViewById(R.id.nav_profile);
+        myProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
+
+        LinearLayout myNotifications = findViewById(R.id.nav_notifications);
+        myNotifications.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        });
+
+
     }
+
+
 
     private void loadEvents() {
         Timestamp now = Timestamp.now();
