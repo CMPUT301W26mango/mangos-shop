@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 /**
- * US 02.02.01 — Adapter for the waiting list RecyclerView.
+ * US 02.02.01 - Adapter for the waiting list RecyclerView.
  *
  * Displays one entrant name per row. Holds full EnrolledEntrant objects
  * (name, email, phone, enrolment date) so the same list can be passed
  * directly to CsvExportHelper without a second Firestore read.
  *
- * Only the name field is shown in the UI — the other fields are
+ * Only the name field is shown in the UI - the other fields are
  * invisible to the organizer here but available for CSV export.
  */
 public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.ViewHolder> {

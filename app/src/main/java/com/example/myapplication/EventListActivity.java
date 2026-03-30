@@ -1,12 +1,16 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +27,18 @@ import java.util.List;
 
 import android.content.Intent;
 
+
+/**
+ * This is an activity that shows all events to entrants
+ * It queries the firebase databse for load events
+ * This enables it so that the users can:
+ * - View event details by selecting an event
+ * - Scan a QR code to open the corresponding event
+ * - View lottery guidelines
+ * - Navigate to their profile editing screen
+ * The activity also filters events based on their registration start
+ * and end times so that only currently active events are displayed.
+ */
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -35,8 +51,12 @@ public class EventListActivity extends AppCompatActivity {
     private ImageButton closeInfoButton;
     private ImageButton profileButton; // go to edit profile
 
+    private com.google.firebase.firestore.ListenerRegistration statusListener;
+
+
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +71,8 @@ public class EventListActivity extends AppCompatActivity {
 
                 EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
                 eventDetailsFragment.setArguments(bundle);
+
+
                 eventDetailsFragment.show(getSupportFragmentManager(), "eventDetails");
             } else {
                 Toast.makeText(this, "Scan cancelled", Toast.LENGTH_SHORT).show();
@@ -64,11 +86,15 @@ public class EventListActivity extends AppCompatActivity {
 
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getSupportFragmentManager());
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
         loadEvents();
+        listenForStatusChanges();
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+
 
         lotteryinfoButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
@@ -89,7 +115,24 @@ public class EventListActivity extends AppCompatActivity {
             Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
+
+
+        LinearLayout myProfile = findViewById(R.id.nav_profile);
+        myProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
+
+        LinearLayout myNotifications = findViewById(R.id.nav_notifications);
+        myNotifications.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        });
+
+
     }
+
+
 
     private void loadEvents() {
         Timestamp now = Timestamp.now();
@@ -120,4 +163,34 @@ public class EventListActivity extends AppCompatActivity {
         options.setBarcodeImageEnabled(false);
         scannerLauncher.launch(options);
     }
+
+
+    private void listenForStatusChanges() {
+        String deviceId = Settings.Secure.getString(
+                getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        statusListener = db.collectionGroup("waitingList")
+                .whereEqualTo("userId", deviceId)
+                .addSnapshotListener((snapshots, e) -> {
+
+                    if (e != null) {
+                        Log.e("FirestoreListener", "Error", e);
+                        return;
+                    }
+
+                    Log.d("FirestoreListener", "Status changed!");
+
+
+                    loadEvents();
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (statusListener != null) {
+            statusListener.remove();
+        }
+    }
+
 }

@@ -13,6 +13,8 @@ import java.util.Date;
 
 public class EventsTest {
 
+
+
     @Test
     public void testEventTitleSetCorrectly() {
         Event event = new Event();

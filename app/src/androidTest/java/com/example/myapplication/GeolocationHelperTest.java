@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 /**
+This test file was created using Claude AI.
+prompt: Generate test cases for GeoLocationHelper.
+
  * US 02.02.03 — Enable or disable the geolocation requirement for an event.
  *
  * Geolocation is handled in two places:
@@ -28,17 +31,6 @@ import static org.junit.Assert.*;
  *      and sets the Switch. GeolocationHelper.setupToggle() writes back to
  *      Firestore on every toggle.
  *      Tests for this flow are in the "GeolocationHelper Edit Flow" section.
- *
- * Important: Switch is a UI widget and must only be interacted with on the
- * main thread. Every test that calls setChecked() or setEnabled() wraps that
- * call in InstrumentationRegistry.getInstrumentation().runOnMainSync().
- * Failing to do this causes:
- *     AndroidRuntimeException: Animators may only be run on Looper threads.
- *
- * Acceptance criteria covered:
- *   #1 — Toggle for geolocation requirement exists on the event form.
- *   #3 — When disabled, no location data is collected (switch OFF = false stored).
- *   #4 — Setting is stored with the event (switch ON = true stored).
  */
 @RunWith(AndroidJUnit4.class)
 public class GeolocationHelperTest {

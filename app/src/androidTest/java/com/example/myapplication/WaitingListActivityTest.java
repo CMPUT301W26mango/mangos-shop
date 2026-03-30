@@ -19,6 +19,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.*;
 
 /**
+This test file was created using Claude AI
+Prompt: Generate test cases for the file WaitingListActivity.
+
  * US 02.02.01 + US 02.06.05 - Tests for WaitingListActivity
  *
  * Tests the Activity's behavior for:

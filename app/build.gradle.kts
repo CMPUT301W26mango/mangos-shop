@@ -1,9 +1,12 @@
+
 plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+
 
 android {
     namespace = "com.example.myapplication"
@@ -38,9 +41,15 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
+    androidTestImplementation("com.google.protobuf:protobuf-javalite:3.21.12")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -56,12 +65,15 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.ext.junit)
     testImplementation(libs.junit)
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("org.hamcrest:hamcrest:2.2")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation("androidx.test:core:1.5.0")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     androidTestImplementation("androidx.fragment:fragment-testing:1.6.2")
-    // Import the Firebase BoM
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
     implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
@@ -69,4 +81,10 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-javalite:3.21.12")
+    }
 }

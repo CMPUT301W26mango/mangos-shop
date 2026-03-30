@@ -1,27 +1,49 @@
 package com.example.myapplication;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 
 import java.util.Calendar;
 import java.util.Date;
 import androidx.appcompat.app.AlertDialog;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+
+import android.content.Intent;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 
 /**
@@ -38,14 +60,22 @@ import java.util.Map;
  */
 
 public class EventCreateActivity extends AppCompatActivity {
+
+    StorageReference storageReference;
+    Uri image;
     private EditText eventNameInput;
     private EditText locationInput;
     private EditText startDateInput;
     private EditText endDateInput;
     private EditText eventDescriptionInput;
 
-    private EditText posterURLInput;
+    //private EditText posterURLInput;
+
+    private Button uploadPosterButton;
     private Button createEventButton;
+
+    private String posterDownloadUrl = null;
+    private ImageView posterPreview;
 
     private EditText eventDateInput;
 
@@ -53,10 +83,49 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText capacityInput;
 
-    private EditText eventType;
-    private EditText  organizerName;
-    private Switch geoSwitch;
+    private EditText waitingListInput;
 
+
+    private EditText eventType;
+    private Switch geoSwitch;
+    private ImageButton profileButton;
+
+
+    private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    image = result.getData().getData();
+                    createEventButton.setVisibility(View.GONE);
+                    uploadPosterButton.setText("Uploading...");
+                    uploadPosterButton.setEnabled(false);
+
+                    // Show preview immediately
+                    posterPreview.setVisibility(View.VISIBLE);
+                    Glide.with(this).load(image).into(posterPreview);
+
+                    // Upload to Firebase Storage
+                    StorageReference ref = storageReference.child("events/" + UUID.randomUUID() + "/poster");
+                    ref.putFile(image)
+                            .addOnSuccessListener(taskSnapshot ->
+                                    ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                                        posterDownloadUrl = uri.toString();
+                                        uploadPosterButton.setText("Poster Uploaded ✓");
+                                        createEventButton.setVisibility((View.VISIBLE));
+                                        uploadPosterButton.setEnabled(true);
+                                        Toast.makeText(this, "Poster uploaded!", Toast.LENGTH_SHORT).show();
+                                    })
+                            )
+                            .addOnFailureListener(e -> {
+                                uploadPosterButton.setText("Upload Poster Image");
+                                uploadPosterButton.setEnabled(true);
+                                posterPreview.setVisibility(View.GONE);
+                                Toast.makeText(this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +138,22 @@ public class EventCreateActivity extends AppCompatActivity {
         startDateInput = findViewById(R.id.start_date_input);
         endDateInput = findViewById(R.id.end_date_input);
         eventDescriptionInput = findViewById(R.id.event_description_input);
-        posterURLInput = findViewById(R.id.posterurl_input);
+        //posterURLInput = findViewById(R.id.posterurl_input);
+        uploadPosterButton = findViewById(R.id.upload_poster_button);
+        posterPreview = findViewById(R.id.poster_image_preview);
         createEventButton = findViewById(R.id.create_event_button);
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
+        waitingListInput = findViewById(R.id.max_waitingList_size);
         eventType = findViewById(R.id.event_type);
-        organizerName = findViewById(R.id.organizer_name);
         geoSwitch = findViewById(R.id.switchGeolocation);
+        profileButton = findViewById(R.id.btn_to_edit_profile);
+
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(EventCreateActivity.this, EntrantAccount.class);
+            startActivity(intent);
+        });
 
 
         // using time picker and date picker (event date logic)
@@ -245,6 +323,14 @@ public class EventCreateActivity extends AppCompatActivity {
         });
 
 
+        FirebaseApp.initializeApp(EventCreateActivity.this);
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+        uploadPosterButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            activityResultLauncher.launch(intent);
+        });
 
 
         eventStore = new EventStore();
@@ -256,31 +342,46 @@ public class EventCreateActivity extends AppCompatActivity {
             String description = eventDescriptionInput.getText().toString().trim();
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
-            String posterImageURL = posterURLInput.getText().toString().trim();
-            String organizerNameInput = organizerName.getText().toString().trim();
+            String waitingListText = waitingListInput.getText().toString().trim();
             String eventTypeInput = eventType.getText().toString().trim();
+
+            Profiles profilesHelper = new Profiles();
+            String myId = profilesHelper.getDeviceId(this);
+
+
+            String autoName = getIntent().getStringExtra("USER_NAME");
+            if (autoName == null) {
+                autoName = "Organizer";
+            }
 
             Event event = new Event();
             event.setTitle(eventName);
             event.setLocation(location);
             event.setDescription(description);
+            event.setDeviceId(myId);
+            event.setOrganizerName(autoName);
 
-            if (!posterImageURL.isEmpty()) {
+           /* if (!posterImageURL.isEmpty()) {
 
                 event.setPosterURL(posterImageURL);
+            } */
+
+
+            if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
+                event.setPosterURL(posterDownloadUrl);
             }
+
 
             if (!eventDate.isEmpty()) {
                 event.setDateEvent(eventDate);
             }
 
-            if (!organizerNameInput.isEmpty()) {
-                event.setOrganizerName(organizerNameInput);
-            }
 
             if (!eventTypeInput.isEmpty()) {
                 event.setEventType(eventTypeInput);
             }
+
+
 
             if (!startDate.isEmpty()) {
                 try {
@@ -306,19 +407,26 @@ public class EventCreateActivity extends AppCompatActivity {
                 event.setCapacity(Integer.parseInt(capacityText));
             }
 
+
+            if (!waitingListText.isEmpty()) {
+                event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
+            }
+
+
+
+
+
             boolean geoRequired = geoSwitch.isChecked();
             event.setGeolocationRequired(geoRequired);
+
             eventStore.addEvent(event);
-            eventDateInput.setText("");
-            eventNameInput.setText("");
-            locationInput.setText("");
-            startDateInput.setText("");
-            endDateInput.setText("");
-            eventDescriptionInput.setText("");
-            capacityInput.setText("");
-            posterURLInput.setText("");
-            organizerName.setText("");
-            eventType.setText("");
+            posterPreview.setVisibility(View.GONE);
+            uploadPosterButton.setText("Upload Poster Image");
+            posterDownloadUrl = null;
+            image = null;
+            finish();
         });
     }
+
+
 }

@@ -6,12 +6,6 @@ package com.example.myapplication;
  * Used by CsvExportHelper to generate CSV output.
  * Fields match acceptance criteria #2: name, email, phone, enrolment date.
  *
- * ASSUMED FIRESTORE STRUCTURE:
- *     events/{eventId}/enrolledEntrants/{entrantId}
- *         - name: String
- *         - email: String
- *         - phone: String (optional, may be null)
- *         - enrolmentDate: String (e.g., "2025-01-15")
  */
 public class EnrolledEntrant {
 

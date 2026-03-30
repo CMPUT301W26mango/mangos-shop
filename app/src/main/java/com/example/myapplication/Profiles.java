@@ -48,11 +48,11 @@ public class Profiles {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 DocumentSnapshot doc = task.getResult();
 
-                //admin greanted
+                //admin granted
                 Boolean isAdmin = doc.getBoolean("isAdmin");
                 if (Boolean.TRUE.equals(isAdmin)) {
 
-                    // so now whent the admin is requested and accepted role changes from Entrant to Admin
+                    // so now when the admin is requested and accepted role changes from Entrant to Admin
                     if (!"Admin".equals(doc.getString("role"))){
                         db.collection("users").document(deviceId).update("role", "Admin");
                     }
@@ -86,7 +86,7 @@ public class Profiles {
         DocumentReference userRef = db.collection("users").document(deviceId);
         batch.delete(userRef);
 
-        // when deleted the profile also delte the entries into any waiting lists
+        // when deleted the profile also delete the entries into any waiting lists
         db.collectionGroup("waitingList").whereEqualTo("deviceId", deviceId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {

@@ -120,48 +120,58 @@ public class EntrantAccountTest {
     public void testIfAdminAutoNavigate() {
         Context context = ApplicationProvider.getApplicationContext();
 
-        // Ensure the user document exists first so the update doesn't fail
+        // Ensure the user document exists first by "merging" a default state
         Profiles profiles = new Profiles();
         String deviceId = profiles.getDeviceId(context);
 
+        // Use set with merge to create the doc if it's missing, rather than failing on update
         FirebaseFirestore.getInstance().collection("users").document(deviceId)
                 .set(new java.util.HashMap<String, Object>() {{
                     put("isAdmin", false);
                     put("role", "Entrant");
                 }}, com.google.firebase.firestore.SetOptions.merge());
 
-        // Launch the activity
+        // Wait a moment for the initial creation to sync before launching the activity
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Intent intent = new Intent(context, EntrantAccount.class);
         try (ActivityScenario<EntrantAccount> scenario = ActivityScenario.launch(intent)) {
 
             // Verify start on Entrant screen
             onView(withId(R.id.main)).check(matches(isDisplayed()));
 
-            // Trigger the Admin change
+            // Flip the database switch to Admin
             FirebaseFirestore.getInstance().collection("users").document(deviceId)
                     .update("isAdmin", true, "role", "Admin");
 
-            // 5 seconds to fire the intent
+            // Wait for Firestore listener to trigger (using a loop to avoid freezing Espresso permanently)
             long startTime = System.currentTimeMillis();
-            boolean success = false;
-            while (System.currentTimeMillis() - startTime < 5000) {
+            boolean intentFired = false;
+
+            while (System.currentTimeMillis() - startTime < 5000) { // 5-second timeout
                 try {
                     intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
-                    success = true;
-                    break;
+                    intentFired = true;
+                    break; // It passed! Break the loop early.
                 } catch (AssertionError e) {
-                    // give more time
-                    Thread.sleep(500);
+                    // Intent hasn't fired yet, wait 500ms and check again
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
                 }
             }
 
-            if (!success) {
-                // standard error
+            // If the loop finished and it never fired, do one final intended() call to trigger the standard failure message
+            if (!intentFired) {
                 intended(hasComponent(AdminBrowseEventsActivity.class.getName()));
             }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
