@@ -19,6 +19,12 @@
 
 
         <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OrganizerDashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".EventCreateActivity"
             android:exported="false"
             android:label="@string/title_activity_event_creation"
@@ -49,13 +55,14 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
-        <activity android:name=".OrganizerDashboardActivity" />
+        <activity android:name=".OrganizerAccount" />
         <activity android:name=".AdminAccount" />
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
@@ -65,5 +72,5 @@
 
 
     </application>
-</manifest>
 
+</manifest>
