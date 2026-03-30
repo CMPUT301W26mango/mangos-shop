@@ -90,6 +90,8 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText eventType;
     private Switch geoSwitch;
+
+    private Switch privSwitch;
     private ImageButton profileButton;
 
 
@@ -149,6 +151,9 @@ public class EventCreateActivity extends AppCompatActivity {
                         // geo logic
                         geoSwitch.setChecked(event.getGeolocationRequired());
 
+                        // priv logic
+                        privSwitch.setChecked(event.getPrivateEvent());
+
                         // time logic
                         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                         if (event.getRegStart() != null) {
@@ -192,7 +197,8 @@ public class EventCreateActivity extends AppCompatActivity {
         waitingListInput = findViewById(R.id.max_waitingList_size);
         eventType = findViewById(R.id.event_type);
         geoSwitch = findViewById(R.id.switchGeolocation);
-        profileButton = findViewById(R.id.btn_to_edit_profile);
+        privSwitch = findViewById(R.id.switch_private_event);
+
 
         String mode = getIntent().getStringExtra("MODE");
         String eventId = getIntent().getStringExtra("EVENT_ID");
@@ -207,13 +213,6 @@ public class EventCreateActivity extends AppCompatActivity {
             // pull data
             fetchEventDataForEditing(eventId);
         }
-
-
-        profileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(EventCreateActivity.this, EntrantAccount.class);
-            startActivity(intent);
-        });
-
 
         // using time picker and date picker (event date logic)
         eventDateInput.setOnClickListener(v -> {
@@ -455,6 +454,11 @@ public class EventCreateActivity extends AppCompatActivity {
 
                 boolean geoRequired = geoSwitch.isChecked();
                 event.setGeolocationRequired(geoRequired);
+
+
+                event.setPrivateEvent(privSwitch.isChecked());
+
+
 
                 if (eventId != null) event.setId(eventId);
 
