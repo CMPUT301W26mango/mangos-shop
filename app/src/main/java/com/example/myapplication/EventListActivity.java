@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -110,11 +111,28 @@ public class EventListActivity extends AppCompatActivity {
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
 
-        profileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+//        profileButton.setOnClickListener(v -> {
+//            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
+//            startActivity(intent);
+//        });
+//
+
+        LinearLayout myProfile = findViewById(R.id.nav_profile);
+        myProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
+
+        LinearLayout myNotifications = findViewById(R.id.nav_notifications);
+        myNotifications.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        });
+
+
     }
+
+
 
     private void loadEvents() {
         Timestamp now = Timestamp.now();
@@ -126,8 +144,9 @@ public class EventListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
+                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
 
-                        if (event.getRegEnd() != null && event.getRegEnd().compareTo(now) >= 0) {
+                        if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
                             eventList.add(event);
                         }
                     }

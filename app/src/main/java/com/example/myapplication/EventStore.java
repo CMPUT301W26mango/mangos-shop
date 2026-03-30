@@ -68,6 +68,7 @@ public class EventStore {
         eventData.put("eventType", event.getEventType());
         eventData.put("organizerName", event.getOrganizerName());
         eventData.put("deviceId", event.getDeviceId());
+        eventData.put("privateEvent", event.getPrivateEvent());
         eventData.put("geolocationRequired", event.getGeolocationRequired());
         docRef.set(eventData);
     }
@@ -120,11 +121,10 @@ public class EventStore {
                     event.setDateEvent(document.getString("dateEvent"));
                     event.setPosterURL(document.getString("posterURL"));
                     event.setQrValue(document.getString("qrValue"));
+                    event.setPrivateEvent(document.getBoolean(("privateEvent")));
                     event.setCapacity(document.getLong("capacity").intValue());
                     event.setOrganizerName(document.getString("organizerName"));
                     event.setEventType(document.getString("eventType"));
-
-
 
                     listener.onEventLoaded(event);
                 });
@@ -139,7 +139,7 @@ public class EventStore {
      */
     public void getEventsByOrganizer(String deviceId, OnMultipleEventsLoadedListener listener) {
         db.collection("events")
-                .whereEqualTo("deviceId", deviceId) // Use the ID from your Profiles class
+                .whereEqualTo("deviceId", deviceId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     java.util.List<Event> events = new java.util.ArrayList<>();
@@ -150,6 +150,20 @@ public class EventStore {
                     }
                     listener.onEventsLoaded(events);
                 });
+    }
 
+    public void getAllPublicEvents(OnMultipleEventsLoadedListener listener) {
+        db.collection("events")
+                .whereEqualTo("privateEvent", false)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    java.util.List<Event> events = new java.util.ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        events.add(document.toObject(Event.class));
+                    }
+                    listener.onEventsLoaded(events);
+                });
     }
 }
+
+

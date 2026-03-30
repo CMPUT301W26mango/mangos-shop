@@ -45,7 +45,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
         LinearLayout myProfile = findViewById(R.id.nav_profile);
         myProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerDashboardActivity.this, EntrantAccount.class);
+            Intent intent = new Intent(OrganizerDashboardActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
     }

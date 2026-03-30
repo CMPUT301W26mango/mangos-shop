@@ -115,4 +115,46 @@ public class Profiles {
             onSuccess.onSuccess(snapshot.getCount());
         });
     }
+
+    /**
+     * Fetches the user's name from Firestore based on their device ID.
+     * @param deviceId The device ID of the user.
+     * @param listener Callback to return the name string.
+     */
+    public void getProfileName(String deviceId, OnSuccessListener<String> listener) {
+        db.collection("users").document(deviceId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("name");
+                        listener.onSuccess(name != null ? name : "Unknown Organizer");
+                    } else {
+                        listener.onSuccess("New Organizer");
+                    }
+                })
+                .addOnFailureListener(e -> listener.onSuccess("Organizer"));
+    }
+
+    /**
+     * Sends a notification to a specific user by adding it to their notifications collection in Firestore.
+     *
+     * @param targetDeviceID ID of user
+     * @param message Notification to be delivered
+     * @param eventID ID of event
+     */
+    public void sendNotificationsToUser(String targetDeviceID, String message, String eventID) {
+        db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                // kinda like an off on switch
+                Boolean wantsNotification = doc.getBoolean("notificationsEnabled");
+
+                // Forgot that they might diable it, this is if they disable notis
+                if (wantsNotification != null && !wantsNotification) {
+                    return;
+                }
+
+                Notification noti = new Notification(message, eventID);
+                db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
+            }
+        });
+    }
 }
