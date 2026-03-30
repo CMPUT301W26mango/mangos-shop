@@ -112,7 +112,7 @@ public class EventListActivity extends AppCompatActivity {
         scanQRButton.setOnClickListener(v -> launchQRScanner());
 
         profileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, EntrantAccount.class);
+            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
 

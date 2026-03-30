@@ -117,4 +117,28 @@ public class Profiles {
             onSuccess.onSuccess(snapshot.getCount());
         });
     }
+
+    /**
+     * Sends a notification to a specific user by adding it to their notifications collection in Firestore.
+     *
+     * @param targetDeviceID ID of user
+     * @param message Notification to be delivered
+     * @param eventID ID of event
+     */
+    public void sendNotificationsToUser(String targetDeviceID, String message, String eventID) {
+        db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                // kinda like an off on switch
+                Boolean wantsNotification = doc.getBoolean("notificationsEnabled");
+
+                // Forgot that they might diable it, this is if they disable notis
+                if (wantsNotification != null && !wantsNotification) {
+                    return;
+                }
+
+                Notification noti = new Notification(message, eventID);
+                db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
+            }
+        });
+    }
 }
