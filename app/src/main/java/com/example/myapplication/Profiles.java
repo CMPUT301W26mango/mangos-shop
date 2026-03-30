@@ -118,6 +118,13 @@ public class Profiles {
         });
     }
 
+    /**
+     * Sends a notification to a specific user by adding it to their notifications collection in Firestore.
+     *
+     * @param targetDeviceID ID of user
+     * @param message Notification to be delivered
+     * @param eventID ID of event
+     */
     public void sendNotificationsToUser(String targetDeviceID, String message, String eventID) {
         db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
