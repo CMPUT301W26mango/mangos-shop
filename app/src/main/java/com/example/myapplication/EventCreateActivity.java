@@ -405,90 +405,83 @@ public class EventCreateActivity extends AppCompatActivity {
             Profiles profilesHelper = new Profiles();
             String myId = profilesHelper.getDeviceId(this);
 
-
-            String autoName = getIntent().getStringExtra("USER_NAME");
-            if (autoName == null) {
-                autoName = "Organizer";
-            }
-
-            Event event = new Event();
-            event.setTitle(eventName);
-            event.setLocation(location);
-            event.setDescription(description);
-            event.setDeviceId(myId);
-            event.setOrganizerName(autoName);
-
-
-            if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
-                event.setPosterURL(posterDownloadUrl);
-            }
-
-            if (!eventDate.isEmpty()) {
-                event.setDateEvent(eventDate);
-            }
-
-            if (!eventTypeInput.isEmpty()) {
-                event.setEventType(eventTypeInput);
-            }
-
-            if (!startDate.isEmpty()) {
-                try {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-                    Date date = formatter.parse(startDate);
-                    event.setRegStart(new Timestamp(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            profilesHelper.getProfileName(myId, userName -> {
+                Event event = new Event();
+                event.setTitle(eventName);
+                event.setOrganizerName(userName);
+                event.setLocation(location);
+                event.setDescription(description);
+                event.setDeviceId(myId);
+                if (posterDownloadUrl != null && !posterDownloadUrl.isEmpty()) {
+                    event.setPosterURL(posterDownloadUrl);
                 }
-            }
 
-            if (!endDate.isEmpty()) {
-                try {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-                    Date date = formatter.parse(endDate);
-                    event.setRegEnd(new Timestamp(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                if (!eventDate.isEmpty()) {
+                    event.setDateEvent(eventDate);
                 }
-            }
 
-            if (!capacityText.isEmpty()) {
-                event.setCapacity(Integer.parseInt(capacityText));
-            }
+                if (!eventTypeInput.isEmpty()) {
+                    event.setEventType(eventTypeInput);
+                }
+
+                if (!startDate.isEmpty()) {
+                    try {
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                        Date date = formatter.parse(startDate);
+                        event.setRegStart(new Timestamp(date));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (!endDate.isEmpty()) {
+                    try {
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                        Date date = formatter.parse(endDate);
+                        event.setRegEnd(new Timestamp(date));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (!capacityText.isEmpty()) {
+                    event.setCapacity(Integer.parseInt(capacityText));
+                }
 
 
-            if (!waitingListText.isEmpty()) {
-                event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
-            }
+                if (!waitingListText.isEmpty()) {
+                    event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
+                }
 
-            boolean geoRequired = geoSwitch.isChecked();
-            event.setGeolocationRequired(geoRequired);
+                boolean geoRequired = geoSwitch.isChecked();
+                event.setGeolocationRequired(geoRequired);
 
-            if (eventId != null) event.setId(eventId);
+                if (eventId != null) event.setId(eventId);
 
-            if ("EDIT".equals(mode) && eventId != null) {
-                createEventButton.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                // overwrite existing data
-                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                        .collection("events")
-                        .document(eventId)
-                        .set(event)
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
-                            posterPreview.setVisibility(View.GONE);
-                            uploadPosterButton.setText("Upload Poster Image");
-                            posterDownloadUrl = null;
-                            image = null;
-                            finish(); // Go back to the Detail page
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();
-                        });
-            } else {
-                // no edit mode
-                eventStore.addEvent(event);
-                finish();
-            }
+                if ("EDIT".equals(mode) && eventId != null) {
+                    createEventButton.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    // overwrite existing data
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("events")
+                            .document(eventId)
+                            .set(event)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
+                                posterPreview.setVisibility(View.GONE);
+                                uploadPosterButton.setText("Upload Poster Image");
+                                posterDownloadUrl = null;
+                                image = null;
+                                finish(); // Go back to the Detail page
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    // no edit mode
+                    eventStore.addEvent(event);
+                    finish();
+                }
+            });
         });
-
     }
 }

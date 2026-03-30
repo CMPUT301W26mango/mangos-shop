@@ -117,4 +117,22 @@ public class Profiles {
             onSuccess.onSuccess(snapshot.getCount());
         });
     }
+
+    /**
+     * Fetches the user's name from Firestore based on their device ID.
+     * @param deviceId The device ID of the user.
+     * @param listener Callback to return the name string.
+     */
+    public void getProfileName(String deviceId, OnSuccessListener<String> listener) {
+        db.collection("users").document(deviceId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("name");
+                        listener.onSuccess(name != null ? name : "Unknown Organizer");
+                    } else {
+                        listener.onSuccess("New Organizer");
+                    }
+                })
+                .addOnFailureListener(e -> listener.onSuccess("Organizer"));
+    }
 }
