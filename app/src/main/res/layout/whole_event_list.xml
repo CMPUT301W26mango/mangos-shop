@@ -101,20 +101,14 @@
             android:paddingEnd="8dp">
 
             <ImageButton
-                android:id="@+id/btn_to_edit_profile"
-                android:layout_width="36dp"
+                android:id="@+id/btnFilter"
+                android:layout_width="93dp"
                 android:layout_height="36dp"
-                android:padding="0dp"
                 android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_myplaces"
-                app:tint="@color/blue"/>
+                android:padding="0dp"
+                android:src="@drawable/filter"
+                app:tint="@color/blue" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textColor="@color/gray"
-                android:textSize="10sp"/>
 
         </LinearLayout>
 
