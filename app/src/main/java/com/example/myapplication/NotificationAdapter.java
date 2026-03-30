@@ -58,6 +58,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.notificationName.setText(item.getNotiName());
 
+        if (!item.isRead()) {
+
+            holder.unreadDot.setVisibility(View.VISIBLE);
+        }
+
         if (item.getNotiTime() != null) {
             long timeInMillis = item.getNotiTime().toDate().getTime();
             long now = System.currentTimeMillis();
@@ -83,6 +88,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             public void onClick(@NonNull View widget) {
                 // Initialize  fragment
                 EventDetailsFragment fragment = new EventDetailsFragment();
+
+                item.setRead(true);
+                holder.unreadDot.setVisibility(View.GONE);
 
                 // Pass eventId
                 Bundle args = new Bundle();
@@ -130,12 +138,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         TextView notificationTime;
 
+        View unreadDot;
 
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             notificationName = itemView.findViewById(R.id.notification_name);
             notificationDesc = itemView.findViewById(R.id.notification_desc);
             notificationTime = itemView.findViewById(R.id.notification_timestamp);
+            unreadDot = itemView.findViewById(R.id.unread_indicator_dot);
 
         }
     }
