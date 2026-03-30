@@ -25,8 +25,6 @@ public class UserProfileActivity extends AppCompatActivity {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileRole = findViewById(R.id.tvProfileRole);
 
-        // close page when back is clicked
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         // setup firebase and grab the device id
         db = FirebaseFirestore.getInstance();

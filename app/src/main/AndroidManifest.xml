@@ -60,6 +60,8 @@
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
         <activity android:name=".EventListActivity" />
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".NotificationSettingsActivity" />
 
     </application>
 </manifest>
