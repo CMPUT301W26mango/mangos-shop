@@ -122,16 +122,16 @@ public class Profiles {
         db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
                 // kinda like an off on switch
-                Boolean wantsNotification = doc.getBoolean("notifiationsEnabled");
+                Boolean wantsNotification = doc.getBoolean("notificationsEnabled");
 
                 // Forgot that they might diable it, this is if they disable notis
                 if (wantsNotification != null && !wantsNotification) {
                     return;
                 }
-            }
 
-            Notification noti = new Notification(message, eventID);
-            db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
+                Notification noti = new Notification(message, eventID);
+                db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
+            }
         });
     }
 }
