@@ -39,16 +39,17 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Share QR" />
 
-    </RelativeLayout>
 
-    <Button
-        android:id="@+id/btn_invite_users"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Invite Users"
-        app:layout_constraintTop_toBottomOf="@id/header_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <ImageView
+            android:id="@+id/btn_invite_users"
+            android:layout_width="36dp"
+            android:layout_height="34dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/btn_share_qr"
+            android:src="@drawable/person_search" />
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

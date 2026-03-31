@@ -17,24 +17,13 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
-        // Get the ID passed from the Dashboard
         eventId = getIntent().getStringExtra("EVENT_ID");
+
+        // set up click listeners
         ImageView shareBtn = findViewById(R.id.btn_share_qr);
         ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
-        Button btnInvite = findViewById(R.id.btn_invite_users);
+        ImageView btnInvite = findViewById(R.id.btn_invite_users);
 
-
-        EventStore eventStore = new EventStore();
-
-        eventStore.getEventById(eventId, event -> {
-            if (event.getPrivateEvent())  {
-                shareBtn.setVisibility(View.GONE);
-            } else {
-                shareBtn.setVisibility(View.VISIBLE);
-            }
-        });
-
-        // Settings Cog logic
         settingsBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, EventCreateActivity.class);
             intent.putExtra("MODE", "EDIT");
@@ -42,14 +31,30 @@ public class EventDetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        shareBtn.setOnClickListener(v -> {
-            showQRCodePopup();
-        });
+        shareBtn.setOnClickListener(v -> showQRCodePopup());
 
         btnInvite.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserSearchActivity.class);
             intent.putExtra("EVENT_ID", eventId);
             startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // re fetch to update better
+        ImageView shareBtn = findViewById(R.id.btn_share_qr);
+        ImageView btnInvite = findViewById(R.id.btn_invite_users);
+
+        EventStore eventStore = new EventStore();
+        eventStore.getEventById(eventId, event -> {
+            boolean isPrivate = Boolean.TRUE.equals(event.getPrivateEvent());
+            runOnUiThread(() -> {
+                shareBtn.setVisibility(isPrivate ? View.GONE : View.VISIBLE);
+                btnInvite.setVisibility(isPrivate ? View.VISIBLE : View.GONE);
+            });
         });
     }
 
