@@ -2,12 +2,14 @@ package com.example.myapplication;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.fragment.app.FragmentManager;
@@ -168,6 +170,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
 
+        // Open the comments when the image is clicked
+        holder.viewCommentsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), CommentActivity.class);
+            // Pass the actual document ID so the Activity knows which event's comments to fetch
+            intent.putExtra("eventId", event.getId());
+            intent.putExtra("organizerId", event.getDeviceId());
+            v.getContext().startActivity(intent);
+        });
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,6 +217,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         TextView organizer;
         TextView eventStatus;
+        ImageButton viewCommentsBtn;
 
         /**
          * Initializes all the UI elements in this object
@@ -220,6 +233,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             organizer = itemView.findViewById(R.id.textViewOrganizer);
             eventStatus = itemView.findViewById(R.id.eventStatus);
             eventCardRoot = itemView.findViewById(R.id.eventCardRoot);
+            viewCommentsBtn = itemView.findViewById(R.id.viewCommentsBtn);
 
         }
     }
