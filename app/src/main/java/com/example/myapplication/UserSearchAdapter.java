@@ -24,11 +24,14 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     private String eventId;
     private boolean isPrivate;
 
-    public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId, boolean isPrivate) {
+    private boolean isCoOrg;
+
+    public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId, boolean isPrivate, boolean isCoOrg) {
         this.context = context;
         this.userList = userList;
         this.eventId = eventId;
         this.isPrivate = isPrivate;
+        this.isCoOrg = isCoOrg;
     }
 
     public void updateList(List<UserProfiles> newList) {
@@ -51,9 +54,14 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
 
         // Handle the Invite Click
         holder.itemView.setOnClickListener(v -> {
-            String[] options = isPrivate
-                    ? new String[]{"Send Invite", "Make Co-Organizer"}
-                    : new String[]{"Make Co-Organizer"};
+            String[] options;
+            if (isPrivate && !isCoOrg) {
+                options = new String[]{"Send Invite", "Make Co-Organizer"};
+            } else if (isPrivate && isCoOrg) {
+                options = new String[]{"Send Invite"}; // co-org can invite but not promote
+            } else {
+                options = new String[]{"Make Co-Organizer"}; // public event, owner only
+            }
 
             new android.app.AlertDialog.Builder(context)
                     .setTitle(user.getName())

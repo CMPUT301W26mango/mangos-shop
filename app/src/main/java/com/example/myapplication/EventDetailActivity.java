@@ -12,6 +12,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private String eventId;
     private boolean isPrivate = false;
+    private boolean isCoOrg = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class EventDetailActivity extends AppCompatActivity {
             Intent intent = new Intent(this, UserSearchActivity.class);
             intent.putExtra("EVENT_ID", eventId);
             intent.putExtra("IS_PRIVATE", isPrivate);
+            intent.putExtra("IS_CO_ORG", isCoOrg);
             startActivity(intent);
         });
     }
@@ -55,9 +57,8 @@ public class EventDetailActivity extends AppCompatActivity {
         EventStore eventStore = new EventStore();
         eventStore.getEventById(eventId, event -> {
             isPrivate = Boolean.TRUE.equals(event.getPrivateEvent());
+            isCoOrg = event.getCoOrganizers() != null && event.getCoOrganizers().contains(currentDeviceId);
             boolean isOwner = currentDeviceId.equals(event.getDeviceId());
-            boolean isCoOrg = event.getCoOrganizers() != null
-                    && event.getCoOrganizers().contains(currentDeviceId);
 
             runOnUiThread(() -> {
                 // settings cog — owner only not co org
@@ -66,8 +67,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 // QR share
                 shareBtn.setVisibility(!isPrivate ? View.VISIBLE : View.GONE);
 
-                // invite/search — owner of private event only not co org
-                btnInvite.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+                // invite/search
+                btnInvite.setVisibility((isOwner || (isCoOrg && isPrivate)) ? View.VISIBLE : View.GONE);
             });
         });
     }
