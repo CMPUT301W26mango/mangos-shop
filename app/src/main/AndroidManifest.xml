@@ -38,7 +38,9 @@
             android:exported="false" />
         <activity
             android:name=".AdminBrowseEventsActivity"
-            android:exported="false"></activity>
+            android:exported="false">
+
+        </activity>
         <activity android:name=".WaitingListActivity" />
         <activity
             android:name=".AdminEventDetailActivity"
@@ -57,7 +59,6 @@
         </activity>
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
-        <activity android:name=".OrganizerAccount" />
         <activity android:name=".AdminAccount" />
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
@@ -65,7 +66,6 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".NotificationSettingsActivity" />
         <activity android:name=".NotificationsActivity" />
-        <activity android:name=".EventDetailActivity" />
 
 
 
