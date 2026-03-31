@@ -80,6 +80,18 @@
             android:visibility="gone"/>
 
         <TextView
+            android:id="@+id/tv_invited_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You have been invited to join the waiting list for a private event!"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textColor="#7F00FF"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <TextView
             android:id="@+id/tv_rejected_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -435,6 +447,30 @@
             android:backgroundTint="@color/blue"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/acceptInvBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Accept Invite!"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#008000"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/declineInvBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Decline Invite!"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/red"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/acceptBtn"

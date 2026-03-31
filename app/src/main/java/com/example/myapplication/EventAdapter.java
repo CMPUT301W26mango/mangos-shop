@@ -159,7 +159,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                                 holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
                                 card.setStrokeColor(Color.parseColor("#FF0000")); // Red Border
 
-                            } else {
+                            } else if (status.equals("waiting")) {
                                 holder.eventStatus.setText("Status: Waiting");
                                 holder.eventStatus.setTextColor(Color.parseColor("#000000"));
                                 card.setStrokeColor(Color.parseColor("#000000")); // Black Border
