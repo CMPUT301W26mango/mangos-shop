@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import android.graphics.Bitmap;
 import java.util.Objects;
 
 /**
@@ -127,6 +128,9 @@ public class EventDetailsFragment extends DialogFragment {
         Button acceptBtn = view.findViewById(R.id.acceptBtn);
         Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
         TextView textViewAlreadyRegistered = view.findViewById(R.id.alreadyRegisteredTextView);
+        ImageView shareBtn = view.findViewById(R.id.btn_share_qr);
+        shareBtn.setVisibility(View.VISIBLE);
+        shareBtn.setOnClickListener(v -> showQRCodePopup(eventId));
 
 
 
@@ -507,4 +511,22 @@ public class EventDetailsFragment extends DialogFragment {
                 });
     }
 
+    private void showQRCodePopup(String eventId) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("Event QR Code");
+
+        android.widget.ImageView qrView = new android.widget.ImageView(requireContext());
+        qrView.setPadding(40, 40, 40, 40);
+
+        try {
+            Bitmap bitmap = QrHelper.generateQrCode(eventId);
+            qrView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            qrView.setImageResource(android.R.drawable.stat_notify_error);
+        }
+
+        builder.setView(qrView);
+        builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
 }

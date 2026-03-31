@@ -42,6 +42,19 @@
             android:textColor="@color/darkergray"/>
 
 
+        <ImageView
+            android:id="@+id/btn_share_qr"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:src="@drawable/share_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Share QR"
+            android:visibility="gone"/>
+
+
         <TextView
             android:id="@+id/tv_selected_message"
             android:layout_width="match_parent"
