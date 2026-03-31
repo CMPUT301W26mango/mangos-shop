@@ -7,16 +7,20 @@
 
 
     <ScrollView
-        android:layout_width="331dp"
-        android:layout_height="574dp"
-        android:layout_gravity="center">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:maxWidth="400dp"
             android:layout_height="wrap_content"
             android:background="@drawable/guidelines_dialog_background"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="25dp">
 
 
             <ImageButton
@@ -101,7 +105,6 @@
                     android:layout_height="wrap_content"
                     android:text="SPORTS"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -112,7 +115,6 @@
                     android:layout_height="wrap_content"
                     android:text="CONCERT"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -123,7 +125,6 @@
                     android:layout_height="wrap_content"
                     android:text="MUSIC"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -134,7 +135,6 @@
                     android:layout_height="wrap_content"
                     android:text="PARTY"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -145,7 +145,6 @@
                     android:layout_height="wrap_content"
                     android:text="CHARITY"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -154,10 +153,9 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
+                    android:checked="false"
                     android:text="CULTURAL"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
@@ -168,11 +166,19 @@
                     android:layout_height="wrap_content"
                     android:text="MISC"
                     android:textColor="@color/chip_text_selector"
-                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
             </com.google.android.material.chip.ChipGroup>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text = "Leave all unchecked to view all event types"
+                android:textColor="@color/gray"
+                android:layout_gravity="center"
+                android:textSize="10sp"/>
+
+
 
             <View
                 android:layout_width="match_parent"
@@ -184,16 +190,19 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Available Spots"
+                    android:text="Available Spaces"
                     android:textColor="@color/darkergray"
                     android:textSize="16sp" />
 
@@ -235,19 +244,21 @@
 
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:background="@android:color/darker_gray" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text = "Leave blank for all availability"
+                android:textColor="@color/gray"
+                android:layout_gravity="center"
+                android:textSize="10sp"/>
 
 
             <Button
-                android:id="@+id/registerBtn"
+                android:id="@+id/applyFiltersBtn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginBottom="16dp"
                 android:backgroundTint="@color/blue"
                 android:text="Apply Filters"
                 android:textColor="#FFFFFF"
