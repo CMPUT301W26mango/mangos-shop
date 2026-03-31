@@ -401,6 +401,47 @@ public class EventCreateActivity extends AppCompatActivity {
             String waitingListText = waitingListInput.getText().toString().trim();
             String eventTypeInput = eventType.getText().toString().trim();
 
+            if (eventName.isEmpty()) {
+                eventNameInput.setError("Event name is required");
+                eventNameInput.requestFocus();
+                return;
+            }
+            if (location.isEmpty()) {
+                locationInput.setError("Location is required");
+                locationInput.requestFocus();
+                return;
+            }
+            if (startDate.isEmpty()) {
+                startDateInput.setError("Registration start date is required");
+                startDateInput.requestFocus();
+                return;
+            }
+            if (endDate.isEmpty()) {
+                endDateInput.setError("Registration end date is required");
+                endDateInput.requestFocus();
+                return;
+            }
+            if (eventDate.isEmpty()) {
+                eventDateInput.setError("Event date is required");
+                eventDateInput.requestFocus();
+                return;
+            }
+            if (description.isEmpty()) {
+                eventDescriptionInput.setError("Description is required");
+                eventDescriptionInput.requestFocus();
+                return;
+            }
+            if (capacityText.isEmpty()) {
+                capacityInput.setError("Capacity is required");
+                capacityInput.requestFocus();
+                return;
+            }
+            if (eventTypeInput.isEmpty()) {
+                eventType.setError("Event type is required");
+                eventType.requestFocus();
+                return;
+            }
+
             Profiles profilesHelper = new Profiles();
             String myId = profilesHelper.getDeviceId(this);
 

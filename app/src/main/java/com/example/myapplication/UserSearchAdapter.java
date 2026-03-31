@@ -1,0 +1,81 @@
+package com.example.myapplication;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.UserViewHolder> {
+
+    private List<UserProfiles> userList;
+    private Context context;
+    private String eventId;
+
+    public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId) {
+        this.context = context;
+        this.userList = userList;
+        this.eventId = eventId;
+    }
+
+    public void updateList(List<UserProfiles> newList) {
+        this.userList = newList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_user_search, parent, false);
+        return new UserViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+        UserProfiles user = userList.get(position);
+
+        holder.tvName.setText(user.getName());
+
+        // Handle the Invite Click
+        holder.itemView.setOnClickListener(v -> {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            Map<String, Object> inviteData = new HashMap<>();
+            inviteData.put("userId", user.getDeviceId());
+            inviteData.put("status", "invited");
+            inviteData.put("invitedAt", Timestamp.now());
+
+            db.collection("events").document(eventId)
+                    .collection("waitingList").document(user.getDeviceId())
+                    .set(inviteData)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Invited " + user.getName() + "!", Toast.LENGTH_SHORT).show();
+                    });
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return userList.size();
+    }
+
+    static class UserViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName;
+
+        public UserViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tv_user_name);
+        }
+    }
+}
