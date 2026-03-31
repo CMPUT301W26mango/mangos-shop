@@ -75,12 +75,10 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
                             inviteData.put("status", "invited");
                             inviteData.put("invitedAt", Timestamp.now());
 
+                            // also add to invitedUsers array on the event document
                             db.collection("events").document(eventId)
-                                    .collection("waitingList").document(user.getDeviceId())
-                                    .set(inviteData)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(context, "Invited " + user.getName() + "!", Toast.LENGTH_SHORT).show();
-                                    });
+                                    .update("invitedUsers",
+                                            com.google.firebase.firestore.FieldValue.arrayUnion(user.getDeviceId()));
 
                         } else {
                             // Make Co-Organizer

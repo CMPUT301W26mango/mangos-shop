@@ -38,6 +38,8 @@ public class Event {
     private Boolean privateEvent;
     private List<String> coOrganizers;
 
+    private List<String> invitedUsers;
+
 
     /**
      * Empty constructor required by Firebase Firestore for
@@ -68,7 +70,7 @@ public class Event {
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
                  String qrValue, int capacity, String dateEvent,
-                 String organizerName, String eventType, int maxWaitingListSize, String deviceId, Boolean privateEvent, List<String> coOrganizers) {
+                 String organizerName, String eventType, int maxWaitingListSize, String deviceId, Boolean privateEvent, List<String> coOrganizers, List<String> invitedUsers) {
 
         this.id = id;
         this.title = title;
@@ -86,10 +88,19 @@ public class Event {
         this.deviceId = deviceId;
         this.privateEvent = privateEvent;
         this.coOrganizers = coOrganizers;
+        this.invitedUsers = invitedUsers;
     }
 
     // Getters and Setters
 
+
+    public List<String> getInvitedUsers() {
+        return invitedUsers;
+    }
+
+    public void setInvitedUsers(List<String> invitedUsers) {
+        this.invitedUsers = invitedUsers;
+    }
 
     public List<String> getCoOrganizers() { return coOrganizers; }
 

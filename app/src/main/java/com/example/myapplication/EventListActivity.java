@@ -169,10 +169,12 @@ public class EventListActivity extends AppCompatActivity {
                         boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
                         boolean isCoOrg = event.getCoOrganizers() != null
                                 && event.getCoOrganizers().contains(deviceId);
+                        boolean isInvited = event.getInvitedUsers() != null
+                                && event.getInvitedUsers().contains(deviceId);
                         boolean isActive = event.getRegEnd() != null
                                 && event.getRegEnd().compareTo(now) >= 0;
 
-                        if (isActive && (isPublic || isCoOrg)) {
+                        if (isActive && (isPublic || isCoOrg || isInvited)) {
                             eventList.add(event);
                         }
                     }
