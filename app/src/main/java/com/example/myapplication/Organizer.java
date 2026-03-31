@@ -23,7 +23,7 @@ public class Organizer extends UserProfiles {
      * @param email Organizer Email
      * @param phone Organizer number (optional)
      */
-    public Organizer(String name, String email, String phone) {
-        super(name, email, phone, "Organizer");
+    public Organizer(String name, String email, String phone, String deviceId) {
+        super(name, email, phone, "Organizer", deviceId);
     }
 }

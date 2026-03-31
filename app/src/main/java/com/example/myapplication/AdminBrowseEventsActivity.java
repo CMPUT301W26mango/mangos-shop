@@ -35,6 +35,7 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
     private SearchView searchViewEvents;
     private TextView textViewEmptyEvents;
     private Button buttonBrowseProfiles;
+    private Button buttonBrowseImages;
 
     private FirebaseFirestore db;
     private AdminEventAdapter adapter;
@@ -51,9 +52,14 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
         searchViewEvents = findViewById(R.id.searchViewEvents);
         textViewEmptyEvents = findViewById(R.id.textViewEmptyEvents);
         buttonBrowseProfiles = findViewById(R.id.buttonBrowseProfiles);
+        buttonBrowseImages = findViewById(R.id.buttonBrowseImages);
 
         buttonBrowseProfiles.setOnClickListener(v -> {
             Intent intent = new Intent(this, AdminBrowseProfilesActivity.class);
+            startActivity(intent);
+        });
+        buttonBrowseImages.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminBrowseImagesActivity.class);
             startActivity(intent);
         });
 

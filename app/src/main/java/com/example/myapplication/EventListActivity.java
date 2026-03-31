@@ -90,7 +90,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewEvents);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
-        profileButton = findViewById(R.id.btn_to_edit_profile);
+//        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getSupportFragmentManager());
@@ -151,7 +151,6 @@ public class EventListActivity extends AppCompatActivity {
     }
 
 
-
     private void loadEvents() {
         Timestamp now = Timestamp.now();
         db.collection("events")
@@ -162,8 +161,9 @@ public class EventListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
+                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
 
-                        if (event.getRegEnd() != null && event.getRegEnd().compareTo(now) >= 0) {
+                        if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
                             eventList.add(event);
                         }
                     }
