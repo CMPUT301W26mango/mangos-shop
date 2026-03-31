@@ -61,6 +61,7 @@ public class EventListActivity extends AppCompatActivity {
 
     private com.google.firebase.firestore.ListenerRegistration statusListener;
 
+    private com.google.firebase.firestore.ListenerRegistration eventChangesListener;
 
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
@@ -97,7 +98,6 @@ public class EventListActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         loadEvents();
-        listenForStatusChanges();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -145,7 +145,9 @@ public class EventListActivity extends AppCompatActivity {
         }
 
         listenForStatusChanges();
+        listenForEventChanges();
         listenForNewNotifications();
+
 
 
     }
@@ -216,6 +218,9 @@ public class EventListActivity extends AppCompatActivity {
         if (statusListener != null) {
             statusListener.remove();
         }
+        if (eventChangesListener != null) {
+            eventChangesListener.remove();
+        }
     }
 
     private void listenForNewNotifications() {
@@ -269,6 +274,17 @@ public class EventListActivity extends AppCompatActivity {
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         manager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    private void listenForEventChanges() {
+        eventChangesListener = db.collection("events")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("EventListActivity", "Event listener error", e);
+                        return;
+                    }
+                    loadEvents();
+                });
     }
 }
 
