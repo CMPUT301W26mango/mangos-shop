@@ -184,7 +184,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("eventId", event.getQrValue());
+                bundle.putString("eventId", event.getId());
                 EventDetailsFragment fragment = new EventDetailsFragment();
                 fragment.setArguments(bundle);
                 fragment.show(fragmentManager, "eventDetails");

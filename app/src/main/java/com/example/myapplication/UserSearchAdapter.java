@@ -22,11 +22,13 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     private List<UserProfiles> userList;
     private Context context;
     private String eventId;
+    private boolean isPrivate;
 
-    public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId) {
+    public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId, boolean isPrivate) {
         this.context = context;
         this.userList = userList;
         this.eventId = eventId;
+        this.isPrivate = isPrivate;
     }
 
     public void updateList(List<UserProfiles> newList) {
@@ -49,19 +51,42 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
 
         // Handle the Invite Click
         holder.itemView.setOnClickListener(v -> {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            String[] options = isPrivate
+                    ? new String[]{"Send Invite", "Make Co-Organizer"}
+                    : new String[]{"Make Co-Organizer"};
 
-            Map<String, Object> inviteData = new HashMap<>();
-            inviteData.put("userId", user.getDeviceId());
-            inviteData.put("status", "invited");
-            inviteData.put("invitedAt", Timestamp.now());
+            new android.app.AlertDialog.Builder(context)
+                    .setTitle(user.getName())
+                    .setItems(options, (dialog, which) -> {
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            db.collection("events").document(eventId)
-                    .collection("waitingList").document(user.getDeviceId())
-                    .set(inviteData)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(context, "Invited " + user.getName() + "!", Toast.LENGTH_SHORT).show();
-                    });
+                        if (isPrivate && which == 0) {
+                            // Send Invite
+                            Map<String, Object> inviteData = new HashMap<>();
+                            inviteData.put("userId", user.getDeviceId());
+                            inviteData.put("status", "invited");
+                            inviteData.put("invitedAt", Timestamp.now());
+
+                            db.collection("events").document(eventId)
+                                    .collection("waitingList").document(user.getDeviceId())
+                                    .set(inviteData)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(context, "Invited " + user.getName() + "!", Toast.LENGTH_SHORT).show();
+                                    });
+
+                        } else {
+                            // Make Co-Organizer
+                            db.collection("events").document(eventId)
+                                    .update("coOrganizers", com.google.firebase.firestore.FieldValue.arrayUnion(user.getDeviceId()))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(context, user.getName() + " is now a co-organizer", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(context, "Failed to assign co-organizer", Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    })
+                    .show();
         });
     }
 
