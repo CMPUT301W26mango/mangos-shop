@@ -2,6 +2,8 @@ package com.example.myapplication;
 
 import com.google.firebase.Timestamp;
 
+import java.util.List;
+
 /**
  * Model class representing an event in the application.
  *
@@ -34,6 +36,8 @@ public class Event {
     private String deviceId;
 
     private Boolean privateEvent;
+    private List<String> coOrganizers;
+
 
     /**
      * Empty constructor required by Firebase Firestore for
@@ -64,7 +68,7 @@ public class Event {
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
                  String qrValue, int capacity, String dateEvent,
-                 String organizerName, String eventType, int maxWaitingListSize, String deviceId, Boolean privateEvent) {
+                 String organizerName, String eventType, int maxWaitingListSize, String deviceId, Boolean privateEvent, List<String> coOrganizers) {
 
         this.id = id;
         this.title = title;
@@ -81,10 +85,15 @@ public class Event {
         this.maxWaitingListSize = maxWaitingListSize;
         this.deviceId = deviceId;
         this.privateEvent = privateEvent;
+        this.coOrganizers = coOrganizers;
     }
 
     // Getters and Setters
 
+
+    public List<String> getCoOrganizers() { return coOrganizers; }
+
+    public void setCoOrganizers(List<String> coOrganizers) { this.coOrganizers = coOrganizers; }
 
     public Boolean getPrivateEvent() {
         return privateEvent;

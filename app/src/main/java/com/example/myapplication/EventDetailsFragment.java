@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -27,8 +28,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import android.graphics.Bitmap;
 import java.util.Objects;
 
 /**
@@ -127,18 +130,19 @@ public class EventDetailsFragment extends DialogFragment {
         Button acceptBtn = view.findViewById(R.id.acceptBtn);
         Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
         TextView textViewAlreadyRegistered = view.findViewById(R.id.alreadyRegisteredTextView);
+        ImageView shareBtn = view.findViewById(R.id.btn_share_qr);
+        shareBtn.setVisibility(View.VISIBLE);
+        shareBtn.setOnClickListener(v -> showQRCodePopup(eventId));
 
 
 
         db.collection("events")
-                .whereEqualTo("id", eventId)
-                .limit(1)
+                .document(eventId)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
+                .addOnSuccessListener(document -> {
                     if (!isAdded() || getContext() == null) return;
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        QueryDocumentSnapshot document =
-                                (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
+                    if (document.exists()) {
+                        firestoreDocId = document.getId();
 
                         // Firestore Document Id
                         firestoreDocId = document.getId();
@@ -212,38 +216,39 @@ public class EventDetailsFragment extends DialogFragment {
                         // Determine what button to show
                        // isRegistered(registerBtn, btnCancel, textViewAlreadyRegistered);
 
+                        TextView tvCoOrgMessage = view.findViewById(R.id.tv_co_organizer_message);
+                        Button btnOrgView = view.findViewById(R.id.btn_go_to_organizer_view);
 
-                        // Check registration status and show correct UI
-                        checkStatusAndShowUI(registerBtn, btnCancel, acceptBtn,
-                                textViewAlreadyRegistered, selectedMsg,
-                                acceptedMsg, rejectedMsg, lotteryRedrawMsg,eventFull);
+                        List<String> coOrganizers = (List<String>) document.get("coOrganizers");
+                        boolean isCoOrg = coOrganizers != null && coOrganizers.contains(deviceId);
 
-                        // Create a listener for the two buttons
-                        registerBtn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull);
-                            }
-                        });
+                        if (isCoOrg) {
+                            registerBtn.setVisibility(View.GONE);
+                            btnCancel.setVisibility(View.GONE);
+                            acceptBtn.setVisibility(View.GONE);
+                            textViewAlreadyRegistered.setVisibility(View.GONE);
+                            tvCoOrgMessage.setVisibility(View.VISIBLE);
+                            btnOrgView.setVisibility(View.VISIBLE);
+                            btnOrgView.setOnClickListener(v -> {
+                                Intent intent = new Intent(requireContext(), EventDetailActivity.class);
+                                intent.putExtra("EVENT_ID", firestoreDocId);
+                                startActivity(intent);
+                                dismiss();
+                            });
+                        } else {
+                            checkStatusAndShowUI(registerBtn, btnCancel, acceptBtn,
+                                    textViewAlreadyRegistered, selectedMsg,
+                                    acceptedMsg, rejectedMsg, lotteryRedrawMsg, eventFull);
 
+                            registerBtn.setOnClickListener(v ->
+                                    joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull));
 
-                       acceptBtn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                acceptInvitation(acceptBtn, selectedMsg, acceptedMsg);
-                            }
-                        });
+                            acceptBtn.setOnClickListener(v ->
+                                    acceptInvitation(acceptBtn, selectedMsg, acceptedMsg));
 
-
-                        btnCancel.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                leaveWaitingList(registerBtn, btnCancel, acceptBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg);
-                            }
-                        });
-
-
-
+                            btnCancel.setOnClickListener(v ->
+                                    leaveWaitingList(registerBtn, btnCancel, acceptBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg));
+                        }
 
                     } else {
                         if (!isAdded() || getContext() == null) return;
@@ -507,4 +512,22 @@ public class EventDetailsFragment extends DialogFragment {
                 });
     }
 
+    private void showQRCodePopup(String eventId) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("Event QR Code");
+
+        android.widget.ImageView qrView = new android.widget.ImageView(requireContext());
+        qrView.setPadding(40, 40, 40, 40);
+
+        try {
+            Bitmap bitmap = QrHelper.generateQrCode(eventId);
+            qrView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            qrView.setImageResource(android.R.drawable.stat_notify_error);
+        }
+
+        builder.setView(qrView);
+        builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
 }

@@ -153,6 +153,8 @@ public class EventListActivity extends AppCompatActivity {
 
     private void loadEvents() {
         Timestamp now = Timestamp.now();
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         db.collection("events")
                 .whereLessThanOrEqualTo("regStart", now)
                 .get()
@@ -161,9 +163,14 @@ public class EventListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
-                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
 
-                        if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
+                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
+                        boolean isCoOrg = event.getCoOrganizers() != null
+                                && event.getCoOrganizers().contains(deviceId);
+                        boolean isActive = event.getRegEnd() != null
+                                && event.getRegEnd().compareTo(now) >= 0;
+
+                        if (isActive && (isPublic || isCoOrg)) {
                             eventList.add(event);
                         }
                     }

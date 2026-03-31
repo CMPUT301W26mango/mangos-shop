@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class EventDetailActivity extends AppCompatActivity {
 
     private String eventId;
+    private boolean isPrivate = false;
+    private boolean isCoOrg = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,8 @@ public class EventDetailActivity extends AppCompatActivity {
         btnInvite.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserSearchActivity.class);
             intent.putExtra("EVENT_ID", eventId);
+            intent.putExtra("IS_PRIVATE", isPrivate);
+            intent.putExtra("IS_CO_ORG", isCoOrg);
             startActivity(intent);
         });
     }
@@ -44,16 +48,27 @@ public class EventDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // re fetch to update better
         ImageView shareBtn = findViewById(R.id.btn_share_qr);
         ImageView btnInvite = findViewById(R.id.btn_invite_users);
+        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
+
+        String currentDeviceId = android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
         EventStore eventStore = new EventStore();
         eventStore.getEventById(eventId, event -> {
-            boolean isPrivate = Boolean.TRUE.equals(event.getPrivateEvent());
+            isPrivate = Boolean.TRUE.equals(event.getPrivateEvent());
+            isCoOrg = event.getCoOrganizers() != null && event.getCoOrganizers().contains(currentDeviceId);
+            boolean isOwner = currentDeviceId.equals(event.getDeviceId());
+
             runOnUiThread(() -> {
-                shareBtn.setVisibility(isPrivate ? View.GONE : View.VISIBLE);
-                btnInvite.setVisibility(isPrivate ? View.VISIBLE : View.GONE);
+                // settings cog — owner only not co org
+                settingsBtn.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+
+                // QR share
+                shareBtn.setVisibility(!isPrivate ? View.VISIBLE : View.GONE);
+
+                // invite/search
+                btnInvite.setVisibility((isOwner || (isCoOrg && isPrivate)) ? View.VISIBLE : View.GONE);
             });
         });
     }
