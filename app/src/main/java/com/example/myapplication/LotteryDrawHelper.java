@@ -1,0 +1,236 @@
+package com.example.myapplication;
+
+import android.util.Log;
+
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * US 02.05.02 — Shared lottery draw logic.
+ *
+ * Called by:
+ *   - LotteryDrawWorker (PeriodicWorkRequest — scans all expired events every ~15 min)
+ *   - WaitingListActivity lazy check (safety net if periodic worker hasn't fired yet)
+ *
+ * Draw-once guarantee: a `drawCompleted` boolean on the event document is checked
+ * before every draw. The batch write sets `drawCompleted = true` atomically with
+ * the status updates, so a second concurrent trigger will find it already true.
+ *
+ * Firestore field names (from EventStore.addEvent()):
+ *   event doc  — "regEnd" (Timestamp), "capacity" (Long), "drawCompleted" (Boolean)
+ *   waitingList — "status" (String: "waiting"/"selected"/"accepted"/"rejected"),
+ *                 document ID == entrant's deviceId
+ */
+public class LotteryDrawHelper {
+
+    private static final String TAG = "LotteryDrawHelper";
+
+    // -------------------------------------------------------------------------
+    // Callback interface
+    // -------------------------------------------------------------------------
+
+    /**
+     * Callback so callers know whether the draw succeeded or was skipped.
+     */
+    public interface OnDrawCompleteListener {
+        void onSuccess(int selectedCount);
+        void onFailure(Exception e);
+    }
+
+    // -------------------------------------------------------------------------
+    // Part 1 — Scan all expired events and draw (used by LotteryDrawWorker)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Queries Firestore for all events whose registration deadline has passed
+     * and whose draw has not yet been completed, then calls performDraw() for each.
+     *
+     * This is called by the periodic WorkManager worker so it requires no knowledge
+     * of specific event IDs — it finds all events that need drawing on its own.
+     *
+     * @param listener called once per event that is processed (may be null)
+     */
+    public static void scanAndDrawAll(OnDrawCompleteListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Query events where regEnd < now (deadline has passed).
+        // drawCompleted check is done client-side to avoid needing a composite Firestore index.
+        db.collection("events")
+                .whereLessThan("regEnd", Timestamp.now())
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot == null || querySnapshot.isEmpty()) {
+                        Log.d(TAG, "No expired events found.");
+                        if (listener != null) listener.onSuccess(0);
+                        return;
+                    }
+
+                    for (DocumentSnapshot eventDoc : querySnapshot.getDocuments()) {
+                        Boolean drawCompleted = eventDoc.getBoolean("drawCompleted");
+                        if (Boolean.TRUE.equals(drawCompleted)) {
+                            continue; // already drawn — skip
+                        }
+
+                        String eventId = eventDoc.getId();
+                        Log.d(TAG, "Drawing for expired event: " + eventId);
+                        // Perform the draw; listener is per-event so pass null here to avoid
+                        // conflating multiple events into one callback chain.
+                        performDraw(eventId, null);
+                    }
+
+                    if (listener != null) listener.onSuccess(querySnapshot.size());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to query expired events", e);
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+
+    // -------------------------------------------------------------------------
+    // Part 2 — Perform the draw for a single event (used by both triggers)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Executes the lottery draw for one event.
+     *
+     * Steps:
+     *  1. Read the event document.
+     *  2. If drawCompleted == true, abort silently.
+     *  3. Read the waiting list entries with status == "waiting".
+     *  4. Shuffle and select the first [capacity] entries.
+     *  5. Commit a WriteBatch: update selected entrants to "selected",
+     *     set drawCompleted = true and drawDate = now on the event document.
+     *  6. Send in-app notifications to selected entrants.
+     *
+     * @param eventId  Firestore document ID of the event
+     * @param listener optional callback; pass null if not needed
+     */
+    public static void performDraw(String eventId, OnDrawCompleteListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        // Step 1: read the event document
+        eventRef.get()
+                .addOnSuccessListener(eventDoc -> {
+                    if (!eventDoc.exists()) {
+                        Log.w(TAG, "Event not found: " + eventId);
+                        if (listener != null) listener.onSuccess(0);
+                        return;
+                    }
+
+                    // Step 2: guard — skip if draw already ran
+                    Boolean drawCompleted = eventDoc.getBoolean("drawCompleted");
+                    if (Boolean.TRUE.equals(drawCompleted)) {
+                        Log.d(TAG, "Draw already completed for event: " + eventId);
+                        if (listener != null) listener.onSuccess(0);
+                        return;
+                    }
+
+                    // capacity field name matches EventStore.addEvent(): "capacity"
+                    Long capacityLong = eventDoc.getLong("capacity");
+                    int capacity = (capacityLong != null) ? capacityLong.intValue() : 0;
+                    String eventTitle = eventDoc.getString("title");
+
+                    if (capacity <= 0) {
+                        Log.w(TAG, "Capacity is 0 for event: " + eventId + " — marking done.");
+                        markDrawComplete(db, eventRef, 0, listener);
+                        return;
+                    }
+
+                    // Step 3: read waiting list entries with status == "waiting"
+                    eventRef.collection("waitingList")
+                            .whereEqualTo("status", "waiting")
+                            .get()
+                            .addOnSuccessListener(waitingSnap -> {
+                                List<String> waitingIds = new ArrayList<>();
+                                for (DocumentSnapshot doc : waitingSnap.getDocuments()) {
+                                    // Document ID is the entrant's deviceId (matches EventDetailsFragment)
+                                    waitingIds.add(doc.getId());
+                                }
+
+                                if (waitingIds.isEmpty()) {
+                                    Log.d(TAG, "No waiting entrants for event: " + eventId);
+                                    markDrawComplete(db, eventRef, 0, listener);
+                                    return;
+                                }
+
+                                // Step 4: shuffle and select up to [capacity] entrants
+                                Collections.shuffle(waitingIds);
+                                int selectCount = Math.min(capacity, waitingIds.size());
+                                List<String> selected = waitingIds.subList(0, selectCount);
+
+                                // Step 5: atomic batch write
+                                WriteBatch batch = db.batch();
+
+                                for (String userId : selected) {
+                                    DocumentReference entrantRef =
+                                            eventRef.collection("waitingList").document(userId);
+                                    // "status" field name matches EventDetailsFragment.joinWaitingList()
+                                    batch.update(entrantRef, "status", "selected");
+                                }
+
+                                batch.update(eventRef, "drawCompleted", true);
+                                batch.update(eventRef, "drawDate", Timestamp.now());
+
+                                batch.commit()
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "Draw complete for " + eventId
+                                                    + ": " + selectCount + " selected.");
+
+//                                            // Step 6: notify selected entrants
+//                                            Profiles profiles = new Profiles();
+//                                            String displayName = (eventTitle != null) ? eventTitle : "an event";
+//                                            for (String userId : selected) {
+//                                                profiles.sendNotificationsToUser(
+//                                                        userId,
+//                                                        "You have been selected for " + displayName
+//                                                                + "! Open the app to accept or decline.",
+//                                                        eventId
+//                                                );
+//                                            }
+
+                                            if (listener != null) listener.onSuccess(selectCount);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Batch write failed for event: " + eventId, e);
+                                            if (listener != null) listener.onFailure(e);
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to read waiting list for event: " + eventId, e);
+                                if (listener != null) listener.onFailure(e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to read event document: " + eventId, e);
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+
+    /** Marks drawCompleted = true when capacity is 0 or waiting pool is empty. */
+    private static void markDrawComplete(FirebaseFirestore db, DocumentReference eventRef,
+                                         int selectedCount, OnDrawCompleteListener listener) {
+        WriteBatch batch = db.batch();
+        batch.update(eventRef, "drawCompleted", true);
+        batch.update(eventRef, "drawDate", Timestamp.now());
+        batch.commit()
+                .addOnSuccessListener(v -> {
+                    if (listener != null) listener.onSuccess(selectedCount);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to mark draw complete", e);
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+}

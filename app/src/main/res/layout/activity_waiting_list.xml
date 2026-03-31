@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     US 02.02.01 + US 02.06.05
-    Waiting List screen showing registered entrants with CSV export button.
+    Waiting List screen: shows registered entrant names and a CSV export button.
+    The lottery draw runs automatically in the background (WorkManager + lazy check).
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
