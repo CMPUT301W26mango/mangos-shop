@@ -1,7 +1,12 @@
 package com.example.myapplication;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -10,13 +15,16 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -129,6 +137,16 @@ public class EventListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // ask for notification permission the second they open this screen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
+        listenForStatusChanges();
+        listenForNewNotifications();
+
 
     }
 
@@ -193,4 +211,57 @@ public class EventListActivity extends AppCompatActivity {
         }
     }
 
+    private void listenForNewNotifications() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String deviceId = new Profiles().getDeviceId(this);
+
+        // setup channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("EVENT_ALERTS", "Event Alerts", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(channel);
+        }
+
+        db.collection("users").document(deviceId).collection("notifications")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null || snapshots == null) return;
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        // only trigger on brand new messages, ignore old ones
+                        if (dc.getType() == DocumentChange.Type.ADDED) {
+
+                            // check if they actually want notifications
+                            db.collection("users").document(deviceId).get().addOnSuccessListener(doc -> {
+                                Boolean wantsNotis = doc.getBoolean("notificationsEnabled");
+
+                                // default to true if null just in case
+                                if (wantsNotis == null || wantsNotis) {
+                                    String message = dc.getDocument().getString("message");
+                                    showSystemNotification(message);
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+
+    private void showSystemNotification(String messageText) {
+        // Needed for the newer andriod apparantly
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "EVENT_ALERTS")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("New Event Update!")
+                .setContentText(messageText)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+        manager.notify((int) System.currentTimeMillis(), builder.build());
+    }
 }
+
