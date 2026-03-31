@@ -133,7 +133,6 @@ public class EventListActivity extends AppCompatActivity {
     }
 
 
-
     private void loadEvents() {
         Timestamp now = Timestamp.now();
         db.collection("events")
