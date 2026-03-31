@@ -397,38 +397,39 @@ public class EventDetailsFragment extends DialogFragment {
      * @param textViewAlreadyRegistered
      *  This is a text view to show that they are already registered and can cancel
      * */
-    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage){
+    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage) {
+        //  Remove the user from the waiting list sub-collection
         db.collection("events")
                 .document(firestoreDocId)
                 .collection("waitingList")
                 .document(deviceId)
                 .delete()
-                .addOnSuccessListener(waitingList -> {
-                    if (!isAdded() || getContext() == null) return;
-                    Log.d(logTag, "Successfully left waiting list");
+                .addOnSuccessListener(aVoid -> {
+                    //  Remove the user from the invitedUsers array so they lose access/visibility
+                    db.collection("events")
+                            .document(firestoreDocId)
+                            .update("invitedUsers", com.google.firebase.firestore.FieldValue.arrayRemove(deviceId))
+                            .addOnSuccessListener(updateVoid -> {
+                                if (!isAdded() || getContext() == null) return;
+
+                                Log.d(logTag, "Successfully left waiting list and removed from invitedUsers");
+                                Toast.makeText(getContext(), "You've left the event.", Toast.LENGTH_SHORT).show();
 
 
-                    Toast.makeText(getContext(),
-                            "You've left the waiting list.",
-                            Toast.LENGTH_SHORT).show();
+                                dismiss();
+                            })
+                            .addOnFailureListener(e -> {
 
-                    // Swap buttons back
-                    acceptBtn.setVisibility(View.GONE);
-                    tvSelectedMessage.setVisibility(View.GONE);
-                    tvAcceptedMessage.setVisibility(View.GONE);
-                    registerBtn.setVisibility(View.VISIBLE);
-                    cancelBtn.setVisibility(View.GONE);
-                    textViewAlreadyRegistered.setVisibility(View.GONE);
+                                if (!isAdded() || getContext() == null) return;
+                                dismiss();
+                            });
                 })
                 .addOnFailureListener(e -> {
                     if (!isAdded() || getContext() == null) return;
-                    Log.e(logTag, "Something went wrong when cancelling", e);
-                    Toast.makeText(getContext(),
-                            "Something went wrong when cancelling",
-                            Toast.LENGTH_SHORT).show();
+                    Log.e(logTag, "Something went wrong when leaving", e);
+                    Toast.makeText(getContext(), "Something went wrong when leaving", Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     /**
      * Checks the entrant's current status in the waiting list and shows the correct UI.
