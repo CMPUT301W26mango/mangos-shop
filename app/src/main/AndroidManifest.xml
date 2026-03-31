@@ -57,7 +57,6 @@
         </activity>
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
-        <activity android:name=".OrganizerAccount" />
         <activity android:name=".AdminAccount" />
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
@@ -65,9 +64,6 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".NotificationSettingsActivity" />
         <activity android:name=".NotificationsActivity" />
-        <activity android:name=".EventDetailActivity" />
-
-
 
     </application>
 
