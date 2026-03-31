@@ -1,5 +1,6 @@
 package com.example.myapplication;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
 
 /**
  * This is a comment class it represents one comment
@@ -10,6 +11,7 @@ public class Comment {
     private String userName;
     private String deviceId;
     private Timestamp timestamp;
+    private String commentId;
 
     /**
      * Empty constructor
@@ -105,5 +107,25 @@ public class Comment {
      * */
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+
+    /**
+     * This gets the id of the comment
+     * @return commentId
+     *  This is the id of the comment that is returned
+     * */
+    @Exclude
+    public String getCommentId() {
+        return commentId;
+    }
+
+    /**
+     *  This sets the id of the comment
+     * @param commentId
+     *  Passed in Id to set the comment, helps with deleting comments
+     * */
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 }

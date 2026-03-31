@@ -31,6 +31,8 @@ public class CommentActivity extends AppCompatActivity {
     private Button sendButton;
     private ImageButton backButton;
 
+    private String organizerId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,7 @@ public class CommentActivity extends AppCompatActivity {
         eventId = getIntent().getStringExtra("eventId");
 
         // Also get the organizer id from that intent
-        String organizerId = getIntent().getStringExtra("organizerId");
+        organizerId = getIntent().getStringExtra("organizerId");
 
         if (eventId == null) {
             Toast.makeText(this, "Error loading comments", Toast.LENGTH_SHORT).show();
@@ -59,7 +61,10 @@ public class CommentActivity extends AppCompatActivity {
         backButton = findViewById(R.id.btnBack);
 
         commentList = new ArrayList<>();
-        adapter = new CommentAdapter(commentList, organizerId);
+        adapter = new CommentAdapter(commentList, organizerId, comment -> {
+            checkRoleAndDelete(comment);
+        });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
@@ -90,6 +95,7 @@ public class CommentActivity extends AppCompatActivity {
                     for(QueryDocumentSnapshot doc: snapshots){
                         // Convert the document into the comment class
                         Comment comment = doc.toObject(Comment.class);
+                        comment.setCommentId(doc.getId());
                         commentList.add(comment);
                     }
 
@@ -142,5 +148,49 @@ public class CommentActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to get user profile", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void checkRoleAndDelete(Comment comment) {
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // Check the users collection to see if they are an organizer first
+        db.collection("users").document(deviceId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+
+                        // If they are an Organizer OR if they are the original event creator
+                        if ("Organizer".equals(role) || deviceId.equals(organizerId)) {
+                            showDeleteDialog(comment);
+                        }
+                        // If they aren't, the method just ends and nothing happens
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("CommentActivity", "Failed to check user role", e);
+                });
+    }
+
+    private void showDeleteDialog(Comment comment) {
+        // Make the popup
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Delete Comment")
+                .setMessage("Are you sure you want to delete this comment?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+
+                    // Delete it from firebase now
+                    db.collection("events").document(eventId)
+                            .collection("comments").document(comment.getCommentId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Failed to delete comment", Toast.LENGTH_SHORT).show();
+                            });
+
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

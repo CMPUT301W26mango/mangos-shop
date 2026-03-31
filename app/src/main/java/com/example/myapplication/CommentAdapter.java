@@ -15,10 +15,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     private List<Comment> commentList;
     private String organizerId;
 
-    public CommentAdapter(List<Comment> commentList, String organizerId){
+    // Set the interface up for a pop up to delete comment
+    public interface OnCommentLongClickListener {
+        void onCommentLongClick(Comment comment);
+    }
+
+    private OnCommentLongClickListener longClickListener;
+
+    public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener){
         this.commentList = commentList;
         this.organizerId = organizerId;
+        this.longClickListener = longClickListener;
     }
+
+
 
     @NonNull
     @Override
@@ -59,6 +69,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             // Do it just now as a default
             holder.timestampText.setText("Just Now");
         }
+
+        // Listen for a long click to open a delete comment dialogue
+        holder.itemView.setOnLongClickListener(v -> {
+            longClickListener.onCommentLongClick(comment);
+            return true;
+        });
     }
 
 
