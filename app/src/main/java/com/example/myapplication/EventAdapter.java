@@ -131,40 +131,43 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
                         if (e != null || doc == null) return;
 
+
+                        com.google.android.material.card.MaterialCardView card =
+                                (com.google.android.material.card.MaterialCardView) holder.eventCardRoot;
+
                         if (doc.exists()) {
                             String status = doc.getString("status");
                             if (status == null) status = "waiting";
 
                             holder.eventStatus.setVisibility(View.VISIBLE);
 
-                            if (status.equals("selected")) {
 
+                            card.setStrokeWidth(8);
+
+                            if (status.equals("selected")) {
                                 holder.eventStatus.setText("Status: Selected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.yellow_border);
+                                card.setStrokeColor(Color.parseColor("#FFBF00")); // Yellow Border
 
                             } else if (status.equals("accepted")) {
-
                                 holder.eventStatus.setText("Status: Accepted");
                                 holder.eventStatus.setTextColor(Color.parseColor("#008000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.green_border);
+                                card.setStrokeColor(Color.parseColor("#008000")); // Green Border
 
                             } else if (status.equals("rejected")) {
-
                                 holder.eventStatus.setText("Status: Rejected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.red_border);
+                                card.setStrokeColor(Color.parseColor("#FF0000")); // Red Border
 
                             } else {
-
                                 holder.eventStatus.setText("Status: Waiting");
                                 holder.eventStatus.setTextColor(Color.parseColor("#000000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.black_border);
+                                card.setStrokeColor(Color.parseColor("#000000")); // Black Border
                             }
 
                         } else {
                             holder.eventStatus.setVisibility(View.GONE);
-                            holder.eventCardRoot.setBackgroundResource(R.drawable.rounded_card);
+                            card.setStrokeWidth(0);
                         }
                     });
         }
