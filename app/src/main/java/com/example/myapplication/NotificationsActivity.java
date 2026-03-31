@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,7 +62,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                 doc.getId(),
                                 doc.getString("eventId"),
                                 doc.getString("eventName"),
-                                doc.getString("notification_name"),
+                                doc.getString("notiName"),
                                 doc.getString("description"),
                                 doc.getTimestamp("timestamp"),
                                 Boolean.TRUE.equals(doc.getBoolean("read"))
