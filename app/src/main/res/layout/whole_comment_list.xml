@@ -37,7 +37,7 @@
 
 
             <ImageButton
-                android:id="@+id/btnFilter"
+                android:id="@+id/btnBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -56,16 +56,15 @@
         android:paddingEnd="8dp"
         android:gravity="center_vertical">
 
-        <android.inputmethodservice.ExtractEditText
+        <EditText
             android:id="@+id/commentInput"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:queryHint="Search events"
-            android:iconifiedByDefault="false"
+            android:hint="Add a comment..."
+            android:paddingStart="12dp"
             android:background="@drawable/rounded_card">
-
-        </android.inputmethodservice.ExtractEditText>
+        </EditText>
 
 
         <Button

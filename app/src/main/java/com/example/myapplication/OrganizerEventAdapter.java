@@ -1,8 +1,10 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -76,6 +78,14 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             holder.imagePoster.setImageResource(android.R.drawable.ic_menu_gallery);
         }
 
+        // Open the comments if the organizer presses on it
+        holder.viewCommentsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), CommentActivity.class);
+            intent.putExtra("eventId", event.getId());
+            intent.putExtra("organizerId", event.getDeviceId());
+            v.getContext().startActivity(intent);
+        });
+
         holder.itemView.setOnClickListener(v -> {
             clickListener.onEventClick(event);
         });
@@ -100,6 +110,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         TextView titleText, locationText, capacityText;
 
         ImageView imagePoster;
+        ImageButton viewCommentsBtn;
         /**
          * Initializes the components found in the event card layout.
          * @param itemView The view of the individual event card.
@@ -110,6 +121,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             locationText = itemView.findViewById(R.id.card_event_location);
             capacityText = itemView.findViewById(R.id.card_event_capacity);
             imagePoster = itemView.findViewById(R.id.card_event_image);
+            viewCommentsBtn = itemView.findViewById(R.id.viewCommentsBtnForOrganizers);
         }
     }
 }
