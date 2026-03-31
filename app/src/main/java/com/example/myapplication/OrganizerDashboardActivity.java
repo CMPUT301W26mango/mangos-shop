@@ -194,7 +194,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                                 .collection("notifications").add(notifData);
                         sentCount++;
                     }
-                    Toast.makeText(this, "Blasted to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Notification sent to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to reach entrants", Toast.LENGTH_SHORT).show());
     }
