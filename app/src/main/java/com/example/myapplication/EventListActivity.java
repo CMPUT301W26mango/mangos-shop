@@ -82,7 +82,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewEvents);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
-        profileButton = findViewById(R.id.btn_to_edit_profile);
+        //profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
         adapter = new EventAdapter(eventList, getSupportFragmentManager());
@@ -131,7 +131,6 @@ public class EventListActivity extends AppCompatActivity {
 
 
     }
-
 
 
     private void loadEvents() {
