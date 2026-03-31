@@ -11,6 +11,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.widget.Button;
+import android.app.AlertDialog;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Activity that displays all of the events created by the organizer
  * From this page organizers can click to go to the event creation page
@@ -36,6 +53,9 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(OrganizerDashboardActivity.this, EventCreateActivity.class);
             startActivity(intent);
         });
+
+        Button btnNotify = findViewById(R.id.btn_send_notifications);
+        btnNotify.setOnClickListener(v -> fetchEventsAndShowBroadcastDialog());
 
         LinearLayout myEvents = findViewById(R.id.my_events);
         myEvents.setOnClickListener(v -> {
@@ -72,5 +92,110 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
             });
             recyclerView.setAdapter(adapter);
         });
+    }
+
+    // grab my events first so the dropdown actually has stuff in it
+    private void fetchEventsAndShowBroadcastDialog() {
+        String myDeviceId = new Profiles().getDeviceId(this);
+        EventStore eventStore = new EventStore();
+
+        eventStore.getEventsByOrganizer(myDeviceId, events -> {
+            if (events == null || events.isEmpty()) {
+                Toast.makeText(this, "Need to create an event first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            buildBroadcastDialog(events);
+        });
+    }
+
+    // setting up the alert dialog for the broadcast
+    private void buildBroadcastDialog(List<Event> myEvents) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Global Broadcast");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+
+        // event selection dropdown
+        TextView lblEvent = new TextView(this);
+        lblEvent.setText("Select Event:");
+        layout.addView(lblEvent);
+
+        Spinner eventSpinner = new Spinner(this);
+        List<String> eventNames = new ArrayList<>();
+        for (Event e : myEvents) {
+            eventNames.add(e.getTitle());
+        }
+        ArrayAdapter<String> eventAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, eventNames);
+        eventSpinner.setAdapter(eventAdapter);
+        layout.addView(eventSpinner);
+
+        // target group dropdown
+        TextView lblGroup = new TextView(this);
+        lblGroup.setText("\nSelect Target Group:");
+        layout.addView(lblGroup);
+
+        Spinner groupSpinner = new Spinner(this);
+        String[] groupOptions = {"Waitlist Only", "Selected Entrants", "Cancelled/Rejected Entrants"};
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, groupOptions);
+        groupSpinner.setAdapter(groupAdapter);
+        layout.addView(groupSpinner);
+
+        // message input
+        EditText messageInput = new EditText(this);
+        messageInput.setHint("\nType your message here...");
+        layout.addView(messageInput);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Send", (dialog, which) -> {
+            String message = messageInput.getText().toString().trim();
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Event selectedEvent = myEvents.get(eventSpinner.getSelectedItemPosition());
+            int groupIndex = groupSpinner.getSelectedItemPosition();
+
+            String targetStatus = "waiting";
+            if (groupIndex == 1) targetStatus = "selected";
+            if (groupIndex == 2) targetStatus = "rejected";
+
+            executeBlast(selectedEvent.getId(), targetStatus, message);
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    // pushing the message directly to the entrants' notification sub-collections
+    private void executeBlast(String eventId, String targetStatus, String message) {
+        FirebaseFirestore.getInstance().collection("events").document(eventId).collection("waitingList")
+                .whereEqualTo("status", targetStatus)
+                .get()
+                .addOnSuccessListener(querySnapshots -> {
+                    if (querySnapshots.isEmpty()) {
+                        Toast.makeText(this, "No entrants found in that list", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int sentCount = 0;
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
+                        String entrantDeviceId = doc.getId();
+
+                        // push message to their inbox
+                        Map<String, Object> notifData = new HashMap<>();
+                        notifData.put("message", message);
+                        notifData.put("timestamp", System.currentTimeMillis());
+
+                        FirebaseFirestore.getInstance().collection("users").document(entrantDeviceId)
+                                .collection("notifications").add(notifData);
+                        sentCount++;
+                    }
+                    Toast.makeText(this, "Blasted to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to reach entrants", Toast.LENGTH_SHORT).show());
     }
 }
