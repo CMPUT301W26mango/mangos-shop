@@ -42,6 +42,19 @@
             android:textColor="@color/darkergray"/>
 
 
+        <ImageView
+            android:id="@+id/btn_share_qr"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:src="@drawable/share_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Share QR"
+            android:visibility="gone"/>
+
+
         <TextView
             android:id="@+id/tv_selected_message"
             android:layout_width="match_parent"
@@ -390,6 +403,28 @@
             android:layout_marginTop="16dp"
             android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/tv_co_organizer_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You are a co-organizer for this event."
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textColor="@color/blue"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btn_go_to_organizer_view"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Go to Organizer View"
+            android:backgroundTint="@color/blue"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"/>
+
         <Button
             android:id="@+id/registerBtn"
             android:layout_width="match_parent"
@@ -405,7 +440,7 @@
             android:id="@+id/acceptBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Accept invitation!"
+            android:text="Accept"
             android:textSize="16sp"
             android:textColor="#FFFFFF"
             android:backgroundTint="#008000"

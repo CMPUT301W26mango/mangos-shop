@@ -3,10 +3,12 @@ package com.example.myapplication;
 import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -126,6 +128,8 @@ public class EventStore {
                     event.setOrganizerName(document.getString("organizerName"));
                     event.setEventType(document.getString("eventType"));
 
+                    event.setDeviceId(document.getString("deviceId"));
+                    event.setCoOrganizers((List<String>) document.get("coOrganizers"));
                     listener.onEventLoaded(event);
                 });
     }
@@ -163,6 +167,11 @@ public class EventStore {
                     }
                     listener.onEventsLoaded(events);
                 });
+    }
+
+    public void addCoOrganizer(String eventDocId, String userId) {
+        db.collection("events").document(eventDocId)
+                .update("coOrganizers", FieldValue.arrayUnion(userId));
     }
 }
 

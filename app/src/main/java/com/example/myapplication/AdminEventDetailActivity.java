@@ -35,13 +35,46 @@ public class AdminEventDetailActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
 
-    private String eventId;
     private String posterURL;
+    private String eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_event_detail);
+
+        eventId = getIntent().getStringExtra("eventId");
+
+        Button deleteButton = findViewById(R.id.btn_delete_event);
+
+        if (eventId == null || eventId.isEmpty()) {
+            Toast.makeText(this, "Missing event ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        deleteButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete this event?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                        db.collection("events")
+                                .document(eventId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Event deleted", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Error deleting event", Toast.LENGTH_SHORT).show();
+                                });
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
 
         title = findViewById(R.id.textEventTitle);
         location = findViewById(R.id.textEventLocation);
@@ -51,7 +84,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        eventId = getIntent().getStringExtra("eventId");
         String eventTitle = getIntent().getStringExtra("title");
         String eventLocation = getIntent().getStringExtra("location");
         String eventOrganizer = getIntent().getStringExtra("organizer");
