@@ -103,6 +103,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
+
         lotteryinfoButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.lottery_guidelines_dialog);
@@ -135,6 +136,16 @@ public class EventListActivity extends AppCompatActivity {
             Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
             startActivity(intent);
         });
+
+        // ask for notification permission the second they open this screen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
+        listenForStatusChanges();
+        listenForNewNotifications();
 
 
     }
@@ -176,7 +187,6 @@ public class EventListActivity extends AppCompatActivity {
         String deviceId = Settings.Secure.getString(
                 getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // watch for changes in the waitlist
         statusListener = db.collectionGroup("waitingList")
                 .whereEqualTo("userId", deviceId)
                 .addSnapshotListener((snapshots, e) -> {
@@ -187,6 +197,8 @@ public class EventListActivity extends AppCompatActivity {
                     }
 
                     Log.d("FirestoreListener", "Status changed!");
+
+
                     loadEvents();
                 });
     }
@@ -194,7 +206,6 @@ public class EventListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // clean up listener so it doesn't run in the background
         if (statusListener != null) {
             statusListener.remove();
         }
@@ -238,13 +249,12 @@ public class EventListActivity extends AppCompatActivity {
         // Needed for the newer andriod apparantly
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
                 return;
             }
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "EVENT_ALERTS")
-                .setSmallIcon(android.R.drawable.ic_dialog_info) // todo: change to actual app icon later
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("New Event Update!")
                 .setContentText(messageText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -254,3 +264,4 @@ public class EventListActivity extends AppCompatActivity {
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }
+
