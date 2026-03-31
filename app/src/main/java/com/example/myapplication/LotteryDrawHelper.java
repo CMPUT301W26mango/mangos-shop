@@ -10,7 +10,9 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * US 02.05.02 — Shared lottery draw logic.
@@ -149,9 +151,12 @@ public class LotteryDrawHelper {
                             .whereEqualTo("status", "waiting")
                             .get()
                             .addOnSuccessListener(waitingSnap -> {
+                                Map<String, String> waitingEntrants = new HashMap<>(); // deviceId -> name
                                 List<String> waitingIds = new ArrayList<>();
                                 for (DocumentSnapshot doc : waitingSnap.getDocuments()) {
                                     // Document ID is the entrant's deviceId (matches EventDetailsFragment)
+                                    String entrantName = doc.getString("name");
+                                    waitingEntrants.put(doc.getId(), entrantName != null ? entrantName : "");
                                     waitingIds.add(doc.getId());
                                 }
 
@@ -184,17 +189,29 @@ public class LotteryDrawHelper {
                                             Log.d(TAG, "Draw complete for " + eventId
                                                     + ": " + selectCount + " selected.");
 
-//                                            // Step 6: notify selected entrants
-//                                            Profiles profiles = new Profiles();
-//                                            String displayName = (eventTitle != null) ? eventTitle : "an event";
-//                                            for (String userId : selected) {
-//                                                profiles.sendNotificationsToUser(
-//                                                        userId,
-//                                                        "You have been selected for " + displayName
-//                                                                + "! Open the app to accept or decline.",
-//                                                        eventId
-//                                                );
-//                                            }
+                                            // Step 6: write notification documents for selected entrants
+                                            String displayTitle = (eventTitle != null) ? eventTitle : "an event";
+                                            for (String userId : selected) {
+                                                String entrantName = waitingEntrants.get(userId);
+                                                String displayName = (entrantName != null && !entrantName.isEmpty())
+                                                        ? entrantName : "Entrant";
+                                                String notifMessage = "Congratulations " + displayName
+                                                        + "! You have been selected to join " + displayTitle
+                                                        + ". Please go to the event page to accept or reject your entry.";
+
+                                                Map<String, Object> notifData = new HashMap<>();
+                                                notifData.put("recipientDeviceId", userId);
+                                                notifData.put("message", notifMessage);
+                                                notifData.put("eventId", eventId);
+                                                notifData.put("timestamp", Timestamp.now());
+                                                notifData.put("read", false);
+
+                                                db.collection("users").document(userId)
+                                                        .collection("notifications")
+                                                        .add(notifData)
+                                                        .addOnFailureListener(notifErr ->
+                                                                Log.e(TAG, "Failed to write notification for: " + userId, notifErr));
+                                            }
 
                                             if (listener != null) listener.onSuccess(selectCount);
                                         })
