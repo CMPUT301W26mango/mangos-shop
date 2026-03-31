@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import com.google.firebase.firestore.DocumentId;
+
 /**
  * User information and roles description
  * This is what takes in the user info for the profiles to be created.
@@ -14,6 +16,10 @@ public class UserProfiles {
     private boolean isAdmin = false;
     private boolean adminRequested = false;
 
+
+    @DocumentId
+    private String deviceId;
+
     // needed by Firestore (for data mapping)
     public UserProfiles() {}
 
@@ -27,13 +33,22 @@ public class UserProfiles {
      * @param phone Phone number of user (optional)
      * @param role What are they (Entrant, Organizer, or Admin)
      */
-    public UserProfiles(String name, String email, String phone, String role) {
+    public UserProfiles(String name, String email, String phone, String role, String deviceId) {
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.role = role;
         this.isAdmin = false;
         this.adminRequested = false;
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getName() {

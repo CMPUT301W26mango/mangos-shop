@@ -2,13 +2,11 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -21,19 +19,37 @@ public class EventDetailActivity extends AppCompatActivity {
 
         // Get the ID passed from the Dashboard
         eventId = getIntent().getStringExtra("EVENT_ID");
+        ImageView shareBtn = findViewById(R.id.btn_share_qr);
+        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
+        Button btnInvite = findViewById(R.id.btn_invite_users);
+
+
+        EventStore eventStore = new EventStore();
+
+        eventStore.getEventById(eventId, event -> {
+            if (event.getPrivateEvent())  {
+                shareBtn.setVisibility(View.GONE);
+            } else {
+                shareBtn.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Settings Cog logic
-        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
         settingsBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(EventDetailActivity.this, EventSettingsActivity.class);
+            Intent intent = new Intent(this, EventCreateActivity.class);
+            intent.putExtra("MODE", "EDIT");
             intent.putExtra("EVENT_ID", eventId);
             startActivity(intent);
         });
 
-        // Share/QR logic
-        ImageView shareBtn = findViewById(R.id.btn_share_qr);
         shareBtn.setOnClickListener(v -> {
             showQRCodePopup();
+        });
+
+        btnInvite.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserSearchActivity.class);
+            intent.putExtra("EVENT_ID", eventId);
+            startActivity(intent);
         });
     }
 

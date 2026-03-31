@@ -33,6 +33,8 @@ public class Event {
 
     private String deviceId;
 
+    private Boolean privateEvent;
+
     /**
      * Empty constructor required by Firebase Firestore for
      * automatic deserialization of documents into Event objects.
@@ -57,11 +59,12 @@ public class Event {
      * @param eventType       the type/category of the event
      * @param maxWaitingListSize maximum number of entrants allowed on the waiting list
      * @param deviceId        the users device id they use to log into the app
+     *
      */
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
                  String qrValue, int capacity, String dateEvent,
-                 String organizerName, String eventType, int maxWaitingListSize, String deviceId) {
+                 String organizerName, String eventType, int maxWaitingListSize, String deviceId, Boolean privateEvent) {
 
         this.id = id;
         this.title = title;
@@ -77,9 +80,19 @@ public class Event {
         this.eventType = eventType;
         this.maxWaitingListSize = maxWaitingListSize;
         this.deviceId = deviceId;
+        this.privateEvent = privateEvent;
     }
 
     // Getters and Setters
+
+
+    public Boolean getPrivateEvent() {
+        return privateEvent;
+    }
+
+    public void setPrivateEvent(Boolean privateEvent) {
+        this.privateEvent = privateEvent;
+    }
 
     /**
      * @return the unique device id of the organizer

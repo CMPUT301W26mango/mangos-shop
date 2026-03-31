@@ -51,6 +51,12 @@
             android:text="Profiles"
             android:layout_marginStart="8dp"/>
 
+        <Button
+            android:id="@+id/buttonBrowseImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Browse Images"/>
+
     </LinearLayout>
 
 </FrameLayout>

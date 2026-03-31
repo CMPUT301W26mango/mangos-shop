@@ -32,4 +32,21 @@
         android:text="Role"
         android:textColor="#000000"
         android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_delete_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Profile"
+        android:backgroundTint="@android:color/holo_red_dark"/>
+
+    <Button
+        android:id="@+id/btn_remove_organizer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remove Organizer"
+        android:backgroundTint="@android:color/holo_red_dark"/>
+
+
+
 </LinearLayout>

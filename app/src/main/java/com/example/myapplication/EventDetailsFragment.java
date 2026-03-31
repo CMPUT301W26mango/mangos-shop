@@ -131,7 +131,7 @@ public class EventDetailsFragment extends DialogFragment {
 
 
         db.collection("events")
-                .whereEqualTo("qrValue", eventId)
+                .whereEqualTo("id", eventId)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -448,7 +448,7 @@ public class EventDetailsFragment extends DialogFragment {
                                     tvSelectedMessage.setVisibility(View.VISIBLE);
                                     acceptBtn.setVisibility(View.VISIBLE);
                                     cancelBtn.setVisibility(View.VISIBLE);
-                                    cancelBtn.setText("Decline invitation");
+                                    cancelBtn.setText("Decline");
                                     break;
 
                                 case "accepted":

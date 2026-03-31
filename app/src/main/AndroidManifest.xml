@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,8 +19,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-
-
+        <activity
+            android:name=".UserSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OrganizerDashboardActivity"
+            android:exported="false" />
         <activity
             android:name=".EventCreateActivity"
             android:exported="false"
@@ -27,36 +36,28 @@
         <activity
             android:name=".AdminProfileDetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminBrowseEventsActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false"></activity>
         <activity android:name=".WaitingListActivity" />
-
-
         <activity
             android:name=".AdminEventDetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminBrowseProfilesActivity"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
-        <activity android:name=".OrganizerDashboardActivity" />
+        <activity android:name=".OrganizerAccount" />
         <activity android:name=".AdminAccount" />
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
@@ -69,5 +70,5 @@
 
 
     </application>
-</manifest>
 
+</manifest>
