@@ -2,14 +2,19 @@ package com.example.myapplication;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -23,6 +28,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,7 +38,9 @@ import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Intent;
 
@@ -52,11 +61,14 @@ public class EventListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private List<Event> eventList;
+    private List<Event> allActiveEvents;
+    private List<Event> displayedEvents;
     private FirebaseFirestore db;
 
     private ImageButton lotteryinfoButton;
     private ImageButton scanQRButton;
     private ImageButton closeInfoButton;
+    private ImageButton btnFilter;
     private ImageButton profileButton; // go to edit profile
 
     private com.google.firebase.firestore.ListenerRegistration statusListener;
@@ -90,10 +102,15 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewEvents);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
+        btnFilter = findViewById(R.id.btnFilter);
 //        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
-        adapter = new EventAdapter(eventList, getSupportFragmentManager());
+        allActiveEvents = new ArrayList<>();
+        displayedEvents = new ArrayList<>();
+
+
+        adapter = new EventAdapter(displayedEvents, getSupportFragmentManager());
 
         db = FirebaseFirestore.getInstance();
         loadEvents();
@@ -118,6 +135,7 @@ public class EventListActivity extends AppCompatActivity {
         });
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
+        btnFilter.setOnClickListener((v -> showFilterDialog()));
 
 //        profileButton.setOnClickListener(v -> {
 //            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
@@ -157,16 +175,18 @@ public class EventListActivity extends AppCompatActivity {
                 .whereLessThanOrEqualTo("regStart", now)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    eventList.clear();
+                    allActiveEvents.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
                         boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
 
                         if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
-                            eventList.add(event);
+                            allActiveEvents.add(event);
                         }
                     }
+                    applyFilters(null, null, null, null, null);
+
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
@@ -263,5 +283,123 @@ public class EventListActivity extends AppCompatActivity {
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
+
+    private void showFilterDialog(){
+        // Create the dialog
+        Dialog filterDialog = new Dialog(this);
+        filterDialog.setContentView(R.layout.fragment_filter);
+
+        if (filterDialog.getWindow() != null) {
+            filterDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            // Make it full width with some margins
+            filterDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        ImageButton btnClose = filterDialog.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(v -> filterDialog.dismiss());
+
+        // Set up everything to do with the filter (button listerners and such)
+        setupFilterDialogue(filterDialog);
+        filterDialog.show();
+
+
+    }
+
+    private void setupFilterDialogue(Dialog dialog){
+        TextInputEditText minDateInput = dialog.findViewById(R.id.filterMinEventDate);
+        TextInputEditText maxDateInput = dialog.findViewById(R.id.filterMaxEventDate);
+        Button filterApplyButton = dialog.findViewById(R.id.applyFiltersBtn);
+
+        minDateInput.setOnClickListener(v -> showDatePicker(minDateInput));
+        maxDateInput.setOnClickListener(v -> showDatePicker(maxDateInput));
+
+        filterApplyButton.setOnClickListener(v->{
+            gatherAndApplyFilters(dialog);
+            dialog.dismiss();
+        });
+
+
+    }
+
+    private void showDatePicker(TextInputEditText targetDateInput){
+        // Get the caldendar
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this, (view, year, month, dayOfMonth) -> {
+            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            targetDateInput.setText(selectedDate);
+        },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+
+    }
+
+    private void gatherAndApplyFilters(Dialog dialog){
+        // Get the selected category
+        ChipGroup chipGroup = dialog.findViewById(R.id.chipGroupEventType);
+        String selectedCategory = null;
+
+        int checkedChipId = chipGroup.getCheckedChipId();
+
+        // Get Capacity Limits
+        TextInputEditText minSpotsInput = dialog.findViewById(R.id.filterMinSpots);
+        TextInputEditText maxSpotsInput = dialog.findViewById(R.id.filterMaxSpots);
+
+        // Also take care if the field is empty
+        Integer minSpots = minSpotsInput.getText().toString().isEmpty() ? null : Integer.parseInt(minSpotsInput.getText().toString());
+        Integer maxSpots = maxSpotsInput.getText().toString().isEmpty() ? null : Integer.parseInt(maxSpotsInput.getText().toString());
+
+        //Get Date Limits
+        TextInputEditText minDateInput = dialog.findViewById(R.id.filterMinEventDate);
+        TextInputEditText maxDateInput = dialog.findViewById(R.id.filterMaxEventDate);
+
+        String minDate = minDateInput.getText().toString().isEmpty() ? null : minDateInput.getText().toString();
+        String maxDate = maxDateInput.getText().toString().isEmpty() ? null : maxDateInput.getText().toString();
+
+        // Pass to filtering logic
+        applyFilters(selectedCategory, minSpots, maxSpots, minDate, maxDate);
+    }
+
+    private void applyFilters(String category, Integer minSpots, Integer maxSpots, String minDate, String maxDate){
+        displayedEvents.clear();
+
+        for (Event event : allActiveEvents) {
+            boolean matches = true;
+
+            // Category Filter
+            if (category != null && event.getEventType() != null) {
+                if (!event.getEventType().equalsIgnoreCase(category)) {
+                    matches = false;
+                }
+            }
+
+            // Capacity Filter
+            if (minSpots != null && event.getCapacity() < minSpots) matches = false;
+            if (maxSpots != null && event.getCapacity() > maxSpots) matches = false;
+
+            // Date Filter (Lexicographical string comparison works here because format is yyyy-MM-dd)
+            if (event.getDateEvent() != null && !event.getDateEvent().isEmpty()) {
+                // Extract just the date part "yyyy-MM-dd" from the event's "yyyy-MM-dd HH:mm"
+                String justDate = event.getDateEvent().substring(0, 10);
+
+                if (minDate != null && justDate.compareTo(minDate) < 0) matches = false;
+                if (maxDate != null && justDate.compareTo(maxDate) > 0) matches = false;
+            } else if (minDate != null || maxDate != null) {
+                // If the event has no date but the user wants to filter by date, exclude it
+                matches = false;
+            }
+
+            if (matches) {
+                displayedEvents.add(event);
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
 }
 
