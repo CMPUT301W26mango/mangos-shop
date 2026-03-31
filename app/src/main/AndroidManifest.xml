@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -22,6 +23,15 @@
             android:name=".CommentActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
+        <activity
+            android:name=".UserSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OrganizerDashboardActivity"
+            android:exported="false" />
         <activity
             android:name=".EventCreateActivity"
             android:exported="false"
@@ -51,13 +61,14 @@
         </activity>
         <activity android:name=".EntrantAccount" />
         <activity android:name=".WaitingList" />
-        <activity android:name=".OrganizerDashboardActivity" />
         <activity android:name=".AdminAccount" />
         <activity android:name=".WelcomeBack" />
         <activity android:name=".CreateAccount" />
         <activity android:name=".EventListActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".NotificationSettingsActivity" />
+        <activity android:name=".NotificationsActivity" />
+
     </application>
 
 </manifest>

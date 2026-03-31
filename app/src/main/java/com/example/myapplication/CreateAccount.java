@@ -129,13 +129,13 @@ public class CreateAccount extends AppCompatActivity {
 
         UserProfiles user;
         if ("Organizer".equals(selectedRole)) {
-            user = new Organizer(name, email, phone);
+            user = new Organizer(name, email, phone, deviceId);
         } else if ("Admin".equals(selectedRole)) {
-            user = new Entrant(name, email, phone);
+            user = new Entrant(name, email, phone, deviceId);
             user.setAdminRequested(true);
             Toast.makeText(this, "Admin requested. Defaulting to Entrant pending approval.", Toast.LENGTH_LONG).show();
         } else {
-            user = new Entrant(name, email, phone);
+            user = new Entrant(name, email, phone, deviceId);
         }
 
         FirebaseFirestore.getInstance().collection("users").document(deviceId).set(user)
