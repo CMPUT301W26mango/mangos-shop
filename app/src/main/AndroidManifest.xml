@@ -64,6 +64,7 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".NotificationSettingsActivity" />
         <activity android:name=".NotificationsActivity" />
+        <activity android:name=".EventDetailActivity" />
 
 
 
