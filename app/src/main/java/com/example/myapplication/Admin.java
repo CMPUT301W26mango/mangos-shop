@@ -23,7 +23,7 @@ public class Admin extends UserProfiles {
      * @param email Admins Email
      * @param phone Admins number (optional)
      */
-    public Admin(String name, String email, String phone) {
-        super(name, email, phone, "Admin");
+    public Admin(String name, String email, String phone, String deviceId) {
+        super(name, email, phone, "Admin", deviceId);
     }
 }

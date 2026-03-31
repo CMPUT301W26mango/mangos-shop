@@ -23,7 +23,7 @@ public class Entrant extends UserProfiles {
      * @param email Entrant Email
      * @param phone Entrant number (optional)
      */
-    public Entrant(String name, String email, String phone) {
-        super(name, email, phone, "Entrant");
+    public Entrant(String name, String email, String phone, String deviceId) {
+        super(name, email, phone, "Entrant", deviceId);
     }
 }

@@ -6,6 +6,7 @@ import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +60,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.notificationName.setText(item.getNotiName());
 
         if (!item.isRead()) {
-
             holder.unreadDot.setVisibility(View.VISIBLE);
+        } else {
+            holder.unreadDot.setVisibility(View.GONE);
         }
 
         if (item.getNotiTime() != null) {
@@ -91,6 +93,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                 item.setRead(true);
                 holder.unreadDot.setVisibility(View.GONE);
+
+                db.collection("users")
+                        .document(deviceId)
+                        .collection("notifications")
+                        .document(item.getId())
+                        .update("read", true)
+                        .addOnSuccessListener(aVoid -> {
+                            // success (optional)
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firestore", "Failed to update read status", e);
+                        });
+
 
                 // Pass eventId
                 Bundle args = new Bundle();
