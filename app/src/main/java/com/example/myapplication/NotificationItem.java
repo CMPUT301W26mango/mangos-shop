@@ -42,4 +42,9 @@ public class NotificationItem {
     public Timestamp getNotiTime() {return notiTime; }
     public boolean isRead() { return read; }
     public void setRead(boolean read) { this.read = read; }
+
+    public String getNotificationName() {
+        return notiName;
+    }
+
 }

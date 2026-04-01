@@ -53,28 +53,6 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView backBtn = findViewById(R.id.btn_back);
         backBtn.setOnClickListener(v -> finish());
 
-        // Existing action buttons (IDs preserved)
-        ImageView shareBtn = findViewById(R.id.btn_share_qr);
-        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
-        ImageView btnInvite = findViewById(R.id.btn_invite_users);
-
-        settingsBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EventCreateActivity.class);
-            intent.putExtra("MODE", "EDIT");
-            intent.putExtra("EVENT_ID", eventId);
-            startActivity(intent);
-        });
-
-        shareBtn.setOnClickListener(v -> showQRCodePopup());
-
-        btnInvite.setOnClickListener(v -> {
-            Intent intent = new Intent(this, UserSearchActivity.class);
-            intent.putExtra("EVENT_ID", eventId);
-            intent.putExtra("IS_PRIVATE", isPrivate);
-            intent.putExtra("IS_CO_ORG", isCoOrg);
-            startActivity(intent);
-        });
-
         // osmdroid map setup
         mapView = findViewById(R.id.mapView);
         mapView.setTileSource(TileSourceFactory.MAPNIK);

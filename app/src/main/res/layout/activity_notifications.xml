@@ -17,6 +17,16 @@
         android:elevation="4dp"
         android:gravity="center"/>
 
+    <Button
+        android:id="@+id/clear_all_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear All"
+        android:backgroundTint="#FF6B6B"
+        android:textColor="#FFFFFF"
+        android:paddingHorizontal="16dp"
+        android:layout_gravity="center"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotifications"
         android:layout_width="match_parent"

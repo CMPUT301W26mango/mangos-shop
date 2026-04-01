@@ -14,9 +14,13 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,10 +58,53 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
         recyclerViewAdminProfiles.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new AdminProfileAdapter(filteredProfiles, profileItem -> {
-            Intent intent = new Intent(this, AdminProfileDetailActivity.class);
-            intent.putExtra("userId", profileItem.getUserId());
-            startActivity(intent);
+
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_admin_profile_detail, null);
+
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .create();
+
+            TextView tvName = dialogView.findViewById(R.id.tv_name);
+            TextView tvEmail = dialogView.findViewById(R.id.tv_email);
+            TextView tvRole = dialogView.findViewById(R.id.tv_role);
+            Button btnDelete = dialogView.findViewById(R.id.btn_delete_profile);
+            ImageButton btnClose = dialogView.findViewById(R.id.btn_close);
+
+            tvName.setText(profileItem.getName());
+            tvEmail.setText(profileItem.getEmail());
+            tvRole.setText(profileItem.getRole());
+
+            btnClose.setOnClickListener(v -> dialog.dismiss());
+
+            btnDelete.setOnClickListener(v -> {
+                FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(profileItem.getUserId())
+                        .delete()
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            loadProfiles();
+                        });
+            });
+
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.show();
         });
+
+        LinearLayout buttonBrowseEvents = findViewById(R.id.buttonBrowseEvents);
+        LinearLayout buttonBrowseImages = findViewById(R.id.buttonBrowseImages);
+        LinearLayout buttonLogs = findViewById(R.id.buttonLogs);
+
+        buttonBrowseEvents.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminBrowseEventsActivity.class)));
+
+        buttonBrowseImages.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminBrowseImagesActivity.class)));
+
+        buttonLogs.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminLogsActivity.class)));
 
         recyclerViewAdminProfiles.setAdapter(adapter);
 
