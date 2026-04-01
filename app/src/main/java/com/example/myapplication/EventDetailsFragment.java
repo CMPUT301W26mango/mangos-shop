@@ -33,6 +33,9 @@ import java.util.Locale;
 import java.util.Map;
 import android.graphics.Bitmap;
 import java.util.Objects;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.content.ContextCompat;
 
 /**
  * Displays event details as a popup dialog
@@ -50,6 +53,8 @@ public class EventDetailsFragment extends DialogFragment {
     private String deviceId;
     private ListenerRegistration statusListener;
 
+    private boolean geolocationRequired = false;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     public EventDetailsFragment() {
 
     }
@@ -206,6 +211,10 @@ public class EventDetailsFragment extends DialogFragment {
                         // Organizer
                         String organizerName = document.getString("organizerName");
                         tvOrganizer.setText(organizerName != null ? organizerName : "Unknown");
+
+                        // Geolocation flag for location capture on join
+                        geolocationRequired = Boolean.TRUE.equals(document.getBoolean("geolocationRequired"));
+                        requestLocationPermissionIfNeeded();
 
                         // Poster
                         String posterUrl = document.getString("posterURL");
@@ -369,6 +378,46 @@ public class EventDetailsFragment extends DialogFragment {
                                 cancelBtn.setVisibility(View.VISIBLE);
                                 cancelBtn.setText("Leave waiting list");
                                 textViewAlreadyRegistered.setVisibility(View.VISIBLE);
+
+                                // Save location if geolocation is required (fire-and-forget after join)
+                                if (geolocationRequired && ContextCompat.checkSelfPermission(getContext(),
+                                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                    LocationHelper.getCurrentLocation(getContext(), (lat, lng) -> {
+                                        if (lat != null && lng != null) {
+                                            Map<String, Object> locationData = new HashMap<>();
+                                            locationData.put("latitude", lat);
+                                            locationData.put("longitude", lng);
+                                            db.collection("events").document(firestoreDocId)
+                                                    .collection("waitingList").document(deviceId)
+                                                    .update(locationData)
+                                                    .addOnFailureListener(locErr ->
+                                                            Log.e(logTag, "Failed to save location", locErr));
+                                        }
+                                    });
+                                }
+
+                                // Enrich waiting list document with profile data (fire-and-forget)
+                                db.collection("users").document(deviceId).get()
+                                        .addOnSuccessListener(profileDoc -> {
+                                            if (profileDoc.exists()) {
+                                                Map<String, Object> profileData = new HashMap<>();
+                                                String name = profileDoc.getString("name");
+                                                String email = profileDoc.getString("email");
+                                                String phone = profileDoc.getString("phone");
+                                                if (name != null) profileData.put("name", name);
+                                                if (email != null) profileData.put("email", email);
+                                                if (phone != null) profileData.put("phone", phone);
+                                                if (!profileData.isEmpty()) {
+                                                    db.collection("events").document(firestoreDocId)
+                                                            .collection("waitingList").document(deviceId)
+                                                            .update(profileData)
+                                                            .addOnFailureListener(err ->
+                                                                    Log.e(logTag, "Failed to enrich waiting list with profile data", err));
+                                                }
+                                            }
+                                        })
+                                        .addOnFailureListener(err ->
+                                                Log.e(logTag, "Failed to read profile for waiting list enrichment", err));
                     }).addOnFailureListener(e -> {
                             if (!isAdded() || getContext() == null) return;
                             Log.d(logTag, "Something went wrong when registering");
@@ -386,6 +435,26 @@ public class EventDetailsFragment extends DialogFragment {
 
 
 
+    }
+
+    /**
+     * Requests ACCESS_FINE_LOCATION permission upfront if the event requires geolocation.
+     * Called immediately after event data loads so the permission dialog appears before
+     * the entrant ever taps Register.
+     */
+    private void requestLocationPermissionIfNeeded() {
+        if (!geolocationRequired) return;
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) return;
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                LOCATION_PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Permission result handled; location will be saved on join if granted.
     }
 
     /**
