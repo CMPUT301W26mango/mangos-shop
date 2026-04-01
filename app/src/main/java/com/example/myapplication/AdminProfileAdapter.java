@@ -57,9 +57,8 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
             role = "Unknown role";
         }
 
-        holder.textViewProfileName.setText(name);
-        holder.textViewProfileEmail.setText("Email: " + email);
-        holder.textViewProfileRole.setText("Role: " + role);
+        holder.textName.setText(name);
+        holder.textRole.setText(role);
 
         holder.itemView.setOnClickListener(v -> listener.onProfileClick(profileItem));
     }
@@ -70,13 +69,12 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
     }
 
     static class AdminProfileViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewProfileName, textViewProfileEmail, textViewProfileRole;
+        TextView textName, textRole;
 
         public AdminProfileViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewProfileName = itemView.findViewById(R.id.textViewProfileName);
-            textViewProfileEmail = itemView.findViewById(R.id.textViewProfileEmail);
-            textViewProfileRole = itemView.findViewById(R.id.textViewProfileRole);
+            textName = itemView.findViewById(R.id.textName);
+            textRole = itemView.findViewById(R.id.textRole);
         }
     }
 }
