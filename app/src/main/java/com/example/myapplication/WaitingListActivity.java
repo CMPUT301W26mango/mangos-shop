@@ -97,7 +97,7 @@ public class WaitingListActivity extends AppCompatActivity {
 
         Button btnMessageWaiting = findViewById(R.id.btnMessageWaiting);
         btnMessageWaiting.setOnClickListener(v -> {
-            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "waiting", "Waiting List");
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Waiting List", java.util.Arrays.asList("waiting"));
         });
 
         // --- Verify ownership, then lazy-check draw, then load waiting list ---
