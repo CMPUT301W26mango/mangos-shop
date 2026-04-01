@@ -11,7 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
@@ -80,7 +83,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
 
-        String description = item.getDescription() + item.getEventName() + "\n Click here to view more details.";
+        String description = item.getDescription() + " for " + item.getEventName() + "\n Click here to view more details.";
 
         SpannableString ss = new SpannableString(description);
 
@@ -94,18 +97,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 item.setRead(true);
                 holder.unreadDot.setVisibility(View.GONE);
 
-                db.collection("users")
-                        .document(deviceId)
-                        .collection("notifications")
-                        .document(item.getId())
-                        .update("read", true)
-                        .addOnSuccessListener(aVoid -> {
-                            // success (optional)
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e("Firestore", "Failed to update read status", e);
-                        });
-
+                if (item.getId() != null && !item.getId().equals(item.getEventId())) {
+                    db.collection("users")
+                            .document(deviceId)
+                            .collection("notifications")
+                            .document(item.getId())
+                            .update("read", true)
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to update read status", e));
+                }
 
                 // Pass eventId
                 Bundle args = new Bundle();
@@ -138,6 +137,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.notificationDesc.setText(ss);
         holder.notificationDesc.setMovementMethod(LinkMovementMethod.getInstance());
 
+        holder.clearSingleBtn.setOnClickListener(v -> {
+            String notificationId = item.getId();
+
+            db.collection("users")
+                    .document(deviceId)
+                    .collection("notifications")
+                    .document(notificationId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+
+                        Toast.makeText(holder.itemView.getContext(), "Notification removed", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("NotificationAdapter", "Error deleting document", e);
+                    });
+        });
+
     }
 
 
@@ -146,7 +162,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return notificationList != null ? notificationList.size() : 0;
     }
 
-    static class NotificationViewHolder extends RecyclerView.ViewHolder {
+    public static class NotificationViewHolder extends RecyclerView.ViewHolder {
 
         TextView notificationName;
         TextView notificationDesc;
@@ -155,12 +171,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         View unreadDot;
 
+        ImageView clearSingleBtn;
+
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             notificationName = itemView.findViewById(R.id.notification_name);
             notificationDesc = itemView.findViewById(R.id.notification_desc);
             notificationTime = itemView.findViewById(R.id.notification_timestamp);
             unreadDot = itemView.findViewById(R.id.unread_indicator_dot);
+            clearSingleBtn = itemView.findViewById(R.id.delete_noti);
 
         }
     }

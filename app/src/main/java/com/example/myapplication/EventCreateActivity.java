@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Switch;
 
 import java.util.Calendar;
@@ -88,7 +91,8 @@ public class EventCreateActivity extends AppCompatActivity {
     private EditText waitingListInput;
 
 
-    private EditText eventType;
+    private EditText eventTypeDropdown;
+
     private Switch geoSwitch;
 
     private Switch privSwitch;
@@ -145,7 +149,6 @@ public class EventCreateActivity extends AppCompatActivity {
                         eventDescriptionInput.setText(event.getDescription());
                         capacityInput.setText(String.valueOf(event.getCapacity()));
                         waitingListInput.setText(String.valueOf(event.getMaxWaitingListSize()));
-                        eventType.setText(event.getEventType());
                         eventDateInput.setText(event.getDateEvent());
 
                         // geo logic
@@ -195,7 +198,7 @@ public class EventCreateActivity extends AppCompatActivity {
         eventDateInput = findViewById(R.id.event_date_input);
         capacityInput = findViewById(R.id.capacity_input);
         waitingListInput = findViewById(R.id.max_waitingList_size);
-        eventType = findViewById(R.id.event_type);
+        eventTypeDropdown = findViewById(R.id.event_type_dropdown);
         geoSwitch = findViewById(R.id.switchGeolocation);
         privSwitch = findViewById(R.id.switch_private_event);
 
@@ -380,6 +383,19 @@ public class EventCreateActivity extends AppCompatActivity {
             dialog.show();
         });
 
+        eventTypeDropdown = findViewById(R.id.event_type_dropdown);
+        String[] eventTypes = getResources().getStringArray(R.array.event_types);
+
+        eventTypeDropdown.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Select Event Type")
+                    .setItems(eventTypes, (dialog, which) -> {
+                        eventTypeDropdown.setText(eventTypes[which]);
+                    })
+                    .show();
+        });
+
+
         FirebaseApp.initializeApp(EventCreateActivity.this);
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -399,7 +415,7 @@ public class EventCreateActivity extends AppCompatActivity {
             String eventDate = eventDateInput.getText().toString().trim();
             String capacityText = capacityInput.getText().toString().trim();
             String waitingListText = waitingListInput.getText().toString().trim();
-            String eventTypeInput = eventType.getText().toString().trim();
+            String eventTypeInput = eventTypeDropdown.getText().toString().trim();
 
             if (eventName.isEmpty()) {
                 eventNameInput.setError("Event name is required");
@@ -437,8 +453,8 @@ public class EventCreateActivity extends AppCompatActivity {
                 return;
             }
             if (eventTypeInput.isEmpty()) {
-                eventType.setError("Event type is required");
-                eventType.requestFocus();
+                eventTypeDropdown.setError("Event type is required");
+                eventTypeDropdown.requestFocus();
                 return;
             }
 

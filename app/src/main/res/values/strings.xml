@@ -12,6 +12,14 @@
     <string name="mango_shop_title">Mango Shop</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string-array name="event_types">
+        <item>Music</item>
+        <item>Misc</item>
+        <item>Cultural</item>
+        <item>Sports</item>
+        <item>Party</item>
+        <item>Charity</item>
+    </string-array>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

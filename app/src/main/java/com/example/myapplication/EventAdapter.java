@@ -110,9 +110,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     .load(event.getPosterURL())
                     .centerCrop()
                     .into(holder.imageViewPoster);
-        } else {
-            holder.imageViewPoster.setImageDrawable(null);
-            holder.imageViewPoster.setBackgroundColor(0xFFE8E8E8);
         }
 
         holder.eventStatus.setVisibility(View.GONE);
@@ -135,11 +132,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                         com.google.android.material.card.MaterialCardView card =
                                 (com.google.android.material.card.MaterialCardView) holder.eventCardRoot;
 
-                        if (doc.exists()) {
+                        if (doc != null && doc.exists()) {
                             String status = doc.getString("status");
                             if (status == null) status = "waiting";
 
                             holder.eventStatus.setVisibility(View.VISIBLE);
+
 
 
                             card.setStrokeWidth(8);
@@ -147,30 +145,39 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                             if (status.equals("selected")) {
                                 holder.eventStatus.setText("Status: Selected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
-                                card.setStrokeColor(Color.parseColor("#FFBF00")); // Yellow Border
-
+                                card.setStrokeColor(Color.parseColor("#FFBF00"));
                             } else if (status.equals("accepted")) {
                                 holder.eventStatus.setText("Status: Accepted");
                                 holder.eventStatus.setTextColor(Color.parseColor("#008000"));
-                                card.setStrokeColor(Color.parseColor("#008000")); // Green Border
-
+                                card.setStrokeColor(Color.parseColor("#008000"));
                             } else if (status.equals("rejected")) {
                                 holder.eventStatus.setText("Status: Rejected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
-                                card.setStrokeColor(Color.parseColor("#FF0000")); // Red Border
-
+                                card.setStrokeColor(Color.parseColor("#FF0000"));
                             } else if (status.equals("waiting")) {
                                 holder.eventStatus.setText("Status: Waiting");
                                 holder.eventStatus.setTextColor(Color.parseColor("#000000"));
                                 card.setStrokeColor(Color.parseColor("#000000")); // Black Border
-                            } else if (status.equals("invited")) {
-
-                                holder.eventStatus.setText("Status: Invited to private waiting list");
                             }
 
                         } else {
-                            holder.eventStatus.setVisibility(View.GONE);
-                            card.setStrokeWidth(0);
+                            // user not in waiting list
+                            // Check if they are in the invitedUsers array of the main event
+                            List<String> invitedUsers = event.getInvitedUsers();
+
+                            if (invitedUsers != null && invitedUsers.contains(deviceId)) {
+                                // show invited status
+                                holder.eventStatus.setVisibility(View.VISIBLE);
+                                holder.eventStatus.setText("Status: Invited");
+                                holder.eventStatus.setTextColor(Color.parseColor("#800080")); // Purple
+
+                                card.setStrokeWidth(8);
+                                card.setStrokeColor(Color.parseColor("#800080")); // Purple Border
+                            } else {
+                                // regular event not join
+                                holder.eventStatus.setVisibility(View.GONE);
+                                card.setStrokeWidth(0);
+                            }
                         }
                     });
         }

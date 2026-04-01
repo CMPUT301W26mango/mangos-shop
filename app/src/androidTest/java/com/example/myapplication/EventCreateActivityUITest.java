@@ -70,13 +70,6 @@ public class EventCreateActivityUITest {
 
 
     @Test
-    public void testEventTypeFieldIsDisplayed() {
-        onView(withId(R.id.event_type)).perform(scrollTo());
-        onView(withId(R.id.event_type)).check(matches(isDisplayed()));
-    }
-
-
-    @Test
     public void testTypeEventName() {
         onView(withId(R.id.event_name_input))
                 .perform(typeText("Soccer Tryouts"), closeSoftKeyboard());
@@ -109,13 +102,18 @@ public class EventCreateActivityUITest {
     }
 
 
+    @Test
+    public void testEventTypeFieldIsDisplayed() {
+        onView(withId(R.id.event_type_dropdown)).perform(scrollTo());
+        onView(withId(R.id.event_type_dropdown)).check(matches(isDisplayed()));
+    }
+
 
     @Test
     public void testTypeEventType() {
-        onView(withId(R.id.event_type))
-                .perform(scrollTo(), typeText("Sports"), closeSoftKeyboard());
-        onView(withId(R.id.event_type))
-                .check(matches(withText("Sports")));
+        onView(withId(R.id.event_type_dropdown)).perform(scrollTo(), click());
+        onView(withText("Sports")).perform(click());
+        onView(withId(R.id.event_type_dropdown)).check(matches(withText("Sports")));
     }
 
 

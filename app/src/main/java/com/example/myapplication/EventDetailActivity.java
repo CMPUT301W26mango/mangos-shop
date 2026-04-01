@@ -53,28 +53,6 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView backBtn = findViewById(R.id.btn_back);
         backBtn.setOnClickListener(v -> finish());
 
-        // Existing action buttons (IDs preserved)
-        ImageView shareBtn = findViewById(R.id.btn_share_qr);
-        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
-        ImageView btnInvite = findViewById(R.id.btn_invite_users);
-
-        settingsBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EventCreateActivity.class);
-            intent.putExtra("MODE", "EDIT");
-            intent.putExtra("EVENT_ID", eventId);
-            startActivity(intent);
-        });
-
-        shareBtn.setOnClickListener(v -> showQRCodePopup());
-
-        btnInvite.setOnClickListener(v -> {
-            Intent intent = new Intent(this, UserSearchActivity.class);
-            intent.putExtra("EVENT_ID", eventId);
-            intent.putExtra("IS_PRIVATE", isPrivate);
-            intent.putExtra("IS_CO_ORG", isCoOrg);
-            startActivity(intent);
-        });
-
         // osmdroid map setup
         mapView = findViewById(R.id.mapView);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -82,13 +60,26 @@ public class EventDetailActivity extends AppCompatActivity {
         mapView.getController().setZoom(4.0);
         mapView.getController().setCenter(new GeoPoint(0.0, 0.0));
 
-        // "Event Details" button → WaitingListActivity
+        // "Event Details" button - WaitingListActivity
         Button btnEventDetails = findViewById(R.id.btn_event_details);
         btnEventDetails.setOnClickListener(v -> {
-            Intent intent = new Intent(EventDetailActivity.this, WaitingListActivity.class);
-            intent.putExtra("eventId", eventId);
-            intent.putExtra("eventName", eventName != null ? eventName : "");
-            startActivity(intent);
+            db.collection("events").document(eventId).get()
+                    .addOnSuccessListener(doc -> {
+                        Boolean drawCompleted = doc.getBoolean("drawCompleted");
+                        if (Boolean.TRUE.equals(drawCompleted)) {
+                            // after draw - selected users screen
+                            Intent intent = new Intent(EventDetailActivity.this, SelectedUsersActivity.class);
+                            intent.putExtra("eventId", eventId);
+                            intent.putExtra("eventName", eventName != null ? eventName : "");
+                            startActivity(intent);
+                        } else {
+                            // before draw - waiting list screen
+                            Intent intent = new Intent(EventDetailActivity.this, WaitingListActivity.class);
+                            intent.putExtra("eventId", eventId);
+                            intent.putExtra("eventName", eventName != null ? eventName : "");
+                            startActivity(intent);
+                        }
+                    });
         });
 
         if (eventId != null) {

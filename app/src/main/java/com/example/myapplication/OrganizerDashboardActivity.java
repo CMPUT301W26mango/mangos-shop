@@ -163,15 +163,14 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
             if (groupIndex == 1) targetStatus = "selected";
             if (groupIndex == 2) targetStatus = "rejected";
 
-            executeBlast(selectedEvent.getId(), targetStatus, message);
-        });
+            executeBlast(selectedEvent.getId(), targetStatus, message, selectedEvent.getTitle());        });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
 
     // pushing the message directly to the entrants' notification sub-collections
-    private void executeBlast(String eventId, String targetStatus, String message) {
+    private void executeBlast(String eventId, String targetStatus, String message, String eventName) {
         FirebaseFirestore.getInstance().collection("events").document(eventId).collection("waitingList")
                 .whereEqualTo("status", targetStatus)
                 .get()
@@ -187,8 +186,12 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
                         // push message to their inbox
                         Map<String, Object> notifData = new HashMap<>();
-                        notifData.put("message", message);
-                        notifData.put("timestamp", System.currentTimeMillis());
+                        notifData.put("eventId", eventId); // Important for the "Click here" link
+                        notifData.put("eventName", eventName);
+                        notifData.put("notiName", "Organizer Broadcast");
+                        notifData.put("description", message); // This maps to what the entrant sees as the message
+                        notifData.put("read", false);
+                        notifData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
 
                         FirebaseFirestore.getInstance().collection("users").document(entrantDeviceId)
                                 .collection("notifications").add(notifData);
