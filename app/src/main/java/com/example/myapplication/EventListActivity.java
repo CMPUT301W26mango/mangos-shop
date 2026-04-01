@@ -559,11 +559,11 @@ public class EventListActivity extends AppCompatActivity {
             }
 
             // Capacity Filter
-            if (matches && activeMinSpots != null && event.getCapacity() < activeMinSpots) {
+            if (matches && activeMinSpots != null && event.getMaxWaitingListSize() < activeMinSpots) {
                 matches = false;
             }
 
-            if (matches && activeMaxSpots != null && event.getCapacity() > activeMaxSpots) {
+            if (matches && activeMaxSpots != null && event.getMaxWaitingListSize() > activeMaxSpots) {
                 matches = false;
             }
 
