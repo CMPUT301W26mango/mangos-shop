@@ -30,7 +30,7 @@ public class AnnouncementHelper {
      * @param targetStatus
      * @param targetDisplayName
      */
-    public static void showAnnouncementDialog(Context context, String eventId, String eventName, String targetStatus, String targetDisplayName) {
+    public static void showAnnouncementDialog(Context context, String eventId, String eventName, String targetDisplayName, java.util.List<String> targetStatus) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Message " + targetDisplayName + " Entrants");
 
@@ -61,14 +61,14 @@ public class AnnouncementHelper {
      * @param context
      * @param eventId
      * @param eventName
-     * @param statusFilter
+     * @param statusFilters
      * @param messageBody
      */
-    private static void sendMassNotification(Context context, String eventId, String eventName, String statusFilter, String messageBody) {
+    private static void sendMassNotification(Context context, String eventId, String eventName, java.util.List<String> statusFilters, String messageBody) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("events").document(eventId).collection("waitingList")
-                .whereEqualTo("status", statusFilter)
+                .whereIn("status", statusFilters)
                 .get()
                 .addOnSuccessListener((QuerySnapshot snapshots) -> {
                     if (snapshots.isEmpty()) {
@@ -81,12 +81,11 @@ public class AnnouncementHelper {
                         String userId = doc.getId(); // Device ID of the entrant
 
                         Map<String, Object> notifData = new HashMap<>();
+                        notifData.put("recipientDeviceId", userId);
+                        notifData.put("message", "Organizer Announcement: " + messageBody);
                         notifData.put("eventId", eventId);
-                        notifData.put("eventName", eventName != null ? eventName : "Event Update");
-                        notifData.put("notiName", "Organizer Announcement");
-                        notifData.put("description", messageBody);
-                        notifData.put("read", false);
                         notifData.put("timestamp", Timestamp.now());
+                        notifData.put("read", false);
 
                         db.collection("users").document(userId).collection("notifications").add(notifData);
                         count++;
