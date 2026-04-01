@@ -181,6 +181,7 @@ public class EventListActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     allActiveEvents.clear();
+                    eventList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());

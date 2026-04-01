@@ -110,9 +110,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     .load(event.getPosterURL())
                     .centerCrop()
                     .into(holder.imageViewPoster);
-        } else {
-            holder.imageViewPoster.setImageDrawable(null);
-            holder.imageViewPoster.setBackgroundColor(0xFFE8E8E8);
         }
 
         holder.eventStatus.setVisibility(View.GONE);
