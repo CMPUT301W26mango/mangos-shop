@@ -74,6 +74,9 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".NotificationSettingsActivity" />
         <activity android:name=".NotificationsActivity" />
+        <activity android:name=".MyEventsActivity" />
+
+
         <activity android:name=".AdminLogsActivity" />
 
     </application>

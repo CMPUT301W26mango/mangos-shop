@@ -43,9 +43,8 @@ public class UserProfileActivity extends AppCompatActivity {
             startActivity(new Intent(UserProfileActivity.this, NotificationSettingsActivity.class));
         });
 
-        findViewById(R.id.rowDeleteAccount).setOnClickListener(v -> {
-            // routing to EntrantAccount since the delete logic is already built there
-            startActivity(new Intent(UserProfileActivity.this, EntrantAccount.class));
+        findViewById(R.id.btnMyEventsHistory).setOnClickListener(v -> {
+            startActivity(new Intent(this, MyEventsActivity.class));
         });
     }
 

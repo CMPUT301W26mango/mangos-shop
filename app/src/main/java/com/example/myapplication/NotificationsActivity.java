@@ -70,7 +70,7 @@ public class NotificationsActivity extends AppCompatActivity {
                                 doc.getId(),
                                 doc.getString("eventId"),
                                 doc.getString("eventName"),
-                                doc.getString("notification_name"),
+                                doc.getString("notiName"),
                                 doc.getString("description"),
                                 doc.getTimestamp("timestamp"),
                                 Boolean.TRUE.equals(doc.getBoolean("read"))

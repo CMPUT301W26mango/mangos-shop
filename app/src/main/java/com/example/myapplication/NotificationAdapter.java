@@ -83,7 +83,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
 
-        String description = item.getDescription() + item.getEventName() + "\nClick here to view more details.";
+        String description = item.getDescription() + " for " + item.getEventName() + "\n Click here to view more details.";
 
         SpannableString ss = new SpannableString(description);
 
@@ -97,18 +97,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 item.setRead(true);
                 holder.unreadDot.setVisibility(View.GONE);
 
-                db.collection("users")
-                        .document(deviceId)
-                        .collection("notifications")
-                        .document(item.getId())
-                        .update("read", true)
-                        .addOnSuccessListener(aVoid -> {
-                            // success (optional)
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e("Firestore", "Failed to update read status", e);
-                        });
-
+                if (item.getId() != null && !item.getId().equals(item.getEventId())) {
+                    db.collection("users")
+                            .document(deviceId)
+                            .collection("notifications")
+                            .document(item.getId())
+                            .update("read", true)
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to update read status", e));
+                }
 
                 // Pass eventId
                 Bundle args = new Bundle();
@@ -166,7 +162,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return notificationList != null ? notificationList.size() : 0;
     }
 
-    static class NotificationViewHolder extends RecyclerView.ViewHolder {
+    public static class NotificationViewHolder extends RecyclerView.ViewHolder {
 
         TextView notificationName;
         TextView notificationDesc;

@@ -53,10 +53,15 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView backBtn = findViewById(R.id.btn_back);
         backBtn.setOnClickListener(v -> finish());
 
-        // Existing action buttons (IDs preserved)
-        ImageView shareBtn = findViewById(R.id.btn_share_qr);
-        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
-        ImageView btnInvite = findViewById(R.id.btn_invite_users);
+        EventStore eventStore = new EventStore();
+
+        eventStore.getEventById(eventId, event -> {
+            if (Boolean.TRUE.equals(event.getPrivateEvent()))  {
+                shareBtn.setVisibility(View.GONE);
+            } else {
+                shareBtn.setVisibility(View.VISIBLE);
+            }
+        });
 
         settingsBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, EventCreateActivity.class);
