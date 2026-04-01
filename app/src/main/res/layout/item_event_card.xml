@@ -59,6 +59,19 @@
                 android:textColor="#0055FF"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:id="@+id/viewCommentsBtnForOrganizers"
+                android:background="@color/zxing_transparent"
+                android:src="@drawable/comments_logo"
+                android:clickable="true"
+                android:focusable="true">
+
+            </ImageButton>
+
         </LinearLayout>
 
     </LinearLayout>

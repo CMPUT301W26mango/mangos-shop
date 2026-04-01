@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     US 02.02.01 - Single entrant row in the waiting list.
-    Display only: profile icon + name. No action buttons.
-    (Replace/Cancel buttons belong to US 02.05.03 and US 02.06.04)
 -->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"

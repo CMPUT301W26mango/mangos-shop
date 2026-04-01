@@ -17,8 +17,8 @@ import java.util.List;
  * (name, email, phone, enrolment date) so the same list can be passed
  * directly to CsvExportHelper without a second Firestore read.
  *
- * Only the name field is shown in the UI - the other fields are
- * invisible to the organizer here but available for CSV export.
+ * Only the name field is shown in the UI — the other fields are available
+ * for CSV export via CsvExportHelper.
  */
 public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.ViewHolder> {
 
@@ -36,7 +36,7 @@ public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.
         return new ViewHolder(view);
     }
 
-    /** Binds the entrant's name to the row. Only name is shown in the UI. */
+    /** Binds the entrant's name to the row. */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.tvEntrantName.setText(entrants.get(position).getName());

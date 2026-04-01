@@ -504,19 +504,29 @@ public class EventCreateActivity extends AppCompatActivity {
                 if (eventId != null) event.setId(eventId);
 
                 if ("EDIT".equals(mode) && eventId != null) {
-                    createEventButton.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    // overwrite existing data
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("title", event.getTitle());
+                    updates.put("organizerName", event.getOrganizerName());
+                    updates.put("location", event.getLocation());
+                    updates.put("description", event.getDescription());
+                    updates.put("deviceId", event.getDeviceId());
+                    updates.put("posterURL", event.getPosterURL());
+                    updates.put("dateEvent", event.getDateEvent());
+                    updates.put("eventType", event.getEventType());
+                    updates.put("regStart", event.getRegStart());
+                    updates.put("regEnd", event.getRegEnd());
+                    updates.put("capacity", event.getCapacity());
+                    updates.put("maxWaitingListSize", event.getMaxWaitingListSize());
+                    updates.put("geolocationRequired", event.getGeolocationRequired());
+                    updates.put("privateEvent", event.getPrivateEvent());
+
                     com.google.firebase.firestore.FirebaseFirestore.getInstance()
                             .collection("events")
                             .document(eventId)
-                            .set(event)
+                            .update(updates)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
-                                posterPreview.setVisibility(View.GONE);
-                                uploadPosterButton.setText("Upload Poster Image");
-                                posterDownloadUrl = null;
-                                image = null;
-                                finish(); // Go back to the Detail page
+                                finish();
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();

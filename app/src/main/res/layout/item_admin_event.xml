@@ -1,32 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:background="#FFFFFF"
     android:padding="12dp"
-    android:background="@android:color/white"
-    android:layout_marginBottom="8dp">
+    android:layout_margin="8dp"
+    android:elevation="3dp">
 
-    <TextView
-        android:id="@+id/textViewEventTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Event Title"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+    <ImageView
+        android:id="@+id/imagePoster"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#CCCCCC"
+        android:scaleType="centerCrop"/>
 
-    <TextView
-        android:id="@+id/textViewEventLocation"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Location" />
+        android:orientation="vertical"
+        android:layout_marginStart="12dp">
 
-    <TextView
-        android:id="@+id/textViewEventOrganizer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Organizer" />
+        <TextView
+            android:id="@+id/textViewEventTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Name"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/textViewEventLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location: Address"
+            android:textSize="12sp"
+            android:textColor="#444444"/>
+
+        <TextView
+            android:id="@+id/textViewEventOrganizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hosted by John Doe"
+            android:textSize="12sp"
+            android:textColor="#666666"/>
+
+    </LinearLayout>
 
 </LinearLayout>
