@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,6 +27,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
@@ -72,11 +74,20 @@ public class EventListActivity extends AppCompatActivity {
     private ImageButton btnFilter;
     private ImageButton profileButton; // go to edit profile
 
+    private SearchView eventsSearch;
+
     private com.google.firebase.firestore.ListenerRegistration statusListener;
 
     private com.google.firebase.firestore.ListenerRegistration eventChangesListener;
 
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
+
+    // Set the state for the filters
+    private List<String> activeCategories = new ArrayList<>();
+    private Integer activeMinSpots = null;
+    private Integer activeMaxSpots = null;
+    private String activeMinDate = null;
+    private String activeMaxDate = null;
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -168,6 +179,24 @@ public class EventListActivity extends AppCompatActivity {
         listenForNewNotifications();
 
 
+        // Implement the search
+        eventsSearch = findViewById(R.id.eventsSearch);
+        eventsSearch.clearFocus();
+
+        eventsSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) { // Changes the screen as user is typing
+                applyFilters();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                applyFilters();
+                eventsSearch.clearFocus();// Hides the keyboard
+                return true;
+            }
+        });
 
     }
 
@@ -201,7 +230,7 @@ public class EventListActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    applyFilters(null, null, null, null, null);
+                    applyFilters();
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
@@ -342,9 +371,48 @@ public class EventListActivity extends AppCompatActivity {
     }
 
     private void setupFilterDialogue(Dialog dialog){
+
         TextInputEditText minDateInput = dialog.findViewById(R.id.filterMinEventDate);
         TextInputEditText maxDateInput = dialog.findViewById(R.id.filterMaxEventDate);
+        TextInputEditText minSpotsInput = dialog.findViewById(R.id.filterMinSpots);
+        TextInputEditText maxSpotsInput = dialog.findViewById(R.id.filterMaxSpots);
+        ChipGroup chipGroup = dialog.findViewById(R.id.chipGroupEventType);
         Button filterApplyButton = dialog.findViewById(R.id.applyFiltersBtn);
+
+        // Restore the state of everything
+        if (activeMinSpots != null) {
+            minSpotsInput.setText(String.valueOf(activeMinSpots));
+        }
+        if (activeMaxSpots != null) {
+            maxSpotsInput.setText(String.valueOf(activeMaxSpots));
+        }
+
+        // Restore Date Limits
+        if (activeMinDate != null) {
+            minDateInput.setText(activeMinDate);
+        }
+        if (activeMaxDate != null) {
+            maxDateInput.setText(activeMaxDate);
+        }
+
+        // Restore Selected Categories (Chips)
+        if (activeCategories != null && !activeCategories.isEmpty()) {
+            // Loop through all the chips in the group
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+
+                android.view.View child = chipGroup.getChildAt(i);
+                if (child instanceof com.google.android.material.chip.Chip) {
+                    Chip chip = (com.google.android.material.chip.Chip) child;
+
+                    // Set it to be selected
+                    if (activeCategories.contains(chip.getText().toString())) {
+                        chip.setChecked(true);
+                    }
+                }
+            }
+        }
+
+
 
         minDateInput.setOnClickListener(v -> showDatePicker(minDateInput));
         maxDateInput.setOnClickListener(v -> showDatePicker(maxDateInput));
@@ -403,31 +471,46 @@ public class EventListActivity extends AppCompatActivity {
         String minDate = minDateInput.getText().toString().isEmpty() ? null : minDateInput.getText().toString();
         String maxDate = maxDateInput.getText().toString().isEmpty() ? null : maxDateInput.getText().toString();
 
+        // Save them to the Activity's state variables instead of passing them
+        activeCategories = selectedCategories;
+        activeMinSpots = minSpots;
+        activeMaxSpots = maxSpots;
+        activeMinDate = minDate;
+        activeMaxDate = maxDate;
+
         // Pass to filtering logic
-        applyFilters(selectedCategories, minSpots, maxSpots, minDate, maxDate);
+        applyFilters();
     }
 
-    private void applyFilters(List<String> categories, Integer minSpots, Integer maxSpots, String minDate, String maxDate){
+    private void applyFilters(){
         displayedEvents.clear();
+
+        String searchQuery;
+
+        if (eventsSearch != null && eventsSearch.getQuery() != null) {
+            searchQuery = eventsSearch.getQuery().toString().toLowerCase().trim();
+        } else {
+            searchQuery = "";
+        }
 
         // parse the time difference for event time filter
         SimpleDateFormat localFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        localFormat.setTimeZone(TimeZone.getDefault()); // User's local timezone
+        localFormat.setTimeZone(TimeZone.getDefault());
 
         SimpleDateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Firestore's timezone
+        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date minDateObject = null;
         Date maxDateObject = null;
 
         try {
-            if (minDate != null) {
-                minDateObject = localFormat.parse(minDate); // This Parses as 00:00:00 local time by itself so we can just set it
+            if (activeMinDate != null) {
+                minDateObject = localFormat.parse(activeMinDate); // This Parses as 00:00:00 local time by itself so we can just set it
             }
-            if (maxDate != null) {
+            if (activeMaxDate != null) {
                 // To include the entire day (since day ends at 11:59:59 we need to manually set it
                 // Since default is 0:00:00
-                Date parsedMax = localFormat.parse(maxDate);
+                Date parsedMax = localFormat.parse(activeMaxDate);
                 Calendar c = Calendar.getInstance();
                 c.setTime(parsedMax);
                 c.set(Calendar.HOUR_OF_DAY, 23);
@@ -444,13 +527,24 @@ public class EventListActivity extends AppCompatActivity {
         for (Event event : allActiveEvents) {
             boolean matches = true;
 
+            if (!searchQuery.isEmpty()) {
+                String title = event.getTitle() != null ? event.getTitle().toLowerCase() : "";
+                String desc = event.getDescription() != null ? event.getDescription().toLowerCase() : "";
+
+                // If the query isn't in the title and isn't in the description, it's not a match
+                if (!title.contains(searchQuery) && !desc.contains(searchQuery)) {
+                    matches = false;
+                }
+            }
+
+
             // Category Filter
-            if (categories != null && !categories.isEmpty()) {
+            if (matches && activeCategories != null && !activeCategories.isEmpty()) {
                 boolean hasMatchingCategory = false;
 
                 if (event.getEventType() != null) {
                     // Check if the event's type matches any of the selected chips
-                    for (String cat : categories) {
+                    for (String cat : activeCategories) {
                         if (event.getEventType().equalsIgnoreCase(cat)) {   // See if any of them are matching
                             hasMatchingCategory = true;
                             break;
@@ -465,11 +559,16 @@ public class EventListActivity extends AppCompatActivity {
             }
 
             // Capacity Filter
-            if (minSpots != null && event.getCapacity() < minSpots) matches = false;
-            if (maxSpots != null && event.getCapacity() > maxSpots) matches = false;
+            if (matches && activeMinSpots != null && event.getCapacity() < activeMinSpots) {
+                matches = false;
+            }
 
-            // Date Filter (Lexicographical string comparison works here because format is yyyy-MM-dd)
-            if (event.getDateEvent() != null && !event.getDateEvent().isEmpty()) {
+            if (matches && activeMaxSpots != null && event.getCapacity() > activeMaxSpots) {
+                matches = false;
+            }
+
+            // Date Filter
+            if (matches && event.getDateEvent() != null && !event.getDateEvent().isEmpty()) {
                 try {
                     // Parse the event's string as a UTC date
                     Date eventDateUTC = utcFormat.parse(event.getDateEvent());
@@ -482,8 +581,7 @@ public class EventListActivity extends AppCompatActivity {
                     Log.e("Filter", "Error parsing event date string", e);
                     matches = false;
                 }
-            } else if (minDate != null || maxDate != null) {
-                // Event has no date, but user filtered by date
+            } else if (matches && (activeMinDate != null || activeMaxDate != null)) {
                 matches = false;
             }
 
