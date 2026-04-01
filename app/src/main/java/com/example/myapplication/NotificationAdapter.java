@@ -80,7 +80,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
 
-        String description = item.getDescription() + item.getEventName() + "\n Click here to view more details.";
+        String description = item.getDescription() + item.getEventName() + "\nClick here to view more details.";
 
         SpannableString ss = new SpannableString(description);
 
