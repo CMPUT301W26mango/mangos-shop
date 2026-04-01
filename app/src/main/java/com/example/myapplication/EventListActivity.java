@@ -74,6 +74,7 @@ public class EventListActivity extends AppCompatActivity {
 
     private com.google.firebase.firestore.ListenerRegistration statusListener;
 
+    private com.google.firebase.firestore.ListenerRegistration eventChangesListener;
 
     private ActivityResultLauncher<ScanOptions> scannerLauncher;
 
@@ -115,7 +116,6 @@ public class EventListActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         loadEvents();
-        listenForStatusChanges();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -164,7 +164,9 @@ public class EventListActivity extends AppCompatActivity {
         }
 
         listenForStatusChanges();
+        listenForEventChanges();
         listenForNewNotifications();
+
 
 
     }
@@ -172,6 +174,8 @@ public class EventListActivity extends AppCompatActivity {
 
     private void loadEvents() {
         Timestamp now = Timestamp.now();
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         db.collection("events")
                 .whereLessThanOrEqualTo("regStart", now)
                 .get()
@@ -180,14 +184,23 @@ public class EventListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
-                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
 
-                        if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
-                            allActiveEvents.add(event);
+                        boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
+                        boolean isCoOrg = event.getCoOrganizers() != null
+                                && event.getCoOrganizers().contains(deviceId);
+                        boolean isInvited = event.getInvitedUsers() != null
+                                && event.getInvitedUsers().contains(deviceId);
+                        boolean isActive = event.getRegEnd() != null
+                                && event.getRegEnd().compareTo(now) >= 0;
+
+                        if (isActive && (isPublic || isCoOrg || isInvited)) {
+                            eventList.add(event);
+                            if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
+                                allActiveEvents.add(event);
+                            }
                         }
                     }
                     applyFilters(null, null, null, null, null);
-
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
@@ -229,6 +242,9 @@ public class EventListActivity extends AppCompatActivity {
         super.onDestroy();
         if (statusListener != null) {
             statusListener.remove();
+        }
+        if (eventChangesListener != null) {
+            eventChangesListener.remove();
         }
     }
 
@@ -283,6 +299,17 @@ public class EventListActivity extends AppCompatActivity {
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         manager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    private void listenForEventChanges() {
+        eventChangesListener = db.collection("events")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("EventListActivity", "Event listener error", e);
+                        return;
+                    }
+                    loadEvents();
+                });
     }
 
     private void showFilterDialog(){

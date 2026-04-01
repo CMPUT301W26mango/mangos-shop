@@ -29,7 +29,9 @@ public class UserSearchActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.rv_search_results);
 
         profilesHelper = new Profiles();
-        adapter = new UserSearchAdapter(this, new ArrayList<>(), eventId);
+        boolean isPrivate = getIntent().getBooleanExtra("IS_PRIVATE", false);
+        boolean isCoOrg = getIntent().getBooleanExtra("IS_CO_ORG", false);
+        adapter = new UserSearchAdapter(this, new ArrayList<>(), eventId, isPrivate, isCoOrg);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
