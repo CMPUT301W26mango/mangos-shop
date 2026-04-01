@@ -236,6 +236,7 @@ public class EventListActivity extends AppCompatActivity {
             if (manager != null) manager.createNotificationChannel(channel);
         }
 
+        long appStartTime = System.currentTimeMillis();
         db.collection("users").document(deviceId).collection("notifications")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null || snapshots == null) return;
@@ -244,14 +245,20 @@ public class EventListActivity extends AppCompatActivity {
                         // only trigger on brand new messages, ignore old ones
                         if (dc.getType() == DocumentChange.Type.ADDED) {
 
+                            Timestamp notifTime = dc.getDocument().getTimestamp("timestamp");
+                            if (notifTime == null || notifTime.toDate().getTime() < appStartTime) {
+                                continue; // skips old notifications
+                            }
+
                             // check if they actually want notifications
                             db.collection("users").document(deviceId).get().addOnSuccessListener(doc -> {
                                 Boolean wantsNotis = doc.getBoolean("notificationsEnabled");
 
                                 // default to true if null just in case
                                 if (wantsNotis == null || wantsNotis) {
-                                    String message = dc.getDocument().getString("message");
-                                    showSystemNotification(message);
+                                    String messageText = dc.getDocument().getString("description");
+                                    String titleText = dc.getDocument().getString("eventName");
+                                    showSystemNotification(titleText, messageText);
                                 }
                             });
                         }
@@ -259,7 +266,7 @@ public class EventListActivity extends AppCompatActivity {
                 });
     }
 
-    private void showSystemNotification(String messageText) {
+    private void showSystemNotification(String title, String messageText) {
         // Needed for the newer andriod apparantly
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
