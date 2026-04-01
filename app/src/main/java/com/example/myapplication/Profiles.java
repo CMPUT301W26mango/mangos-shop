@@ -156,7 +156,14 @@ public class Profiles {
                     return;
                 }
 
-                Notification noti = new Notification(message, eventID);
+                java.util.Map<String, Object> noti = new java.util.HashMap<>();
+                noti.put("eventId", eventID);
+                noti.put("eventName", "Event Update");
+                noti.put("notiName", "System Message");
+                noti.put("description", message);
+                noti.put("read", false);
+                noti.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                
                 db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
             }
         });

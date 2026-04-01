@@ -27,7 +27,7 @@ public class EventDetailActivity extends AppCompatActivity {
         EventStore eventStore = new EventStore();
 
         eventStore.getEventById(eventId, event -> {
-            if (event.getPrivateEvent())  {
+            if (Boolean.TRUE.equals(event.getPrivateEvent()))  {
                 shareBtn.setVisibility(View.GONE);
             } else {
                 shareBtn.setVisibility(View.VISIBLE);
