@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_margin="8dp"
+    android:background="@drawable/rounded_card">
+
+    <TextView
+        android:id="@+id/textMessage"
+        android:text="Message"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/textSender"
+        android:text="Sent by"/>
+
+    <TextView
+        android:id="@+id/textTime"
+        android:text="Time"/>
+</LinearLayout>
