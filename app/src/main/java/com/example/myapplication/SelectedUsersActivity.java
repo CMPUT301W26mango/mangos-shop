@@ -75,7 +75,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                     containerCancelled.removeAllViews();
 
                     for (QueryDocumentSnapshot doc : snapshots) {
-                        String userId = doc.getString("userId");
+                        String userId = doc.getId();
                         String status = doc.getString("status");
                         if (status == null) status = "waiting";
 
