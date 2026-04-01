@@ -170,6 +170,8 @@ public class LotteryDrawHelper {
                                 Collections.shuffle(waitingIds);
                                 int selectCount = Math.min(capacity, waitingIds.size());
                                 List<String> selected = waitingIds.subList(0, selectCount);
+                                List<String> notSelected = waitingIds.subList(selectCount, waitingIds.size());
+
 
                                 // Step 5: atomic batch write
                                 WriteBatch batch = db.batch();
@@ -179,6 +181,13 @@ public class LotteryDrawHelper {
                                             eventRef.collection("waitingList").document(userId);
                                     // "status" field name matches EventDetailsFragment.joinWaitingList()
                                     batch.update(entrantRef, "status", "selected");
+                                }
+
+                                // Mark non-selected entrants as "rejected" so they form the replacement pool
+                                for (String userId : notSelected) {
+                                    DocumentReference entrantRef =
+                                            eventRef.collection("waitingList").document(userId);
+                                    batch.update(entrantRef, "status", "rejected");
                                 }
 
                                 batch.update(eventRef, "drawCompleted", true);
@@ -200,11 +209,12 @@ public class LotteryDrawHelper {
                                                         + ". Please go to the event page to accept or reject your entry.";
 
                                                 Map<String, Object> notifData = new HashMap<>();
-                                                notifData.put("recipientDeviceId", userId);
-                                                notifData.put("message", notifMessage);
                                                 notifData.put("eventId", eventId);
-                                                notifData.put("timestamp", Timestamp.now());
+                                                notifData.put("eventName", displayTitle);
+                                                notifData.put("notiName", "Lottery Winner!");
+                                                notifData.put("description", notifMessage);
                                                 notifData.put("read", false);
+                                                notifData.put("timestamp", Timestamp.now());
 
                                                 db.collection("users").document(userId)
                                                         .collection("notifications")
@@ -213,6 +223,25 @@ public class LotteryDrawHelper {
                                                                 Log.e(TAG, "Failed to write notification for: " + userId, notifErr));
                                             }
 
+                                            for (String userId : notSelected) {
+                                                String entrantName = waitingEntrants.get(userId);
+                                                String displayName = (entrantName != null && !entrantName.isEmpty())
+                                                        ? entrantName : "Entrant";
+                                                String notifMessage = "Unfortunately " + displayName
+                                                        + ", you were not selected for " + displayTitle + " this time.";
+
+                                                Map<String, Object> notifData = new HashMap<>();
+                                                notifData.put("eventId", eventId);
+                                                notifData.put("eventName", displayTitle);
+                                                notifData.put("notiName", "Lottery Result");
+                                                notifData.put("description", notifMessage);
+                                                notifData.put("read", false);
+                                                notifData.put("timestamp", Timestamp.now());
+
+                                                db.collection("users").document(userId)
+                                                        .collection("notifications")
+                                                        .add(notifData);
+                                            }
                                             if (listener != null) listener.onSuccess(selectCount);
                                         })
                                         .addOnFailureListener(e -> {
@@ -227,6 +256,97 @@ public class LotteryDrawHelper {
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to read event document: " + eventId, e);
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+
+    // -------------------------------------------------------------------------
+    // Part 3 — Draw a single replacement from the rejected pool (US 02.05.03)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Draws a single replacement entrant from the rejected pool.
+     * Queries for entrants with status "rejected", randomly picks one,
+     * updates their status to "selected", and writes a notification.
+     *
+     * @param eventId  the event's Firestore document ID
+     * @param listener callback with the number of replacements drawn (0 or 1)
+     */
+    public static void drawReplacement(String eventId, OnDrawCompleteListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        // Step 1: read the event document to get the title
+        eventRef.get()
+                .addOnSuccessListener(eventDoc -> {
+                    if (!eventDoc.exists()) {
+                        Log.w(TAG, "drawReplacement: event not found: " + eventId);
+                        if (listener != null) listener.onSuccess(0);
+                        return;
+                    }
+
+                    String eventTitle = eventDoc.getString("title");
+                    String displayTitle = (eventTitle != null) ? eventTitle : "an event";
+
+                    // Step 2: query waiting list for rejected entrants
+                    eventRef.collection("waitingList")
+                            .whereEqualTo("status", "rejected")
+                            .get()
+                            .addOnSuccessListener(rejectedSnap -> {
+                                if (rejectedSnap == null || rejectedSnap.isEmpty()) {
+                                    Log.d(TAG, "drawReplacement: no rejected entrants for event: " + eventId);
+                                    if (listener != null) listener.onSuccess(0);
+                                    return;
+                                }
+
+                                // Step 3: collect IDs and shuffle for random pick
+                                List<DocumentSnapshot> rejectedDocs = new ArrayList<>(rejectedSnap.getDocuments());
+                                Collections.shuffle(rejectedDocs);
+                                DocumentSnapshot picked = rejectedDocs.get(0);
+
+                                String pickedId = picked.getId();
+                                String entrantName = picked.getString("name");
+                                String displayName = (entrantName != null && !entrantName.isEmpty())
+                                        ? entrantName : "Entrant";
+
+                                // Step 4: update status to "selected"
+                                eventRef.collection("waitingList").document(pickedId)
+                                        .update("status", "selected")
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "drawReplacement: selected " + pickedId + " for event: " + eventId);
+
+                                            // Step 5: write notification (fire-and-forget)
+                                            String notifMessage = "Congratulations " + displayName
+                                                    + "! You have been selected to join " + displayTitle
+                                                    + ". Please go to the event page to accept or reject your entry.";
+
+                                            Map<String, Object> notifData = new HashMap<>();
+                                            notifData.put("recipientDeviceId", pickedId);
+                                            notifData.put("message", notifMessage);
+                                            notifData.put("eventId", eventId);
+                                            notifData.put("timestamp", Timestamp.now());
+                                            notifData.put("read", false);
+
+                                            db.collection("users").document(pickedId)
+                                                    .collection("notifications")
+                                                    .add(notifData)
+                                                    .addOnFailureListener(notifErr ->
+                                                            Log.e(TAG, "drawReplacement: failed to write notification for: " + pickedId, notifErr));
+
+                                            if (listener != null) listener.onSuccess(1);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "drawReplacement: failed to update status for: " + pickedId, e);
+                                            if (listener != null) listener.onFailure(e);
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "drawReplacement: failed to query rejected pool for event: " + eventId, e);
+                                if (listener != null) listener.onFailure(e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "drawReplacement: failed to read event document: " + eventId, e);
                     if (listener != null) listener.onFailure(e);
                 });
     }

@@ -94,9 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:chipSpacingHorizontal="8dp"
-                app:chipSpacingVertical="8dp"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+                app:chipSpacingVertical="8dp">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipSports"
@@ -108,15 +106,6 @@
                     app:chipBackgroundColor="@color/chip_background_selector"
                     app:chipStrokeWidth="0dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipConcert"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CONCERT"
-                    android:textColor="@color/chip_text_selector"
-                    app:chipBackgroundColor="@color/chip_background_selector"
-                    app:chipStrokeWidth="0dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipMusic"
@@ -247,10 +236,87 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text = "Leave blank for all availability"
+                android:text = "Leave blank for all capacity"
                 android:textColor="@color/gray"
                 android:layout_gravity="center"
                 android:textSize="10sp"/>
+
+
+            <!-- Available Date box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Event Date range"
+                    android:textColor="@color/darkergray"
+                    android:textSize="16sp" />
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/filterMinEventDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Min"
+                        android:textSize="12sp"
+                        android:padding="8dp"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:inputType="none"  />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/filterMaxEventDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Min"
+                        android:textSize="12sp"
+                        android:padding="8dp"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:inputType="none"  />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text = "Leave blank for all Dates"
+                android:textColor="@color/gray"
+                android:layout_gravity="center"
+                android:textSize="10sp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/darker_gray" />
 
 
             <Button

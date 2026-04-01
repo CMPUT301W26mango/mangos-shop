@@ -83,25 +83,29 @@ public class Profiles {
      * @param onComplete when delete is completed
      */
     public void deleteProfile(String deviceId, OnCompleteListener<Void> onComplete) {
-        WriteBatch batch = db.batch();
-        DocumentReference userRef = db.collection("users").document(deviceId);
-        batch.delete(userRef);
+        // First, grab all events
+        db.collection("events").get().addOnSuccessListener(eventsSnap -> {
+            WriteBatch batch = db.batch();
 
-        // when deleted the profile also delete the entries into any waiting lists
-        db.collectionGroup("waitingList").whereEqualTo("deviceId", deviceId).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            batch.delete(doc.getReference());
-                        }
-                    } else {
-                        //debug, but should be good,
-                        System.out.println("Warning: Could not clear waiting lists. Missing Index?");
-                    }
+            // Delete the user's main profile document
+            DocumentReference userRef = db.collection("users").document(deviceId);
+            batch.delete(userRef);
 
-                    // update and commit
-                    batch.commit().addOnCompleteListener(onComplete);
-                });
+            // Loop through every event and delete this user's specific document from the waiting list
+            for (DocumentSnapshot eventDoc : eventsSnap.getDocuments()) {
+                DocumentReference waitlistEntry = eventDoc.getReference()
+                        .collection("waitingList")
+                        .document(deviceId);
+                batch.delete(waitlistEntry); // If they aren't in this list, Firebase safely ignores this
+            }
+
+            // Commit the delete
+            batch.commit().addOnCompleteListener(onComplete);
+
+        }).addOnFailureListener(e -> {
+            Log.e("Profiles", "Failed to fetch events for deletion", e);
+            db.collection("users").document(deviceId).delete().addOnCompleteListener(onComplete);
+        });
     }
 
 
