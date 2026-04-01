@@ -36,14 +36,18 @@ public class EventDetailActivity extends AppCompatActivity {
     private MapView mapView;
     private FirebaseFirestore db;
 
+    private ImageView shareBtn;
+    private ImageView btnInvite;
+    private ImageView settingsBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         // osmdroid configuration must happen before setContentView
         Configuration.getInstance().load(
                 getApplicationContext(),
                 getSharedPreferences("osmdroid", MODE_PRIVATE));
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
         eventId = getIntent().getStringExtra("EVENT_ID");
@@ -52,6 +56,32 @@ public class EventDetailActivity extends AppCompatActivity {
         // Back button
         ImageView backBtn = findViewById(R.id.btn_back);
         backBtn.setOnClickListener(v -> finish());
+
+        shareBtn = findViewById(R.id.btn_share_qr);
+        btnInvite = findViewById(R.id.btn_invite_users);
+        settingsBtn = findViewById(R.id.btn_settings_cog);
+
+
+        // Share/QR button
+        shareBtn.setOnClickListener(v -> showQRCodePopup());
+
+
+        settingsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(EventDetailActivity.this, EventCreateActivity.class);
+            intent.putExtra("MODE", "EDIT");
+            intent.putExtra("EVENT_ID", eventId);
+            startActivity(intent);
+        });
+
+
+        btnInvite.setOnClickListener(v -> {
+            Intent intent = new Intent(EventDetailActivity.this, UserSearchActivity.class);
+            intent.putExtra("EVENT_ID", eventId);
+            intent.putExtra("EVENT_NAME", eventName != null ? eventName : "");
+            intent.putExtra("IS_PRIVATE", isPrivate);
+            intent.putExtra("IS_CO_ORG", isCoOrg);
+            startActivity(intent);
+        });
 
         // osmdroid map setup
         mapView = findViewById(R.id.mapView);
@@ -92,10 +122,6 @@ public class EventDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mapView != null) mapView.onResume();
-
-        ImageView shareBtn = findViewById(R.id.btn_share_qr);
-        ImageView btnInvite = findViewById(R.id.btn_invite_users);
-        ImageView settingsBtn = findViewById(R.id.btn_settings_cog);
 
         String currentDeviceId = android.provider.Settings.Secure.getString(
                 getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
