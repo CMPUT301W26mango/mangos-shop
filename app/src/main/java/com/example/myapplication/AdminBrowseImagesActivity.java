@@ -2,16 +2,19 @@ package com.example.myapplication;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.LinearLayout;
+import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +22,8 @@ import java.util.List;
 public class AdminBrowseImagesActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private ImageAdapter adapter;
-    private List<ImageItem> imageList;
-    private FirebaseFirestore db;
+    private List<AdminImageItem> list = new ArrayList<>();
+    private AdminImageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,60 +33,113 @@ public class AdminBrowseImagesActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewImages);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        imageList = new ArrayList<>();
-        adapter = new ImageAdapter(imageList, this::showDeleteDialog);
+        adapter = new AdminImageAdapter(list, item -> showPopup(item));
         recyclerView.setAdapter(adapter);
 
-        db = FirebaseFirestore.getInstance();
-
         loadImages();
+
+        LinearLayout buttonBrowseEvents = findViewById(R.id.buttonBrowseEvents);
+        LinearLayout buttonBrowseProfiles = findViewById(R.id.buttonBrowseProfiles);
+        LinearLayout buttonLogs = findViewById(R.id.buttonLogs);
+
+        buttonBrowseEvents.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminBrowseEventsActivity.class)));
+
+        buttonBrowseProfiles.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminBrowseProfilesActivity.class)));
+
+        buttonLogs.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminLogsActivity.class)));
     }
 
     private void loadImages() {
-        db.collection("events")
+        FirebaseFirestore.getInstance().collection("events")
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    imageList.clear();
+                .addOnSuccessListener(query -> {
+                    list.clear();
 
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    for (QueryDocumentSnapshot doc : query) {
+                        String id = doc.getId();
                         String url = doc.getString("posterURL");
-                        String eventId = doc.getId();
 
                         if (url != null && !url.isEmpty()) {
-                            imageList.add(new ImageItem(url, eventId));
+                            list.add(new AdminImageItem(id, url));
                         }
                     }
 
                     adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed to load images", Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private void showPopup(AdminImageItem item) {
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_admin_event_detail, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        TextView tvTitle = dialogView.findViewById(R.id.tv_event_title);
+        TextView tvLocation = dialogView.findViewById(R.id.tv_event_location);
+        TextView tvType = dialogView.findViewById(R.id.tv_event_type);
+        TextView tvCount = dialogView.findViewById(R.id.tv_spots_available);
+
+        Button btnDeleteEvent = dialogView.findViewById(R.id.btn_delete_event);
+        Button btnDeleteImage = dialogView.findViewById(R.id.btn_delete_image);
+        ImageButton btnClose = dialogView.findViewById(R.id.btn_close);
+
+        FirebaseFirestore.getInstance()
+                .collection("events")
+                .document(item.getEventId())
+                .get()
+                .addOnSuccessListener(doc -> {
+
+                    if (doc.exists()) {
+
+                        String title = doc.getString("title");
+                        String location = doc.getString("location");
+                        Long count = doc.getLong("capacity");
+
+                        if (title == null) title = "Event";
+                        if (location == null) location = "No location";
+
+                        tvTitle.setText(title);
+                        tvLocation.setText(location);
+                        tvType.setText("CULTURAL");
+                        tvCount.setText(count != null ? String.valueOf(count) : "0");
+                    }
                 });
-    }
 
-    private void showDeleteDialog(ImageItem item) {
-        new AlertDialog.Builder(this)
-                .setTitle("Remove Image")
-                .setMessage("Delete this image?")
-                .setPositiveButton("Yes", (dialog, which) -> deleteImage(item))
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
+        btnClose.setOnClickListener(v -> dialog.dismiss());
 
-    private void deleteImage(ImageItem item) {
-        String url = item.getUrl();
+        btnDeleteEvent.setOnClickListener(v -> {
+            FirebaseFirestore.getInstance()
+                    .collection("events")
+                    .document(item.getEventId())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Event deleted", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        loadImages();
+                    });
+        });
 
-        try {
-            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(url);
+        btnDeleteImage.setOnClickListener(v -> {
+            FirebaseFirestore.getInstance()
+                    .collection("events")
+                    .document(item.getEventId())
+                    .update("posterURL", "")
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Image deleted", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        loadImages();
+                    });
+        });
 
-            ref.delete().addOnSuccessListener(aVoid -> {
-                db.collection("events")
-                        .document(item.getEventId())
-                        .update("posterURL", "");
-
-                Toast.makeText(this, "Image deleted", Toast.LENGTH_SHORT).show();
-                loadImages();
-            });
-
-        } catch (Exception e) {
-            Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show();
-        }
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 }
