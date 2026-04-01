@@ -150,8 +150,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     .document(notificationId)
                     .delete()
                     .addOnSuccessListener(aVoid -> {
-                        // No need to manually remove from list;
-                        // the SnapshotListener in the Activity will handle it!
+
                         Toast.makeText(holder.itemView.getContext(), "Notification removed", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {

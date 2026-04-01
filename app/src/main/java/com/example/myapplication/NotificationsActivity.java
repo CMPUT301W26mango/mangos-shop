@@ -88,8 +88,7 @@ public class NotificationsActivity extends AppCompatActivity {
         if (notificationList.isEmpty()) return;
 
 
-        // Firestore client-side doesn't have a "Delete Collection"
-        // so we have to delete each document individually
+
         for (NotificationItem item : notificationList) {
             db.collection("users")
                     .document(deviceId)
