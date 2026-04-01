@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,6 +50,18 @@ public class SelectedUsersActivity extends AppCompatActivity {
         containerCancelled = findViewById(R.id.container_cancelled);
 
         loadUsers();
+
+        String eventName = getIntent().getStringExtra("eventName"); // Grab the name passed from Event Details
+
+        Button btnMessageSelected = findViewById(R.id.btnMessageSelected);
+        btnMessageSelected.setOnClickListener(v -> {
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "selected", "Selected");
+        });
+
+        Button btnMessageCancelled = findViewById(R.id.btnMessageCancelled);
+        btnMessageCancelled.setOnClickListener(v -> {
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "cancelled", "Cancelled");
+        });
     }
 
     private void loadUsers() {
