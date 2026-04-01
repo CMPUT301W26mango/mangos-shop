@@ -190,21 +190,21 @@ public class EventDetailActivity extends AppCompatActivity {
                     List<GeoPoint> points = new ArrayList<>();
                     mapView.getOverlays().clear();
 
+                    int locatedCount = 0;
                     for (QueryDocumentSnapshot doc : snapshots) {
                         Double lat = doc.getDouble("latitude");
                         Double lng = doc.getDouble("longitude");
                         if (lat == null || lng == null) continue;
 
+                        locatedCount++;
                         GeoPoint point = new GeoPoint(lat, lng);
                         points.add(point);
 
-                        Marker marker = new Marker(mapView);
-                        marker.setPosition(point);
-                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                         String userId = doc.getString("userId");
-                        marker.setTitle(userId != null ? userId : "Entrant");
-                        mapView.getOverlays().add(marker);
+                        mapView.getOverlays().add(
+                                createVisibleMarker(mapView, point, userId != null ? userId : "Entrant"));
                     }
+                    Log.d(TAG, "loadEntrantLocations: " + locatedCount + " of " + snapshots.size() + " entrants have location data");
 
                     if (points.size() == 1) {
                         mapView.getController().setZoom(12.0);
@@ -216,6 +216,28 @@ public class EventDetailActivity extends AppCompatActivity {
                     mapView.invalidate();
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load entrant locations", e));
+    }
+
+    private Marker createVisibleMarker(MapView map, GeoPoint point, String title) {
+        Marker marker = new Marker(map);
+        marker.setPosition(point);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+
+        int size = (int) (30 * getResources().getDisplayMetrics().density);
+        android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+        android.graphics.Paint paint = new android.graphics.Paint();
+        paint.setColor(android.graphics.Color.RED);
+        paint.setAntiAlias(true);
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint);
+        paint.setColor(android.graphics.Color.WHITE);
+        paint.setStyle(android.graphics.Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint);
+
+        marker.setIcon(new android.graphics.drawable.BitmapDrawable(getResources(), bmp));
+        marker.setTitle(title);
+        return marker;
     }
 
     private void showQRCodePopup() {

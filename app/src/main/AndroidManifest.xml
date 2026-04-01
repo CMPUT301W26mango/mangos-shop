@@ -46,7 +46,7 @@
         <activity
             android:name=".AdminBrowseEventsActivity"
             android:exported="false"></activity>
-        <activity android:name=".WaitingListActivity" />
+        <activity android:name=".WaitingListActivity" android:exported="false" />
         <activity
             android:name=".AdminEventDetailActivity"
             android:exported="false" />
