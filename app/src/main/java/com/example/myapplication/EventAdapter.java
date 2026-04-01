@@ -2,12 +2,14 @@ package com.example.myapplication;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.fragment.app.FragmentManager;
@@ -129,50 +131,76 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
                         if (e != null || doc == null) return;
 
-                        if (doc.exists()) {
+
+                        com.google.android.material.card.MaterialCardView card =
+                                (com.google.android.material.card.MaterialCardView) holder.eventCardRoot;
+
+                        if (doc != null && doc.exists()) {
                             String status = doc.getString("status");
                             if (status == null) status = "waiting";
 
                             holder.eventStatus.setVisibility(View.VISIBLE);
 
-                            if (status.equals("selected")) {
 
+
+                            card.setStrokeWidth(8);
+
+                            if (status.equals("selected")) {
                                 holder.eventStatus.setText("Status: Selected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.yellow_border);
-
+                                card.setStrokeColor(Color.parseColor("#FFBF00"));
                             } else if (status.equals("accepted")) {
-
                                 holder.eventStatus.setText("Status: Accepted");
                                 holder.eventStatus.setTextColor(Color.parseColor("#008000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.green_border);
-
+                                card.setStrokeColor(Color.parseColor("#008000"));
                             } else if (status.equals("rejected")) {
-
                                 holder.eventStatus.setText("Status: Rejected");
                                 holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.red_border);
-
-                            } else {
-
+                                card.setStrokeColor(Color.parseColor("#FF0000"));
+                            } else if (status.equals("waiting")) {
                                 holder.eventStatus.setText("Status: Waiting");
                                 holder.eventStatus.setTextColor(Color.parseColor("#000000"));
-                                holder.eventCardRoot.setBackgroundResource(R.drawable.black_border);
+                                card.setStrokeColor(Color.parseColor("#000000")); // Black Border
                             }
 
                         } else {
-                            holder.eventStatus.setVisibility(View.GONE);
-                            holder.eventCardRoot.setBackgroundResource(R.drawable.rounded_card);
+                            // user not in waiting list
+                            // Check if they are in the invitedUsers array of the main event
+                            List<String> invitedUsers = event.getInvitedUsers();
+
+                            if (invitedUsers != null && invitedUsers.contains(deviceId)) {
+                                // show invited status
+                                holder.eventStatus.setVisibility(View.VISIBLE);
+                                holder.eventStatus.setText("Status: Invited");
+                                holder.eventStatus.setTextColor(Color.parseColor("#800080")); // Purple
+
+                                card.setStrokeWidth(8);
+                                card.setStrokeColor(Color.parseColor("#800080")); // Purple Border
+                            } else {
+                                // regular event not join
+                                holder.eventStatus.setVisibility(View.GONE);
+                                card.setStrokeWidth(0);
+                            }
                         }
                     });
         }
+
+
+        // Open the comments when the image is clicked
+        holder.viewCommentsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), CommentActivity.class);
+            // Pass the actual document ID so the Activity knows which event's comments to fetch
+            intent.putExtra("eventId", event.getId());
+            intent.putExtra("organizerId", event.getDeviceId());
+            v.getContext().startActivity(intent);
+        });
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("eventId", event.getQrValue());
+                bundle.putString("eventId", event.getId());
                 EventDetailsFragment fragment = new EventDetailsFragment();
                 fragment.setArguments(bundle);
                 fragment.show(fragmentManager, "eventDetails");
@@ -205,6 +233,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         TextView organizer;
         TextView eventStatus;
+        ImageButton viewCommentsBtn;
 
         /**
          * Initializes all the UI elements in this object
@@ -220,6 +249,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             organizer = itemView.findViewById(R.id.textViewOrganizer);
             eventStatus = itemView.findViewById(R.id.eventStatus);
             eventCardRoot = itemView.findViewById(R.id.eventCardRoot);
+            viewCommentsBtn = itemView.findViewById(R.id.viewCommentsBtn);
 
         }
     }

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -22,12 +23,14 @@ import java.util.List;
 
 /**
  * US 02.02.01 - View the list of entrants who joined the waiting list.
+ * US 02.05.02 - Lazy-check safety net: triggers lottery draw if deadline passed and draw not yet done.
  * US 02.06.05 - Export entrants as CSV.
  *
- * Displays a real-time list of all entrants on the waiting list for a
- * specific event. Only the organizer who owns the event (matched by
- * device ID) can view it. Includes a CSV export button.
- *
+ * Displays a real-time list of all entrant names on the waiting list for a
+ * specific event. Only the organizer who owns the event (matched by device ID)
+ * can view this screen. The lottery draw itself runs automatically in the
+ * background via LotteryDrawWorker (PeriodicWorkRequest). This screen only
+ * acts as a safety net via the lazy check in verifyOwnershipAndLoad().
  */
 public class WaitingListActivity extends AppCompatActivity {
 
@@ -78,6 +81,8 @@ public class WaitingListActivity extends AppCompatActivity {
         rvEntrants = findViewById(R.id.rvEntrants);
         btnExportCsv = findViewById(R.id.btnExportCsv);
 
+        tvTitle.setText("Waiting List: " + eventName);
+
         // --- Setup RecyclerView ---
         entrants = new ArrayList<>();
         adapter = new WaitingListAdapter(entrants);
@@ -90,7 +95,7 @@ public class WaitingListActivity extends AppCompatActivity {
             startActivityForResult(intent, CSV_EXPORT_REQUEST);
         });
 
-        // --- Verify ownership, then load waiting list ---
+        // --- Verify ownership, then lazy-check draw, then load waiting list ---
         boolean testMode = getIntent().getBooleanExtra("testMode", false);
         if (testMode) {
             return;
@@ -100,7 +105,6 @@ public class WaitingListActivity extends AppCompatActivity {
 
     /**
      * Handles the result from the CSV file picker.
-     * When the user picks a save location, writes the CSV there.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -111,7 +115,9 @@ public class WaitingListActivity extends AppCompatActivity {
     }
 
     /**
-     * Checks that the current device owns this event before showing data.
+     * Verifies that the current device owns this event, then:
+     *   1. Runs the lazy draw check (US 02.05.02 safety net).
+     *   2. Attaches the real-time waiting list listener.
      */
     private void verifyOwnershipAndLoad() {
         db.collection("events").document(eventId).get()
@@ -122,13 +128,18 @@ public class WaitingListActivity extends AppCompatActivity {
                         return;
                     }
 
-                    String ownerDeviceId = documentSnapshot.getString("organizerDeviceId");
-
+                    // Ownership check — field "deviceId" matches EventStore.addEvent()
+                    String ownerDeviceId = documentSnapshot.getString("deviceId");
                     if (ownerDeviceId == null || !ownerDeviceId.equals(deviceId)) {
                         Toast.makeText(this, "Access denied: you are not the organizer of this event.", Toast.LENGTH_SHORT).show();
                         finish();
                         return;
                     }
+
+                    // US 02.05.02 lazy check — safety net if WorkManager missed this event.
+                    // "regEnd" field name matches EventStore.addEvent() and EventDetailsFragment.
+                    // "drawCompleted" is set by LotteryDrawHelper.performDraw().
+                    runLazyDrawCheck(documentSnapshot);
 
                     attachWaitingListListener();
                 })
@@ -140,9 +151,46 @@ public class WaitingListActivity extends AppCompatActivity {
     }
 
     /**
+     * Lazy draw check (US 02.05.02 safety net).
+     *
+     * If the registration deadline has passed AND the draw has not been marked
+     * complete, trigger the draw immediately. This covers gaps between the
+     * periodic WorkManager runs (e.g., device was offline, app was reinstalled).
+     *
+     * @param eventDoc already-loaded event document snapshot
+     */
+    private void runLazyDrawCheck(DocumentSnapshot eventDoc) {
+        Boolean drawCompleted = eventDoc.getBoolean("drawCompleted");
+        if (Boolean.TRUE.equals(drawCompleted)) {
+            return; // draw already done — nothing to do
+        }
+
+        Timestamp regEnd = eventDoc.getTimestamp("regEnd");
+        if (regEnd == null) {
+            return; // no deadline set — skip
+        }
+
+        if (regEnd.compareTo(Timestamp.now()) < 0) {
+            // Deadline has passed and draw hasn't run yet — trigger it now
+            Log.d(TAG, "Lazy check: triggering draw for event " + eventId);
+            LotteryDrawHelper.performDraw(eventId, new LotteryDrawHelper.OnDrawCompleteListener() {
+                @Override
+                public void onSuccess(int selectedCount) {
+                    Log.d(TAG, "Lazy draw complete: " + selectedCount + " entrants selected.");
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.e(TAG, "Lazy draw failed for event: " + eventId, e);
+                }
+            });
+        }
+    }
+
+    /**
      * Attaches a real-time snapshot listener to the waitingList subcollection.
-     * Reads all four fields: name, email, phone, enrolmentDate.
-     * UI shows name only; all fields are used for CSV export.
+     * Reads name, email, phone, enrolmentDate for display and CSV export.
+     * Status is NOT read or displayed here — the lottery screen handles that.
      */
     private void attachWaitingListListener() {
         waitingListListener = db.collection("events")

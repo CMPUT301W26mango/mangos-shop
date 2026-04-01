@@ -428,74 +428,20 @@
             android:visibility="gone"/>
 
         <Button
-            android:id="@+id/btn_go_to_organizer_view"
+            android:id="@+id/btn_delete_event"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Go to Organizer View"
-            android:backgroundTint="@color/blue"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"/>
-
-        <Button
-            android:id="@+id/registerBtn"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Register Now!"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="@color/blue"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/acceptInvBtn"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Accept Invite!"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#008000"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
-
-        <Button
-            android:id="@+id/declineInvBtn"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Decline Invite!"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
+            android:text="Delete Event"
             android:backgroundTint="@color/red"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
+            android:textColor="#FFFFFF"/>
 
         <Button
-            android:id="@+id/acceptBtn"
+            android:id="@+id/btn_delete_image"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Accept"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#008000"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"
-            />
-
-        <Button
-            android:id="@+id/cancelRegisterBtn"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Leave waiting list"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
+            android:text="Delete Image"
             android:backgroundTint="@color/red"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
+            android:textColor="#FFFFFF"/>
 
 
 

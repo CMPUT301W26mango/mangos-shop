@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,6 +46,11 @@ public class NotificationsActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         loadNotifications();
+
+        Button clearAllBtn = findViewById(R.id.clear_all_btn);
+
+
+        clearAllBtn.setOnClickListener(v -> clearAllNotifications());
     }
 
     /**
@@ -73,4 +80,26 @@ public class NotificationsActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 });
     }
+
+    /**
+     * Deletes all notifications in the user's subcollection
+     */
+    private void clearAllNotifications() {
+        if (notificationList.isEmpty()) return;
+
+
+
+        for (NotificationItem item : notificationList) {
+            db.collection("users")
+                    .document(deviceId)
+                    .collection("notifications")
+                    .document(item.getId())
+                    .delete()
+                    .addOnFailureListener(e -> Log.e("ClearAll", "Failed to delete: " + item.getId()));
+        }
+
+
+        Toast.makeText(this, "All notifications cleared", Toast.LENGTH_SHORT).show();
+    }
+
 }

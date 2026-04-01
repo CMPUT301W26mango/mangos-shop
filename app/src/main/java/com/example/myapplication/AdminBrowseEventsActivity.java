@@ -14,10 +14,14 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.app.AlertDialog;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,8 +38,9 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
     private RecyclerView recyclerViewAdminEvents;
     private SearchView searchViewEvents;
     private TextView textViewEmptyEvents;
-    private Button buttonBrowseProfiles;
-    private Button buttonBrowseImages;
+    private LinearLayout buttonBrowseProfiles;
+    private LinearLayout buttonBrowseImages;
+    private LinearLayout buttonLogs;
 
     private FirebaseFirestore db;
     private AdminEventAdapter adapter;
@@ -62,19 +67,64 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AdminBrowseImagesActivity.class);
             startActivity(intent);
         });
+        buttonLogs = findViewById(R.id.buttonLogs);
+
+        buttonLogs.setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminLogsActivity.class));
+        });
 
         db = FirebaseFirestore.getInstance();
 
         recyclerViewAdminEvents.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new AdminEventAdapter(filteredEvents, eventItem -> {
-            Intent intent = new Intent(this, AdminEventDetailActivity.class);
-            intent.putExtra("eventId", eventItem.getEventId());
-            intent.putExtra("title", eventItem.getTitle());
-            intent.putExtra("location", eventItem.getLocation());
-            intent.putExtra("organizer", eventItem.getOrganizerName());
-            intent.putExtra("posterURL", eventItem.getPosterURL());
-            startActivity(intent);
+
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_admin_event_detail, null);
+
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .create();
+
+            TextView tvTitle = dialogView.findViewById(R.id.tv_event_title);
+            TextView tvLocation = dialogView.findViewById(R.id.tv_event_location);
+            TextView tvOrganizer = dialogView.findViewById(R.id.tv_organizer);
+
+            Button btnDeleteEvent = dialogView.findViewById(R.id.btn_delete_event);
+            Button btnDeleteImage = dialogView.findViewById(R.id.btn_delete_image);
+
+            ImageButton btnClose = dialogView.findViewById(R.id.btn_close);
+
+            tvTitle.setText(eventItem.getTitle());
+            tvLocation.setText(eventItem.getLocation());
+            tvOrganizer.setText(eventItem.getOrganizerName());
+
+            btnClose.setOnClickListener(v -> dialog.dismiss());
+
+            btnDeleteEvent.setOnClickListener(v -> {
+                FirebaseFirestore.getInstance()
+                        .collection("events")
+                        .document(eventItem.getEventId())
+                        .delete()
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Event deleted", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            loadEvents();
+                        });
+            });
+
+            btnDeleteImage.setOnClickListener(v -> {
+                FirebaseFirestore.getInstance()
+                        .collection("events")
+                        .document(eventItem.getEventId())
+                        .update("posterURL", "")
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Image removed", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            loadEvents();
+                        });
+            });
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.show();
         });
 
         recyclerViewAdminEvents.setAdapter(adapter);
