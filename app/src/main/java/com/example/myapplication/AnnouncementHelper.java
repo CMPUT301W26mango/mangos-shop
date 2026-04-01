@@ -81,6 +81,9 @@ public class AnnouncementHelper {
                         String userId = doc.getId(); // Device ID of the entrant
 
                         Map<String, Object> notifData = new HashMap<>();
+                        notifData.put("notiName", "Organizer Announcement");
+                        notifData.put("eventName", eventName != null ? eventName : "Event");
+                        notifData.put("description", messageBody);
                         notifData.put("recipientDeviceId", userId);
                         notifData.put("message", "Organizer Announcement: " + messageBody);
                         notifData.put("eventId", eventId);
