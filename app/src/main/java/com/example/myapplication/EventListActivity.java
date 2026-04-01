@@ -7,14 +7,12 @@ import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -37,10 +35,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.content.Intent;
 
@@ -341,9 +342,16 @@ public class EventListActivity extends AppCompatActivity {
     private void gatherAndApplyFilters(Dialog dialog){
         // Get the selected category
         ChipGroup chipGroup = dialog.findViewById(R.id.chipGroupEventType);
-        String selectedCategory = null;
+        List<String> selectedCategories = new ArrayList<>();
 
-        int checkedChipId = chipGroup.getCheckedChipId();
+        List<Integer> checkedChipIds = chipGroup.getCheckedChipIds();
+
+        for (int id : checkedChipIds) {
+            com.google.android.material.chip.Chip chip = dialog.findViewById(id);
+            if (chip != null) {
+                selectedCategories.add(chip.getText().toString());
+            }
+        }
 
         // Get Capacity Limits
         TextInputEditText minSpotsInput = dialog.findViewById(R.id.filterMinSpots);
@@ -361,18 +369,62 @@ public class EventListActivity extends AppCompatActivity {
         String maxDate = maxDateInput.getText().toString().isEmpty() ? null : maxDateInput.getText().toString();
 
         // Pass to filtering logic
-        applyFilters(selectedCategory, minSpots, maxSpots, minDate, maxDate);
+        applyFilters(selectedCategories, minSpots, maxSpots, minDate, maxDate);
     }
 
-    private void applyFilters(String category, Integer minSpots, Integer maxSpots, String minDate, String maxDate){
+    private void applyFilters(List<String> categories, Integer minSpots, Integer maxSpots, String minDate, String maxDate){
         displayedEvents.clear();
+
+        // parse the time difference for event time filter
+        SimpleDateFormat localFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        localFormat.setTimeZone(TimeZone.getDefault()); // User's local timezone
+
+        SimpleDateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Firestore's timezone
+
+        Date minDateObject = null;
+        Date maxDateObject = null;
+
+        try {
+            if (minDate != null) {
+                minDateObject = localFormat.parse(minDate); // This Parses as 00:00:00 local time by itself so we can just set it
+            }
+            if (maxDate != null) {
+                // To include the entire day (since day ends at 11:59:59 we need to manually set it
+                // Since default is 0:00:00
+                Date parsedMax = localFormat.parse(maxDate);
+                Calendar c = Calendar.getInstance();
+                c.setTime(parsedMax);
+                c.set(Calendar.HOUR_OF_DAY, 23);
+                c.set(Calendar.MINUTE, 59);
+                c.set(Calendar.SECOND, 59);
+                maxDateObject = c.getTime();
+            }
+        } catch (Exception e) {
+            Log.e("Filter", "Error parsing filter dates", e);
+        }
+
+
 
         for (Event event : allActiveEvents) {
             boolean matches = true;
 
             // Category Filter
-            if (category != null && event.getEventType() != null) {
-                if (!event.getEventType().equalsIgnoreCase(category)) {
+            if (categories != null && !categories.isEmpty()) {
+                boolean hasMatchingCategory = false;
+
+                if (event.getEventType() != null) {
+                    // Check if the event's type matches any of the selected chips
+                    for (String cat : categories) {
+                        if (event.getEventType().equalsIgnoreCase(cat)) {   // See if any of them are matching
+                            hasMatchingCategory = true;
+                            break;
+                        }
+                    }
+                }
+
+                // If the event didn't match any selected category, it fails the filter
+                if (!hasMatchingCategory) {
                     matches = false;
                 }
             }
@@ -383,13 +435,20 @@ public class EventListActivity extends AppCompatActivity {
 
             // Date Filter (Lexicographical string comparison works here because format is yyyy-MM-dd)
             if (event.getDateEvent() != null && !event.getDateEvent().isEmpty()) {
-                // Extract just the date part "yyyy-MM-dd" from the event's "yyyy-MM-dd HH:mm"
-                String justDate = event.getDateEvent().substring(0, 10);
+                try {
+                    // Parse the event's string as a UTC date
+                    Date eventDateUTC = utcFormat.parse(event.getDateEvent());
 
-                if (minDate != null && justDate.compareTo(minDate) < 0) matches = false;
-                if (maxDate != null && justDate.compareTo(maxDate) > 0) matches = false;
+                    // Compare the exact moments in time
+                    if (minDateObject != null && eventDateUTC.before(minDateObject)) matches = false;
+                    if (maxDateObject != null && eventDateUTC.after(maxDateObject)) matches = false;
+
+                } catch (Exception e) {
+                    Log.e("Filter", "Error parsing event date string", e);
+                    matches = false;
+                }
             } else if (minDate != null || maxDate != null) {
-                // If the event has no date but the user wants to filter by date, exclude it
+                // Event has no date, but user filtered by date
                 matches = false;
             }
 
