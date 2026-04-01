@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,6 +50,18 @@ public class SelectedUsersActivity extends AppCompatActivity {
         containerCancelled = findViewById(R.id.container_cancelled);
 
         loadUsers();
+
+        String eventName = getIntent().getStringExtra("eventName"); // Grab the name passed from Event Details
+
+        Button btnMessageSelected = findViewById(R.id.btnMessageSelected);
+        btnMessageSelected.setOnClickListener(v -> {
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Selected Entrants", java.util.Arrays.asList("selected", "accepted"));
+        });
+
+        Button btnMessageCancelled = findViewById(R.id.btnMessageCancelled);
+        btnMessageCancelled.setOnClickListener(v -> {
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Unsuccessful/Cancelled", java.util.Arrays.asList("cancelled", "rejected", "not_selected"));
+        });
     }
 
     private void loadUsers() {
@@ -62,7 +75,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                     containerCancelled.removeAllViews();
 
                     for (QueryDocumentSnapshot doc : snapshots) {
-                        String userId = doc.getString("userId");
+                        String userId = doc.getId();
                         String status = doc.getString("status");
                         if (status == null) status = "waiting";
 
@@ -70,6 +83,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                             case "accepted":
                                 addUserRow(containerAccepted, userId, "accepted", doc.getId());
                                 break;
+                            case "not_selected":
                             case "rejected":
                                 addUserRow(containerDeclined, userId, "rejected", doc.getId());
                                 break;
@@ -118,6 +132,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                             btnAction.setBackgroundTintList(
                                     android.content.res.ColorStateList.valueOf(
                                             android.graphics.Color.parseColor("#7B61FF")));
+                            btnAction.setOnClickListener(v -> replaceUser(docId, container, row));
                             break;
                         case "selected":
                             tvName.setTextColor(getResources().getColor(android.R.color.black));
@@ -130,7 +145,12 @@ public class SelectedUsersActivity extends AppCompatActivity {
                             break;
                         case "cancelled":
                             tvName.setTextColor(getResources().getColor(android.R.color.darker_gray));
-                            btnAction.setVisibility(View.GONE);
+                            btnAction.setVisibility(View.VISIBLE);
+                            btnAction.setText("Replace");
+                            btnAction.setBackgroundTintList(
+                                    android.content.res.ColorStateList.valueOf(
+                                            android.graphics.Color.parseColor("#7B61FF")));
+                            btnAction.setOnClickListener(v -> replaceUser(docId, container, row));
                             break;
                     }
 
@@ -147,7 +167,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
     }
 
     /**
-     * Cancel
+     * Cancel a pending (selected) user's invitation.
      */
     private void cancelUser(String docId, LinearLayout container, View row) {
         db.collection("events").document(eventId)
@@ -159,5 +179,37 @@ public class SelectedUsersActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Failed to cancel", Toast.LENGTH_SHORT).show());
+    }
+
+    /**
+     * Remove a declined user from the waiting list, then draw a replacement.
+     * The removal always happens. If no replacement is available, that's okay.
+     */
+    private void replaceUser(String docId, LinearLayout container, View row) {
+        db.collection("events").document(eventId)
+                .collection("waitingList").document(docId)
+                .delete()
+                .addOnSuccessListener(v -> {
+                    LotteryDrawHelper.drawReplacement(eventId, new LotteryDrawHelper.OnDrawCompleteListener() {
+                        @Override
+                        public void onSuccess(int count) {
+                            if (count > 0) {
+                                Toast.makeText(SelectedUsersActivity.this, "Replacement entrant selected!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(SelectedUsersActivity.this, "No entrants available for replacement.", Toast.LENGTH_SHORT).show();
+                            }
+                            loadUsers(); // refresh the list
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.e(TAG, "Replacement draw failed", e);
+                            Toast.makeText(SelectedUsersActivity.this, "Replacement failed.", Toast.LENGTH_SHORT).show();
+                            loadUsers(); // still refresh to show the removal
+                        }
+                    });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(SelectedUsersActivity.this, "Failed to remove user.", Toast.LENGTH_SHORT).show());
     }
 }

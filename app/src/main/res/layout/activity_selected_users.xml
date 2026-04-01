@@ -34,6 +34,17 @@
 
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/btnMessageSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message Selected Entrants" />
+
+    <Button
+        android:id="@+id/btnMessageCancelled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message Cancelled Entrants" />
 
     <ScrollView
         android:layout_width="match_parent"
