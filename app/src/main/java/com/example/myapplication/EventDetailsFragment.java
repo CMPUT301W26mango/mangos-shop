@@ -20,19 +20,16 @@ import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import android.graphics.Bitmap;
-import java.util.Objects;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.content.ContextCompat;
@@ -380,8 +377,9 @@ public class EventDetailsFragment extends DialogFragment {
                                 textViewAlreadyRegistered.setVisibility(View.VISIBLE);
 
                                 // Save location if geolocation is required (fire-and-forget after join)
-                                if (geolocationRequired && ContextCompat.checkSelfPermission(getContext(),
-                                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                boolean locPermGranted = ContextCompat.checkSelfPermission(getContext(),
+                                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                                if (geolocationRequired && locPermGranted) {
                                     LocationHelper.getCurrentLocation(getContext(), (lat, lng) -> {
                                         if (lat != null && lng != null) {
                                             Map<String, Object> locationData = new HashMap<>();

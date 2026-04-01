@@ -78,7 +78,6 @@
 
 
         <activity android:name=".AdminLogsActivity" />
-        <activity android:name=".AdminBrowseImagesActivity"/>
 
     </application>
 
