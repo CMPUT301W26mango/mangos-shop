@@ -7,9 +7,11 @@
 
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -56,6 +58,16 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
         holder.textViewEventOrganizer.setText("Organizer: " + organizer);
 
         holder.itemView.setOnClickListener(v -> listener.onEventClick(eventItem));
+
+        Button btnComments = holder.itemView.findViewById(R.id.btn_view_comments);
+
+        btnComments.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), CommentActivity.class);
+            intent.putExtra("eventId", eventItem.getEventId());
+            intent.putExtra("organizerId", eventItem.getOrganizerId());
+            intent.putExtra("isAdmin", true);
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

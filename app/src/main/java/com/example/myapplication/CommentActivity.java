@@ -32,6 +32,7 @@ public class CommentActivity extends AppCompatActivity {
     private ImageButton backButton;
 
     private String organizerId;
+    private boolean isAdmin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,8 @@ public class CommentActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        isAdmin = getIntent().getBooleanExtra("isAdmin", false);
 
 
         // Set all the variables
@@ -159,8 +162,8 @@ public class CommentActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         String role = documentSnapshot.getString("role");
 
-                        // If they are an Organizer OR if they are the original event creator
-                        if ("Organizer".equals(role) || deviceId.equals(organizerId)) {
+                        // If they are an Organizer OR if they are the original event creator or admin
+                        if (isAdmin || "Organizer".equals(role) || deviceId.equals(organizerId)) {
                             showDeleteDialog(comment);
                         }
                         // If they aren't, the method just ends and nothing happens

@@ -153,12 +153,10 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
                             title = "Untitled Event";
                         }
 
+                        String organizerId = document.getString("organizerId");
+
                         AdminEventItem eventItem = new AdminEventItem(
-                                eventId,
-                                title,
-                                location,
-                                organizerName,
-                                posterURL
+                                eventId, title, location, organizerName, posterURL, organizerId
                         );
 
                         allEvents.add(eventItem);
