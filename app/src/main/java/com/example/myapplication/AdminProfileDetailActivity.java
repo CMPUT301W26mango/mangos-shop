@@ -12,6 +12,7 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
@@ -60,10 +61,10 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
 
                         db.collection("users")
                                 .document(userId)
-                                .update("role", "entrant") // or "user" depending on your app
+                                .update("role", "Entrant") // or "user" depending on your app
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(this, "Organizer removed", Toast.LENGTH_SHORT).show();
-                                    textProfileRole.setText("Role: entrant");
+                                    textProfileRole.setText("Role: Entrant");
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(this, "Error updating role", Toast.LENGTH_SHORT).show();
@@ -116,6 +117,13 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
                     String name = document.getString("name");
                     String email = document.getString("email");
                     String role = document.getString("role");
+                    Button removeOrganizerButton = findViewById(R.id.btn_remove_organizer);
+
+                    if (role != null && role.equals("Organizer")) {
+                        removeOrganizerButton.setVisibility(View.VISIBLE);
+                    } else {
+                        removeOrganizerButton.setVisibility(View.GONE);
+                    }
 
                     if (name == null || name.isEmpty()) {
                         name = "Unnamed User";
