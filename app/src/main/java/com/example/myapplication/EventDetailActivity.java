@@ -82,13 +82,26 @@ public class EventDetailActivity extends AppCompatActivity {
         mapView.getController().setZoom(4.0);
         mapView.getController().setCenter(new GeoPoint(0.0, 0.0));
 
-        // "Event Details" button → WaitingListActivity
+        // "Event Details" button - WaitingListActivity
         Button btnEventDetails = findViewById(R.id.btn_event_details);
         btnEventDetails.setOnClickListener(v -> {
-            Intent intent = new Intent(EventDetailActivity.this, WaitingListActivity.class);
-            intent.putExtra("eventId", eventId);
-            intent.putExtra("eventName", eventName != null ? eventName : "");
-            startActivity(intent);
+            db.collection("events").document(eventId).get()
+                    .addOnSuccessListener(doc -> {
+                        Boolean drawCompleted = doc.getBoolean("drawCompleted");
+                        if (Boolean.TRUE.equals(drawCompleted)) {
+                            // after draw - selected users screen
+                            Intent intent = new Intent(EventDetailActivity.this, SelectedUsersActivity.class);
+                            intent.putExtra("eventId", eventId);
+                            intent.putExtra("eventName", eventName != null ? eventName : "");
+                            startActivity(intent);
+                        } else {
+                            // before draw - waiting list screen
+                            Intent intent = new Intent(EventDetailActivity.this, WaitingListActivity.class);
+                            intent.putExtra("eventId", eventId);
+                            intent.putExtra("eventName", eventName != null ? eventName : "");
+                            startActivity(intent);
+                        }
+                    });
         });
 
         if (eventId != null) {
