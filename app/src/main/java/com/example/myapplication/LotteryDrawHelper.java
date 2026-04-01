@@ -172,9 +172,6 @@ public class LotteryDrawHelper {
                                 List<String> selected = waitingIds.subList(0, selectCount);
                                 List<String> notSelected = waitingIds.subList(selectCount, waitingIds.size());
 
-                                // gettingg the wlosers to update thier history
-                                List<String> notSelected = new ArrayList<>(waitingIds);
-                                notSelected.removeAll(selected);
 
                                 // Step 5: atomic batch write
                                 WriteBatch batch = db.batch();
@@ -191,11 +188,6 @@ public class LotteryDrawHelper {
                                     DocumentReference entrantRef =
                                             eventRef.collection("waitingList").document(userId);
                                     batch.update(entrantRef, "status", "rejected");
-                                // Update losers so their history page shows they lost
-                                for (String userId : notSelected) {
-                                    DocumentReference entrantRef =
-                                            eventRef.collection("waitingList").document(userId);
-                                    batch.update(entrantRef, "status", "not_selected");
                                 }
 
                                 batch.update(eventRef, "drawCompleted", true);
