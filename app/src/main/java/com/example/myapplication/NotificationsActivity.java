@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Activity that displays all notifications for the current entrant
  */
-public class NotificationsActivity extends AppCompatActivity {
+public class NotificationsActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;

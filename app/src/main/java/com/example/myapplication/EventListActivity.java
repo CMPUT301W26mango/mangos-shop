@@ -59,7 +59,7 @@ import android.content.Intent;
  * The activity also filters events based on their registration start
  * and end times so that only currently active events are displayed.
  */
-public class EventListActivity extends AppCompatActivity {
+public class EventListActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private EventAdapter adapter;
