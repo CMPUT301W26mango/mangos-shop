@@ -149,12 +149,6 @@ public class EventListActivity extends AppCompatActivity {
         scanQRButton.setOnClickListener(v -> launchQRScanner());
         btnFilter.setOnClickListener((v -> showFilterDialog()));
 
-//        profileButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
-//            startActivity(intent);
-//        });
-//
-
         LinearLayout myProfile = findViewById(R.id.nav_profile);
         myProfile.setOnClickListener(v -> {
             Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
@@ -164,6 +158,12 @@ public class EventListActivity extends AppCompatActivity {
         LinearLayout myNotifications = findViewById(R.id.nav_notifications);
         myNotifications.setOnClickListener(v -> {
             Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        });
+
+        LinearLayout myHistory = findViewById(R.id.nav_history);
+        myHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, MyEventsActivity.class);
             startActivity(intent);
         });
 

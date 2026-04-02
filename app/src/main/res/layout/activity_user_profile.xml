@@ -64,23 +64,6 @@
             android:background="#000000" />
 
         <TextView
-            android:id="@+id/btnMyEventsHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingVertical="16dp"
-            android:text="Event History"
-            android:textColor="#000000"
-            android:textSize="16sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
-
-
-        <TextView
             android:id="@+id/rowNotifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
