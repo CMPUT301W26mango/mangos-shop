@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -102,6 +103,7 @@ public class EventListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whole_event_list);
 
+
         scannerLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
                 String scannedValue = result.getContents();
@@ -123,7 +125,6 @@ public class EventListActivity extends BaseActivity {
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
         btnFilter = findViewById(R.id.btnFilter);
-        LinearLayout myEventsNav = findViewById(R.id.nav_my_events);
 //        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
@@ -138,12 +139,6 @@ public class EventListActivity extends BaseActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
-
-        myEventsNav.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, MyEventsActivity.class);
-            startActivity(intent);
-        });
 
         lotteryinfoButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
