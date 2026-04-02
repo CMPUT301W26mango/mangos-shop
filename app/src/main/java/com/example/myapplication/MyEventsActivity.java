@@ -31,6 +31,9 @@ public class MyEventsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whole_event_list);
 
+        TextView pageTitle = findViewById(R.id.top_page_title);
+        pageTitle.setText("Event History");
+
         db = FirebaseFirestore.getInstance();
         myEventList = new ArrayList<>();
 
@@ -107,7 +110,6 @@ public class MyEventsActivity extends BaseActivity {
 
     private void setupBottomNavigation() {
         LinearLayout navEvents = findViewById(R.id.nav_events);
-        LinearLayout navMyEvents = findViewById(R.id.nav_my_events);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navProfile = findViewById(R.id.nav_profile);
 
@@ -117,7 +119,6 @@ public class MyEventsActivity extends BaseActivity {
         });
 
 
-        navMyEvents.setOnClickListener(v -> {});
 
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
