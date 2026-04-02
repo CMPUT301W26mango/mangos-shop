@@ -50,14 +50,21 @@ import android.content.Intent;
 
 /**
  * This is an activity that shows all events to entrants
- * It queries the firebase databse for load events
+ * It queries the firebase database for load events
  * This enables it so that the users can:
  * - View event details by selecting an event
  * - Scan a QR code to open the corresponding event
  * - View lottery guidelines
  * - Navigate to their profile editing screen
+ * - Filter based on the users interest
+ * - Search based on the users interest
  * The activity also filters events based on their registration start
  * and end times so that only currently active events are displayed.
+ * This activity also filters by the event types
+ * This activity also filters by the capacity of how many people can still join an event
+ * This activity also allows for searching of events via keywords.
+ *      - These searches show results based on matches withe event name or event description
+ *      - These searches working alongside/on top of the filters
  */
 public class EventListActivity extends BaseActivity {
 
@@ -205,7 +212,9 @@ public class EventListActivity extends BaseActivity {
 
     }
 
-
+    /**
+     * This method queries the firestore database for events and loads it
+     * */
     private void loadEvents() {
         Timestamp now = Timestamp.now();
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -397,6 +406,12 @@ public class EventListActivity extends BaseActivity {
 
     }
 
+    /**
+     * This function sets up what the filter pop up will look like, it will also set up the button listeners
+     *  It also restores the UI for any previous filters
+     * @param dialog
+     *  This is the filter dialog to set up
+     * */
     private void setupFilterDialogue(Dialog dialog){
 
         TextInputEditText minDateInput = dialog.findViewById(R.id.filterMinEventDate);
@@ -452,6 +467,11 @@ public class EventListActivity extends BaseActivity {
 
     }
 
+    /**
+     * This shows the date picker for the filters, it allows the user to select specific dates for events
+     * @param targetDateInput
+     *  Which input needs the date picker, (Minimum date input or Maximum Date input)
+     * */
     private void showDatePicker(TextInputEditText targetDateInput){
         // Get the caldendar
         Calendar calendar = Calendar.getInstance();
@@ -509,6 +529,10 @@ public class EventListActivity extends BaseActivity {
         applyFilters();
     }
 
+    /**
+     * This applies all the filters that the user picked in the filter dialogue
+     *  It also handles the search feature and shows the events that the user has searched for
+     * */
     private void applyFilters(){
         displayedEvents.clear();
 

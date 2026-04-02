@@ -22,6 +22,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private OnCommentLongClickListener longClickListener;
 
+    /**
+     * This is the constructor for the adapter, it sets the comment information, the organizer, and a listener for a delete feature
+     * @param commentList
+     *  This is an array of comments, where each comment is an object of the comment class
+     * @param longClickListener
+     *  This is a listener to a long click for a comment, it allows for the feature of deleting comments for admins and organizers
+     * @param organizerId
+     *  This is the id of the organizer that organized the event in which the comments are for
+     * */
     public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener){
         this.commentList = commentList;
         this.organizerId = organizerId;
@@ -29,7 +38,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
 
-
+    /**
+     * Creates and returns a view holder for the comments
+     * Called when the recycler view needs to make a new view (comment)
+     * @param parent
+     *  The view group that the new view will be attached to
+     * @param viewType
+     *  Type of view
+     * @return CommentViewHolder
+     *  The new comment view holder that has the inflated view
+     * */
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,6 +56,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         return new CommentViewHolder(view);
     }
 
+    /**
+     * Binds a comment object to the CommentViewHolder
+     * It also sets the time that the comment was sent, whether its an organizer and calls the function to handle a long press (used for deleting)
+     * @param holder
+     *  The view holder in which to attach the comment
+     * @param position
+     *  Position of the item in the comment list
+     * */
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = commentList.get(position);
@@ -77,7 +103,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         });
     }
 
-
+    /**
+     * Defines what is in the comment view holder, it is an extension of a recycler view which allows for scrolling and recycling views
+     * */
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
         TextView commentText;
@@ -93,6 +121,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
     }
 
+    /**
+     * Calculates how many comments are in the comment list
+     * @return
+     *  The size of the comment list
+     * */
     @Override
     public int getItemCount() {
         return commentList.size();
