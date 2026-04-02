@@ -24,9 +24,9 @@ import static org.junit.Assert.*;
  * Prompt: "Guide me with writing tests for EventStore" March 13, 2026
  */
 @RunWith(AndroidJUnit4.class)
-public class EventStoreTest {
+public class EventDatabaseTest {
 
-    private EventStore eventStore;
+    private EventDatabase eventDatabase;
     private FirebaseFirestore db;
     private String testEventId;
 
@@ -36,7 +36,7 @@ public class EventStoreTest {
         FirebaseApp.initializeApp(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
         );
-        eventStore = new EventStore();
+        eventDatabase = new EventDatabase();
         db = FirebaseFirestore.getInstance();
     }
 
@@ -80,7 +80,7 @@ public class EventStoreTest {
         event.setGeolocationRequired(false);
 
         // Add to Firestore
-        eventStore.addEvent(event);
+        eventDatabase.addEvent(event);
 
         // Wait briefly for Firestore write
         Thread.sleep(3000);
@@ -124,7 +124,7 @@ public class EventStoreTest {
         event.setLocation("Old Trafford");
         event.setGeolocationRequired(true);
 
-        eventStore.addEvent(event);
+        eventDatabase.addEvent(event);
         Thread.sleep(3000);
 
         db.collection("events")
@@ -158,7 +158,7 @@ public class EventStoreTest {
         event.setTitle("Test Delete Event");
         event.setLocation("Old Trafford");
 
-        eventStore.addEvent(event);
+        eventDatabase.addEvent(event);
         Thread.sleep(3000);
 
         // Get the event ID
@@ -178,7 +178,7 @@ public class EventStoreTest {
         assertNotNull("Event should have been created", testEventId);
 
         // Now delete it
-        eventStore.delEventById(testEventId);
+        eventDatabase.delEventById(testEventId);
         Thread.sleep(3000);
 
         // Verify it's gone
@@ -215,7 +215,7 @@ public class EventStoreTest {
         event.setCapacity(30);
         event.setOrganizerName("Test Name");
 
-        eventStore.addEvent(event);
+        eventDatabase.addEvent(event);
         Thread.sleep(3000);
 
         // Get the event ID
@@ -236,7 +236,7 @@ public class EventStoreTest {
 
         // Now retrieve it using getEventById
         CountDownLatch getLatch = new CountDownLatch(1);
-        eventStore.getEventById(testEventId, loadedEvent -> {
+        eventDatabase.getEventById(testEventId, loadedEvent -> {
             assertNotNull("Loaded event should not be null", loadedEvent);
             assertEquals("Test Get Event", loadedEvent.getTitle());
             assertEquals("Old Trafford", loadedEvent.getLocation());

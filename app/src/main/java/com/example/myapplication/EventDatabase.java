@@ -1,9 +1,6 @@
 package com.example.myapplication;
 
-import android.util.Log;
-
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -19,7 +16,7 @@ import java.util.Map;
  * @author Sayuj
  */
 
-public class EventStore {
+public class EventDatabase {
     private final FirebaseFirestore db;
 
     /**
@@ -41,7 +38,7 @@ public class EventStore {
     /**
      * Constructs a new EventStore and initializes the Firestore instance.
      */
-    public EventStore() {
+    public EventDatabase() {
         db = FirebaseFirestore.getInstance();
     }
 
@@ -154,24 +151,6 @@ public class EventStore {
                     }
                     listener.onEventsLoaded(events);
                 });
-    }
-
-    public void getAllPublicEvents(OnMultipleEventsLoadedListener listener) {
-        db.collection("events")
-                .whereEqualTo("privateEvent", false)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    java.util.List<Event> events = new java.util.ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        events.add(document.toObject(Event.class));
-                    }
-                    listener.onEventsLoaded(events);
-                });
-    }
-
-    public void addCoOrganizer(String eventDocId, String userId) {
-        db.collection("events").document(eventDocId)
-                .update("coOrganizers", FieldValue.arrayUnion(userId));
     }
 }
 
