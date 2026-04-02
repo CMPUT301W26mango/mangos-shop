@@ -256,8 +256,14 @@ public class EventDetailsFragment extends DialogFragment {
                                     acceptedMsg, rejectedMsg, lotteryRedrawMsg, eventFull, isInvited, invitedMsg, acceptInvBtn,declineInvBtn);
 
                             // Set up the click listeners once
-                            registerBtn.setOnClickListener(v ->
-                                    joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull, invitedMsg, acceptInvBtn, declineInvBtn));
+                            registerBtn.setOnClickListener(v -> {
+                                if (geolocationRequired && ContextCompat.checkSelfPermission(requireContext(),
+                                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(getContext(), "This event requires location permission. Enable it in Settings.", Toast.LENGTH_LONG).show();
+                                } else {
+                                    joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull, invitedMsg, acceptInvBtn, declineInvBtn);
+                                }
+                            });
 
                             acceptInvBtn.setOnClickListener(v ->
                                     joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull, invitedMsg, acceptInvBtn, declineInvBtn));

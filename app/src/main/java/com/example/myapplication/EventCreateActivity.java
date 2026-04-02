@@ -536,6 +536,7 @@ public class EventCreateActivity extends AppCompatActivity {
                     updates.put("geolocationRequired", event.getGeolocationRequired());
                     updates.put("privateEvent", event.getPrivateEvent());
 
+
                     com.google.firebase.firestore.FirebaseFirestore.getInstance()
                             .collection("events")
                             .document(eventId)
