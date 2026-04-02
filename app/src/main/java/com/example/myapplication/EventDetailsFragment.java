@@ -116,6 +116,7 @@ public class EventDetailsFragment extends DialogFragment {
         TextView tvTitle = view.findViewById(R.id.tv_event_title);
         TextView selectedMsg = view.findViewById(R.id.tv_selected_message);
         TextView acceptedMsg = view.findViewById(R.id.tv_accepted_message);
+        TextView declinedMsg = view.findViewById(R.id.tv_declined_message);
         TextView invitedMsg = view.findViewById(R.id.tv_invited_message);
         TextView rejectedMsg = view.findViewById(R.id.tv_rejected_message);
         TextView lotteryRedrawMsg = view.findViewById(R.id.tv_lottery_redraw);
@@ -132,6 +133,7 @@ public class EventDetailsFragment extends DialogFragment {
 
         Button registerBtn = view.findViewById(R.id.registerBtn);
         Button acceptBtn = view.findViewById(R.id.acceptBtn);
+        Button declineBtn = view.findViewById(R.id.declineBtn);
         Button btnCancel = view.findViewById(R.id.cancelRegisterBtn);
         Button acceptInvBtn = view.findViewById(R.id.acceptInvBtn);
         Button declineInvBtn = view.findViewById(R.id.declineInvBtn);
@@ -248,6 +250,7 @@ public class EventDetailsFragment extends DialogFragment {
                             registerBtn.setVisibility(View.GONE);
                             btnCancel.setVisibility(View.GONE);
                             acceptBtn.setVisibility(View.GONE);
+                            declineBtn.setVisibility(View.GONE);
                             textViewAlreadyRegistered.setVisibility(View.GONE);
                             tvCoOrgMessage.setVisibility(View.VISIBLE);
                             btnOrgView.setVisibility(View.VISIBLE);
@@ -260,9 +263,9 @@ public class EventDetailsFragment extends DialogFragment {
                         }
 
                         else {
-                            checkStatusAndShowUI(registerBtn, btnCancel, acceptBtn,
+                            checkStatusAndShowUI(registerBtn, btnCancel, acceptBtn, declineBtn,
                                     textViewAlreadyRegistered, selectedMsg,
-                                    acceptedMsg, rejectedMsg, lotteryRedrawMsg, eventFull, isInvited, invitedMsg, acceptInvBtn,declineInvBtn);
+                                    acceptedMsg, declinedMsg, rejectedMsg, lotteryRedrawMsg, eventFull, isInvited, invitedMsg, acceptInvBtn,declineInvBtn);
 
                             // Set up the click listeners once
                             registerBtn.setOnClickListener(v -> {
@@ -278,13 +281,17 @@ public class EventDetailsFragment extends DialogFragment {
                                     joinWaitingList(registerBtn, btnCancel, textViewAlreadyRegistered, eventFull, invitedMsg, acceptInvBtn, declineInvBtn));
 
                             declineInvBtn.setOnClickListener(v ->
-                                    declineInvitation(acceptInvBtn, declineInvBtn, invitedMsg));
+                                    declinePrivInvitation(acceptInvBtn, declineInvBtn, invitedMsg));
 
                             acceptBtn.setOnClickListener(v ->
-                                    acceptInvitation(acceptBtn, selectedMsg, acceptedMsg));
+                                    acceptSelection(acceptBtn, declineBtn, selectedMsg, acceptedMsg, declinedMsg));
+                            
+                            declineBtn.setOnClickListener((v ->
+                                    declineSelection(acceptBtn, declineBtn, selectedMsg, acceptedMsg, declinedMsg)
+                                    ));
 
                             btnCancel.setOnClickListener(v ->
-                                    leaveWaitingList(registerBtn, btnCancel, acceptBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg));
+                                    leaveWaitingList(registerBtn, btnCancel, acceptBtn, declineBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg, declinedMsg));
                         }
 
                     } else {
@@ -470,7 +477,7 @@ public class EventDetailsFragment extends DialogFragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                             @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Permission result handled; location will be saved on join if granted.
+        
     }
 
     /**
@@ -482,7 +489,7 @@ public class EventDetailsFragment extends DialogFragment {
      * @param textViewAlreadyRegistered
      *  This is a text view to show that they are already registered and can cancel
      * */
-    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage) {
+    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, Button declineBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         //  Remove the user from the waiting list sub-collection
         db.collection("events")
                 .document(firestoreDocId)
@@ -521,9 +528,11 @@ public class EventDetailsFragment extends DialogFragment {
      */
     private void checkStatusAndShowUI(Button registerBtn, Button cancelBtn,
                                       Button acceptBtn,
+                                      Button declineBtn,
                                       TextView tvAlreadyRegistered,
                                       TextView tvSelectedMessage,
                                       TextView tvAcceptedMessage,
+                                      TextView tvDeclinedMessage,
                                       TextView tvRejectedMessage,
                                       TextView tvRedrawMessage,
                                       TextView eventFull,
@@ -545,13 +554,15 @@ public class EventDetailsFragment extends DialogFragment {
 
                     if (!isAdded() || getContext() == null) return;
 
-                    //  Reset EVERYTHING to GONE first
+                    // Make sure everything isnt visible at first
                     registerBtn.setVisibility(View.GONE);
                     cancelBtn.setVisibility(View.GONE);
                     acceptBtn.setVisibility(View.GONE);
+                    declineBtn.setVisibility(View.GONE);
                     tvAlreadyRegistered.setVisibility(View.GONE);
                     tvSelectedMessage.setVisibility(View.GONE);
                     tvAcceptedMessage.setVisibility(View.GONE);
+                    tvDeclinedMessage.setVisibility(View.GONE);
                     tvRejectedMessage.setVisibility(View.GONE);
                     tvRedrawMessage.setVisibility(View.GONE);
                     invitedMsg.setVisibility(View.GONE);
@@ -564,35 +575,33 @@ public class EventDetailsFragment extends DialogFragment {
                         String status = doc.getString("status");
                         if (status == null) status = "waiting";
 
-                        switch (status) {
-                            case "selected":
-                                tvSelectedMessage.setVisibility(View.VISIBLE);
-                                acceptBtn.setVisibility(View.VISIBLE);
-                                cancelBtn.setVisibility(View.VISIBLE);
-                                cancelBtn.setText("Decline");
-                                break;
+                        if (status.equals("selected")) {
+                            tvSelectedMessage.setVisibility(View.VISIBLE);
+                            acceptBtn.setVisibility(View.VISIBLE);
+                            declineBtn.setVisibility(View.VISIBLE);
 
-                            case "accepted":
-                                tvAcceptedMessage.setVisibility(View.VISIBLE);
-                                cancelBtn.setVisibility(View.VISIBLE);
-                                cancelBtn.setText("Cancel Registration");
-                                break;
+                        } else if (status.equals("accepted")) {
+                            tvAcceptedMessage.setVisibility(View.VISIBLE);
+                            cancelBtn.setVisibility(View.VISIBLE);
+                            cancelBtn.setText("Cancel Registration");
 
-                            case "rejected":
-                                tvRejectedMessage.setVisibility(View.VISIBLE);
-                                tvRedrawMessage.setVisibility(View.VISIBLE);
-                                cancelBtn.setVisibility(View.VISIBLE);
-                                cancelBtn.setText("Leave waiting list");
-                                break;
+                        } else if (status.equals("declined")) {
+                            tvDeclinedMessage.setVisibility(View.VISIBLE);
 
-                            default: // "waiting"
-                                cancelBtn.setVisibility(View.VISIBLE);
-                                cancelBtn.setText("Leave waiting list");
-                                tvAlreadyRegistered.setVisibility(View.VISIBLE);
-                                break;
+                        } else if (status.equals("rejected")) {
+                            tvRejectedMessage.setVisibility(View.VISIBLE);
+                            tvRedrawMessage.setVisibility(View.VISIBLE);
+                            cancelBtn.setVisibility(View.VISIBLE);
+                            cancelBtn.setText("Leave waiting list");
+
+                        } else if (status.equals("waiting")) {
+                            cancelBtn.setVisibility(View.VISIBLE);
+                            cancelBtn.setText("Leave waiting list");
+                            tvAlreadyRegistered.setVisibility(View.VISIBLE);
                         }
+                  
                     } else {
-                        // USER IS NOT IN WAITING LIST
+                        // user not in waiting list
                         if (isInvited) {
                             // User is invited but hasn't joined yet
                             invitedMsg.setVisibility(View.VISIBLE);
@@ -621,7 +630,7 @@ public class EventDetailsFragment extends DialogFragment {
     /**
      * Updates status to "accepted" when entrant accepts the invitation
      */
-    private void acceptInvitation(Button acceptBtn, TextView tvSelectedMessage, TextView tvAcceptedMessage) {
+    private void acceptSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         db.collection("events").document(firestoreDocId)
                 .collection("waitingList").document(deviceId)
                 .update("status", "accepted")
@@ -630,7 +639,9 @@ public class EventDetailsFragment extends DialogFragment {
                     Toast.makeText(getContext(), "You've accepted the invitation!",
                             Toast.LENGTH_SHORT).show();
                     acceptBtn.setVisibility(View.GONE);
+                    declineBtn.setVisibility(View.GONE);
                     tvSelectedMessage.setVisibility(View.GONE);
+                    tvDeclinedMessage.setVisibility(View.GONE);
                     tvAcceptedMessage.setVisibility(View.VISIBLE);
                 })
                 .addOnFailureListener(e -> {
@@ -638,6 +649,28 @@ public class EventDetailsFragment extends DialogFragment {
                     Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+    private void declineSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
+        db.collection("events").document(firestoreDocId)
+                .collection("waitingList").document(deviceId)
+                .update("status", "declined")
+                .addOnSuccessListener(v -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "You've declined the invitation!",
+                            Toast.LENGTH_SHORT).show();
+                    acceptBtn.setVisibility(View.GONE);
+                    declineBtn.setVisibility(View.GONE);
+                    tvSelectedMessage.setVisibility(View.GONE);
+                    tvAcceptedMessage.setVisibility(View.GONE);
+                    tvDeclinedMessage.setVisibility(View.VISIBLE);
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     private void showQRCodePopup(String eventId) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
@@ -664,12 +697,13 @@ public class EventDetailsFragment extends DialogFragment {
      * Removes the user from the invitedUsers array in Firestore.
      * Hides the invite UI and shows a declined message.
      */
-    private void declineInvitation(Button acceptInvBtn, Button declineInvBtn, TextView invitedMsg) {
+    private void declinePrivInvitation(Button acceptInvBtn, Button declineInvBtn, TextView invitedMsg) {
         db.collection("events").document(firestoreDocId)
                 .update("invitedUsers", com.google.firebase.firestore.FieldValue.arrayRemove(deviceId))
                 .addOnSuccessListener(v -> {
                     if (!isAdded() || getContext() == null) return;
 
+                    // Hide invite UI
                     // Hide invite UI
                     acceptInvBtn.setVisibility(View.GONE);
                     declineInvBtn.setVisibility(View.GONE);

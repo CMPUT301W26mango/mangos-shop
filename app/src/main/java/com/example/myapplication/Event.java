@@ -51,21 +51,23 @@ public class Event {
     /**
      * Parameterized constructor for creating a fully populated Event object.
      *
-     * @param id              the unique Firestore document ID
-     * @param title           the name of the event
-     * @param descirption     a description of the event
-     * @param location        the physical location of the event
-     * @param regStart        the registration start timestamp
-     * @param regEnd          the registration end timestamp
-     * @param posterURL       URL of the event poster image
-     * @param qrValue         the QR code value used to identify this event
-     * @param capacity        maximum number of attendees
-     * @param dateEvent       the date the event takes place (as a String)
-     * @param organizerName   the name of the event organizer
-     * @param eventType       the type/category of the event
-     * @param maxWaitingListSize maximum number of entrants allowed on the waiting list
-     * @param deviceId        the users device id they use to log into the app
-     *
+     * @param id                  the unique Firestore document ID
+     * @param title               the name of the event
+     * @param descirption         a description of the event
+     * @param location            the physical location of the event
+     * @param regStart            the registration start timestamp
+     * @param regEnd              the registration end timestamp
+     * @param posterURL           URL of the event poster image
+     * @param qrValue             the QR code value used to identify this event
+     * @param capacity            maximum number of attendees
+     * @param dateEvent           the date the event takes place (as a String)
+     * @param organizerName       the name of the event organizer
+     * @param eventType           the type/category of the event
+     * @param maxWaitingListSize  maximum number of entrants allowed on the waiting list
+     * @param deviceId            the user's device id used to log into the app
+     * @param privateEvent        boolean indicating if the event is private
+     * @param coOrganizers        list of user IDs representing co-organizers
+     * @param invitedUsers        list of user IDs invited to the event
      */
     public Event(String id, String title, String descirption, String location,
                  Timestamp regStart, Timestamp regEnd, String posterURL,
@@ -94,22 +96,41 @@ public class Event {
     // Getters and Setters
 
 
+
+    /**
+     * @return the list of user IDs invited to the event
+     */
     public List<String> getInvitedUsers() {
         return invitedUsers;
     }
 
+    /**
+     * @param invitedUsers the list of invited user IDs to set
+     */
     public void setInvitedUsers(List<String> invitedUsers) {
         this.invitedUsers = invitedUsers;
     }
 
+    /**
+     * @return the list of user IDs acting as co-organizers
+     */
     public List<String> getCoOrganizers() { return coOrganizers; }
 
+    /**
+     * @param coOrganizers the list of co-organizer user IDs to set
+     */
     public void setCoOrganizers(List<String> coOrganizers) { this.coOrganizers = coOrganizers; }
 
+    /**
+     * @return true if the event is private, false or null otherwise
+     */
     public Boolean getPrivateEvent() {
         return privateEvent;
     }
 
+    /**
+     * @param privateEvent the private status to set
+     */
     public void setPrivateEvent(Boolean privateEvent) {
         this.privateEvent = privateEvent;
     }

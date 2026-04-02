@@ -17,6 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter for the RecyclerView in UserSearchActivity that displays user search results.
+ * * This adapter manages the visualization of UserProfiles and handles the logic for
+ * inviting users to private events or promoting them to co-organizers. It dynamically
+ * adjusts the available actions based on the event's privacy settings
+ * and the current user's permissions.
+ *  @author Sayuj
+ */
+
 public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.UserViewHolder> {
 
     private List<UserProfiles> userList;
@@ -28,6 +37,16 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
 
     private boolean isCoOrg;
 
+    /**
+     * Constructs a new UserSearchAdapter.
+     *
+     * @param context   the activity context used for inflating layouts and showing dialogs
+     * @param userList  the initial list of users to display
+     * @param eventId   the unique Firestore ID of the event being managed
+     * @param eventName the name of the event for notification purposes
+     * @param isPrivate true if the event is private, false otherwise
+     * @param isCoOrg   true if the current user is a co-organizer, false if they are the owner
+     */
     public UserSearchAdapter(Context context, List<UserProfiles> userList, String eventId, String eventName, boolean isPrivate, boolean isCoOrg) {
         this.context = context;
         this.userList = userList;
@@ -37,11 +56,24 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
         this.isCoOrg = isCoOrg;
     }
 
+    /**
+     * Updates the data set and refreshes the RecyclerView.
+     *
+     * @param newList the new list of UserProfiles to be displayed
+     */
     public void updateList(List<UserProfiles> newList) {
         this.userList = newList;
         notifyDataSetChanged();
     }
 
+
+    /**
+     * Called when RecyclerView needs a new UserViewHolder to represent an item.
+     *
+     * @param parent   the ViewGroup into which the new View will be added
+     * @param viewType the view type of the new View
+     * @return a new UserViewHolder that holds the View for a user item
+     */
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,6 +81,14 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
         return new UserViewHolder(view);
     }
 
+    /**
+     * Binds user data to the views inside the ViewHolder and sets up the click interaction.
+     * * Logic inside the click listener determines if a user can be invited to a private
+     * event or made a co-organizer based on the flags provided in the constructor.
+     *
+     * @param holder   the ViewHolder which should be updated
+     * @param position the position of the item within the adapter's data set
+     */
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         UserProfiles user = userList.get(position);
@@ -114,15 +154,26 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
         });
     }
 
+    /**
+     * @return the total number of items in the user list
+     */
     @Override
     public int getItemCount() {
         return userList.size();
     }
 
+    /**
+     * Sets a new event name to be used for notification messages.
+     *
+     * @param eventName the new title of the event
+     */
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
 
+    /**
+     * ViewHolder class for user search items.
+     */
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
 

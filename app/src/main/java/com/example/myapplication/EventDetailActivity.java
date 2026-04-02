@@ -8,8 +8,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -23,6 +21,17 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Activity that displays the detailed information of a specific event.
+ *
+ * This activity handles the visualization of event metadata (title, date, capacity)
+ * and provides an interactive map (osmdroid) showing the locations of entrants
+ * currently on the waiting list. It manages role-based UI visibility for organizers,
+ * co-organizers, and entrants, allowing for event editing, user invitation,
+ * and QR code sharing.
+ * @author Sayuj
+ */
 
 public class EventDetailActivity extends BaseActivity {
 
@@ -126,8 +135,8 @@ public class EventDetailActivity extends BaseActivity {
         String currentDeviceId = android.provider.Settings.Secure.getString(
                 getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
-        EventStore eventStore = new EventStore();
-        eventStore.getEventById(eventId, event -> {
+        EventDatabase eventDatabase = new EventDatabase();
+        eventDatabase.getEventById(eventId, event -> {
             isPrivate = Boolean.TRUE.equals(event.getPrivateEvent());
             isCoOrg = event.getCoOrganizers() != null && event.getCoOrganizers().contains(currentDeviceId);
             boolean isOwner = currentDeviceId.equals(event.getDeviceId());

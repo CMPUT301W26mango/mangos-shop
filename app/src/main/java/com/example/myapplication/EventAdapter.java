@@ -161,6 +161,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                                     holder.eventStatus.setText("Status: Accepted");
                                     holder.eventStatus.setTextColor(Color.parseColor("#008000"));
                                     card.setStrokeColor(Color.parseColor("#008000"));
+                                } else if (status.equals("declined")) {
+                                    holder.eventStatus.setText("Status: Declined");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
+                                    card.setStrokeColor(Color.parseColor("#FF0000"));
                                 } else if (status.equals("rejected")) {
                                     holder.eventStatus.setText("Status: Rejected");
                                     holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));

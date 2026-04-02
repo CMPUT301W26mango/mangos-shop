@@ -5,23 +5,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Switch;
 
 import java.util.Calendar;
@@ -29,14 +22,10 @@ import java.util.Date;
 import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,8 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import android.content.Intent;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,7 +72,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
     private EditText eventDateInput;
 
-    private EventStore eventStore;
+    private EventDatabase eventDatabase;
 
     private EditText capacityInput;
 
@@ -406,7 +393,7 @@ public class EventCreateActivity extends AppCompatActivity {
             activityResultLauncher.launch(intent);
         });
 
-        eventStore = new EventStore();
+        eventDatabase = new EventDatabase();
         createEventButton.setOnClickListener(v -> {
             String eventName = eventNameInput.getText().toString().trim();
             String location = locationInput.getText().toString().trim();
@@ -553,7 +540,7 @@ public class EventCreateActivity extends AppCompatActivity {
                             });
                 } else {
                     // no edit mode
-                    eventStore.addEvent(event);
+                    eventDatabase.addEvent(event);
                     finish();
                 }
             });

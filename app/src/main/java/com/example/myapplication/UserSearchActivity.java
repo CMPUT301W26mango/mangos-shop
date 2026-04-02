@@ -13,6 +13,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+/**
+ * Activity that allows organizers or co-organizers to search for users and invite them to an event.
+ *
+ * This class provides a search interface where users can type a query to find others
+ * registered in the system. It interacts with the Profiles helper to perform
+ * real-time filtering and uses a UserSearchAdapater to display results and
+ * handle invitation logic for both public and private events.
+ * @author Sayuj
+ */
 
 public class UserSearchActivity extends AppCompatActivity {
 
