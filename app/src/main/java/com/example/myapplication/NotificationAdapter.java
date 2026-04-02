@@ -87,7 +87,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         SpannableString ss = new SpannableString(description);
 
-        // Define the ClickableSpan
+        // The following code to implement Click "here" is from Claude, "How do I make a certain part of a textview lead to another fragment when clicked", 2026-04-02
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
