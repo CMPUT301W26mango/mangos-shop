@@ -18,7 +18,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This is the activity which shows the comments for a particular event
+ * This displays the comment, the user who wrote the comment, and when they wrote it
+ * It also allows for organizers and admins to delete comments
+ * */
 public class CommentActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -34,6 +38,13 @@ public class CommentActivity extends AppCompatActivity {
     private String organizerId;
     private boolean isAdmin = false;
 
+
+    /**
+     * This function run when the activity is created, it initializes the screen and sets the listeners
+     * @param savedInstanceState
+     *  It obtains the saved instance as a bundle to restore the previous state
+     *
+     * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
