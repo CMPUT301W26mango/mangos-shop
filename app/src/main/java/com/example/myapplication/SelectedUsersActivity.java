@@ -125,7 +125,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                             tvName.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                             btnAction.setVisibility(View.GONE);
                             break;
-                        case "rejected":
+                        case "declined":
                             tvName.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                             btnAction.setVisibility(View.VISIBLE);
                             btnAction.setText("Replace");
