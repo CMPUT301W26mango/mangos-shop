@@ -19,6 +19,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity that displays and manages the list of users selected during an event lottery draw.
+ *
+ * This screen organizes entrants into categorized sections based on their current status:
+ * Accepted, Declined/Rejected, Pending, and Cancelled.
+ * It provides administrative actions for organizers, such as revoking invitations
+ * or drawing new entrants from the waiting list to fill spots left by declined users.
+ * It also does sending bulk announcements to specific groups of entrants.
+ * @author Sayuj
+ */
 
 public class SelectedUsersActivity extends AppCompatActivity {
 

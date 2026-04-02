@@ -1,7 +1,5 @@
 package com.example.myapplication;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
@@ -17,7 +15,6 @@ import android.widget.Button;
 import android.app.AlertDialog;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,10 +80,10 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
         Profiles profilesHelper = new Profiles();
         String myId = profilesHelper.getDeviceId(this);
 
-        EventStore eventStore = new EventStore();
+        EventDatabase eventDatabase = new EventDatabase();
 
 
-        eventStore.getEventsByOrganizer(myId, events -> {
+        eventDatabase.getEventsByOrganizer(myId, events -> {
             OrganizerEventAdapter adapter = new OrganizerEventAdapter(events, event -> {
                 Intent intent = new Intent(this, EventDetailActivity.class);
                 intent.putExtra("EVENT_ID", event.getId());
@@ -99,9 +96,9 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
     // grab my events first so the dropdown actually has stuff in it
     private void fetchEventsAndShowBroadcastDialog() {
         String myDeviceId = new Profiles().getDeviceId(this);
-        EventStore eventStore = new EventStore();
+        EventDatabase eventDatabase = new EventDatabase();
 
-        eventStore.getEventsByOrganizer(myDeviceId, events -> {
+        eventDatabase.getEventsByOrganizer(myDeviceId, events -> {
             if (events == null || events.isEmpty()) {
                 Toast.makeText(this, "Need to create an event first", Toast.LENGTH_SHORT).show();
                 return;
