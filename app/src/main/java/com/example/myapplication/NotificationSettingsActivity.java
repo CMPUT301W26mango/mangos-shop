@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class NotificationSettingsActivity extends AppCompatActivity {
+public class NotificationSettingsActivity extends BaseActivity {
 
     private SwitchMaterial toggleNotifications;
     private FirebaseFirestore db;

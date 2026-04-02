@@ -141,38 +141,6 @@ public class Profiles {
                 })
                 .addOnFailureListener(e -> listener.onSuccess("Organizer"));
     }
-
-    /**
-     * Sends a notification to a specific user by adding it to their notifications collection in Firestore.
-     *
-     * @param targetDeviceID ID of user
-     * @param message        Notification to be delivered
-     * @param eventID        ID of event
-     */
-    public void sendNotificationsToUser(String targetDeviceID, String message, String eventID) {
-        db.collection("users").document(targetDeviceID).get().addOnSuccessListener(doc -> {
-            if (doc.exists()) {
-                // kinda like an off on switch
-                Boolean wantsNotification = doc.getBoolean("notificationsEnabled");
-
-                // Forgot that they might diable it, this is if they disable notis
-                if (wantsNotification != null && !wantsNotification) {
-                    return;
-                }
-
-                java.util.Map<String, Object> noti = new java.util.HashMap<>();
-                noti.put("eventId", eventID);
-                noti.put("eventName", "Event Update");
-                noti.put("notiName", "System Message");
-                noti.put("description", message);
-                noti.put("read", false);
-                noti.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
-                
-                db.collection("users").document(targetDeviceID).collection("notifications").add(noti);
-            }
-        });
-    }
-
     public void searchUsers(String searchText, OnSuccessListener<List<UserProfiles>> listener) {
         // smart search
         String searchField = "name"; // Default to name

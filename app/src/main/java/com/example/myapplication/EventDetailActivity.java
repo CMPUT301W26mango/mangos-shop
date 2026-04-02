@@ -24,7 +24,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventDetailActivity extends AppCompatActivity {
+public class EventDetailActivity extends BaseActivity {
 
     private static final String TAG = "EventDetailActivity";
 

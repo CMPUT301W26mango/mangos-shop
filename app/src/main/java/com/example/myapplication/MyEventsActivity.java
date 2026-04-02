@@ -16,7 +16,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyEventsActivity extends AppCompatActivity {
+public class MyEventsActivity extends BaseActivity {
 
     private RecyclerView historyRecyclerView;
     private EventHistoryAdapter adapter;
