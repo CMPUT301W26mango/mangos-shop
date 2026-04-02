@@ -25,7 +25,7 @@ public class UserProfilesTest {
      */
     @Before
     public void setUp() {
-        testUser = new UserProfiles("Testing Mango", "test@user.com", "1234567890", "Entrant");
+        testUser = new UserProfiles("Testing Mango", "test@user.com", "1234567890", "Entrant", "dummy");
     }
 
     /**
