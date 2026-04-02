@@ -1,149 +1,119 @@
 package com.example.myapplication;
 
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.google.firebase.Timestamp;
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
- * The following test file was written with the guidance of Claude AI
- * Prompt: "Guide me with writing tests for Event" March 12, 2026
+ * The following test file was written with the guidance of Gemini AI
+ * Prompt: "Guide me with writing tests for Event" April 2, 2026
  */
+
 
 public class EventsTest {
 
+    private Event event;
 
-
-    @Test
-    public void testEventTitleSetCorrectly() {
-        Event event = new Event();
-        event.setTitle("Swimming Lessons");
-        assertEquals("Swimming Lessons", event.getTitle());
+    @Before
+    public void setUp() {
+        // This runs before every single test to give us a fresh Event object
+        event = new Event();
     }
 
     @Test
-    public void testEventDescriptionSetCorrectly() {
-        Event event = new Event();
-        event.setDescription("A fun swimming event");
-        assertEquals("A fun swimming event", event.getDescription());
+    public void testEmptyConstructor() {
+        Event emptyEvent = new Event();
+        assertNull("ID should be null on empty initialization", emptyEvent.getId());
     }
 
     @Test
-    public void testEventLocationSetCorrectly() {
-        Event event = new Event();
-        event.setLocation("Edmonton Rec Centre");
-        assertEquals("Edmonton Rec Centre", event.getLocation());
+    public void testParameterizedConstructor() {
+        Timestamp start = new Timestamp(new Date());
+        Timestamp end = new Timestamp(new Date(System.currentTimeMillis() + 10000));
+        List<String> coOrgs = Arrays.asList("org1", "org2");
+        List<String> invited = Arrays.asList("user1", "user2");
+
+        Event fullEvent = new Event("123", "Test Title", "Desc", "Loc",
+                start, end, "url", "qr", 100, "2026-04-10",
+                "Organizer", "Music", 50, "device123", true, coOrgs, invited);
+
+        assertEquals("123", fullEvent.getId());
+        assertEquals("Test Title", fullEvent.getTitle());
+        assertEquals("Loc", fullEvent.getLocation());
+        assertEquals(100, fullEvent.getCapacity());
+        assertTrue(fullEvent.getPrivateEvent());
+        assertEquals(2, fullEvent.getCoOrganizers().size());
     }
 
     @Test
-    public void testEventCapacitySetCorrectly() {
-        Event event = new Event();
-        event.setCapacity(100);
-        assertEquals(100, event.getCapacity());
+    public void testSetAndGetTitle() {
+        event.setTitle("Mango Festival");
+        assertEquals("Mango Festival", event.getTitle());
     }
 
     @Test
-    public void testEventOrganizerNameSetCorrectly() {
-        Event event = new Event();
-        event.setOrganizerName("John Doe");
-        assertEquals("John Doe", event.getOrganizerName());
+    public void testSetAndGetCapacity() {
+        event.setCapacity(500);
+        assertEquals(500, event.getCapacity());
     }
 
     @Test
-    public void testEventQrValueSetCorrectly() {
-        Event event = new Event();
-        event.setQrValue("abc123");
-        assertEquals("abc123", event.getQrValue());
+    public void testListsSettersAndGetters() {
+        List<String> invited = Arrays.asList("Sayuj", "Sami", "Aditya");
+        event.setInvitedUsers(invited);
+
+        assertNotNull(event.getInvitedUsers());
+        assertEquals(3, event.getInvitedUsers().size());
+        assertTrue(event.getInvitedUsers().contains("Sami"));
     }
 
     @Test
-    public void testEventPosterURLSetCorrectly() {
-        Event event = new Event();
-        event.setPosterURL("https://example.com/poster.jpg");
-        assertEquals("https://example.com/poster.jpg", event.getPosterURL());
+    public void testIsRegistrationOpen_WhenOpen() {
+        // Set start time to 1 hour ago
+        Timestamp pastStart = new Timestamp(new Date(System.currentTimeMillis() - 3600000));
+        // Set end time to 1 hour in the future
+        Timestamp futureEnd = new Timestamp(new Date(System.currentTimeMillis() + 3600000));
+
+        event.setRegStart(pastStart);
+        event.setRegEnd(futureEnd);
+
+        assertTrue("Registration should be open", event.isRegistrationOpen());
     }
 
     @Test
-    public void testEventRegStartSetCorrectly() {
-        Timestamp timestamp = new Timestamp(new Date());
-        Event event = new Event();
-        event.setRegStart(timestamp);
-        assertEquals(timestamp, event.getRegStart());
+    public void testIsRegistrationOpen_WhenNotStartedYet() {
+        // Set start time to 1 hour in the future
+        Timestamp futureStart = new Timestamp(new Date(System.currentTimeMillis() + 3600000));
+        Timestamp futureEnd = new Timestamp(new Date(System.currentTimeMillis() + 7200000));
+
+        event.setRegStart(futureStart);
+        event.setRegEnd(futureEnd);
+
+        assertFalse("Registration should be closed (hasn't started)", event.isRegistrationOpen());
     }
 
     @Test
-    public void testEventRegEndSetCorrectly() {
-        Timestamp timestamp = new Timestamp(new Date());
-        Event event = new Event();
-        event.setRegEnd(timestamp);
-        assertEquals(timestamp, event.getRegEnd());
+    public void testIsRegistrationOpen_WhenAlreadyClosed() {
+        // Set both times in the past
+        Timestamp pastStart = new Timestamp(new Date(System.currentTimeMillis() - 7200000));
+        Timestamp pastEnd = new Timestamp(new Date(System.currentTimeMillis() - 3600000));
+
+        event.setRegStart(pastStart);
+        event.setRegEnd(pastEnd);
+
+        assertFalse("Registration should be closed (already ended)", event.isRegistrationOpen());
     }
 
     @Test
-    public void testEventRegEndAfterRegStart_isValid() {
-        Timestamp start = new Timestamp(new Date(1000000));
-        Timestamp end = new Timestamp(new Date(2000000));
-        assertTrue(end.compareTo(start) > 0);
-    }
-
-    @Test
-    public void testEventRegEndBeforeRegStart_isInvalid() {
-        Timestamp start = new Timestamp(new Date(2000000));
-        Timestamp end = new Timestamp(new Date(1000000));
-        assertFalse(end.compareTo(start) > 0);
-    }
-
-
-    @Test
-    public void testEventTitleNull_isEmpty() {
-        Event event = new Event();
-        assertNull(event.getTitle());
-    }
-
-    @Test
-    public void testEventCapacityZero_isValid() {
-        Event event = new Event();
-        event.setCapacity(0);
-        assertEquals(0, event.getCapacity());
-    }
-
-    @Test
-    public void testFullEventObject() {
-        Event event = new Event();
-        event.setTitle("Test Event");
-        event.setLocation("Edmonton");
-        event.setDescription("Description");
-        event.setCapacity(50);
-        event.setOrganizerName("Jane");
-        event.setQrValue("qr123");
-
-        assertNotNull(event.getTitle());
-        assertNotNull(event.getLocation());
-        assertNotNull(event.getDescription());
-        assertEquals(50, event.getCapacity());
-        assertNotNull(event.getOrganizerName());
-        assertNotNull(event.getQrValue());
-    }
-
-    @Test
-    public void testGeolocationRequiredDefaultsFalse() {
-        Event event = new Event();
-        assertFalse(event.getGeolocationRequired());
-    }
-
-    @Test
-    public void testGeolocationRequiredSetTrue() {
-        Event event = new Event();
-        event.setGeolocationRequired(true);
-        assertTrue(event.getGeolocationRequired());
-    }
-
-    @Test
-    public void testGeolocationRequiredSetFalse() {
-        Event event = new Event();
-        event.setGeolocationRequired(true);
-        event.setGeolocationRequired(false);
-        assertFalse(event.getGeolocationRequired());
+    public void testIsRegistrationOpen_WithNullDates() {
+        event.setRegStart(null);
+        event.setRegEnd(null);
+        assertFalse("Registration should default to closed if dates are missing", event.isRegistrationOpen());
     }
 }

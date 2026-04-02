@@ -66,6 +66,7 @@ import android.widget.Toast;
 
 public class EventCreateActivity extends AppCompatActivity {
 
+
     StorageReference storageReference;
     Uri image;
     private EditText eventNameInput;
