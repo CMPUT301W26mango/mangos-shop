@@ -84,10 +84,14 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     implementation("androidx.work:work-runtime:2.9.0")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+
 }
 
 configurations.all {
     resolutionStrategy {
         force("com.google.protobuf:protobuf-javalite:3.21.12")
     }
+
+    exclude(group = "com.google.protobuf", module = "protobuf-lite")
 }
