@@ -42,10 +42,6 @@ public class UserProfileActivity extends AppCompatActivity {
         findViewById(R.id.rowNotifications).setOnClickListener(v -> {
             startActivity(new Intent(UserProfileActivity.this, NotificationSettingsActivity.class));
         });
-
-        findViewById(R.id.btnMyEventsHistory).setOnClickListener(v -> {
-            startActivity(new Intent(this, MyEventsActivity.class));
-        });
     }
 
     private void loadUserData() {
