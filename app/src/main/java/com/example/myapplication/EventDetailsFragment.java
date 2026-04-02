@@ -49,6 +49,7 @@ public class EventDetailsFragment extends DialogFragment {
     private String firestoreDocId;
     private String deviceId;
     private ListenerRegistration statusListener;
+    private ListenerRegistration waitlistCountListener; // Listen for the waitlist changes
 
     private boolean geolocationRequired = false;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
@@ -194,15 +195,23 @@ public class EventDetailsFragment extends DialogFragment {
                         }
 
                         // Capacity/spots
-                        if (document.getLong("capacity") != null) {
-                            Long maxSpots = document.getLong("maxWaitingListSize");
-                            if (maxSpots == null || maxSpots == -1) {
-                                tvSpots.setText("Unlimited");
-                            } else {
-                                tvSpots.setText(String.valueOf(maxSpots.intValue()));
-                            }
+                        Long maxSpots = document.getLong("maxWaitingListSize");
+
+                        if (maxSpots == null || maxSpots == -1) {
+                            tvSpots.setText("Unlimited");
                         } else {
-                            tvSpots.setText("N/A");
+                            waitlistCountListener = db.collection("events").document(firestoreDocId).collection("waitingList")
+                                    .addSnapshotListener((snapshots, firestoreException) -> {
+                                        // Error handler
+                                        if (firestoreException != null || snapshots == null || !isAdded() || getContext() == null) {
+                                            return;
+                                        }
+
+                                        int currentWaitListSize = snapshots.size();
+                                        int remainingSpots = (int)(maxSpots - currentWaitListSize);
+                                        tvSpots.setText(String.valueOf(Math.max(0, remainingSpots)));
+
+                                    });
                         }
 
                         // Organizer
@@ -291,7 +300,9 @@ public class EventDetailsFragment extends DialogFragment {
 
     /**
      * This Method manages the checking of whether the user has already joined the waiting list, it shows the correct view
-     * depending on if the user is signed up or not
+     * depending on if the user is signed up or not.
+     * Note instead of using this function, the work has been transferred over to "checkStatusAndShowUI"
+     * This function is here in case its needed in the future.
      * @param registerBtn
      *  The instance of the register button, needs to be shown or hidden
      * @param cancelBtn
@@ -374,6 +385,7 @@ public class EventDetailsFragment extends DialogFragment {
                                 registerBtn.setVisibility(View.GONE);
                                 cancelBtn.setVisibility(View.VISIBLE);
                                 cancelBtn.setText("Leave waiting list");
+                                eventFull.setVisibility(View.GONE);
                                 textViewAlreadyRegistered.setVisibility(View.VISIBLE);
 
                                 // Save location if geolocation is required (fire-and-forget after join)
@@ -594,8 +606,9 @@ public class EventDetailsFragment extends DialogFragment {
             if (statusListener != null) {
                 statusListener.remove();
             }
-
-
+            if (waitlistCountListener != null) {
+                waitlistCountListener.remove();
+            }
     }
 
 
