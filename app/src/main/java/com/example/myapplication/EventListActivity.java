@@ -224,10 +224,7 @@ public class EventListActivity extends AppCompatActivity {
                                 && event.getRegEnd().compareTo(now) >= 0;
 
                         if (isActive && (isPublic || isCoOrg || isInvited)) {
-                            eventList.add(event);
-                            if (event.getRegEnd().compareTo(now) >= 0 && isPublic) {
-                                allActiveEvents.add(event);
-                            }
+                            allActiveEvents.add(event);
                         }
                     }
                     applyFilters();

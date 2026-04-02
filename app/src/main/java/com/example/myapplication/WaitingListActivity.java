@@ -135,7 +135,10 @@ public class WaitingListActivity extends AppCompatActivity {
 
                     // Ownership check — field "deviceId" matches EventStore.addEvent()
                     String ownerDeviceId = documentSnapshot.getString("deviceId");
-                    if (ownerDeviceId == null || !ownerDeviceId.equals(deviceId)) {
+                    List<String> coOrganizers = (List<String>) documentSnapshot.get("coOrganizers");
+                    boolean isOwner = ownerDeviceId != null && ownerDeviceId.equals(deviceId);
+                    boolean isCoOrg = coOrganizers != null && coOrganizers.contains(deviceId);
+                    if (!isOwner && !isCoOrg) {
                         Toast.makeText(this, "Access denied: you are not the organizer of this event.", Toast.LENGTH_SHORT).show();
                         finish();
                         return;
