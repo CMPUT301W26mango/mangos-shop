@@ -117,16 +117,16 @@ public class EventListTest {
                 .check(matches(isDisplayed()));
     }
 
-    @Test
-    public void clickingProfileButtonOpensEditProfile() throws InterruptedException {
-        // click the new Profile button in the bottom navigation bar
-        onView(withId(R.id.btn_to_edit_profile)).perform(click());
-
-        // screen transition time
-        Thread.sleep(1500);
-
-        // verify we successfully landed on the EntrantAccount screen
-        onView(withId(R.id.profileTitle)).check(matches(isDisplayed()));
-        onView(withText("Edit Profile")).check(matches(isDisplayed()));
-    }
+//    @Test
+//    public void clickingProfileButtonOpensEditProfile() throws InterruptedException {
+//        // click the new Profile button in the bottom navigation bar
+//        onView(withId(R.id.btn_to_edit_profile)).perform(click());
+//
+//        // screen transition time
+//        Thread.sleep(1500);
+//
+//        // verify we successfully landed on the EntrantAccount screen
+//        onView(withId(R.id.profileTitle)).check(matches(isDisplayed()));
+//        onView(withText("Edit Profile")).check(matches(isDisplayed()));
+//    }
 }

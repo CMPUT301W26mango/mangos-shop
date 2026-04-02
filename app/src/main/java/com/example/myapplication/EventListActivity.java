@@ -424,13 +424,6 @@ public class EventListActivity extends BaseActivity {
             maxSpotsInput.setText(String.valueOf(activeMaxSpots));
         }
 
-        // Restore Date Limits
-        if (activeMinDate != null) {
-            minDateInput.setText(activeMinDate);
-        }
-        if (activeMaxDate != null) {
-            maxDateInput.setText(activeMaxDate);
-        }
 
         // Restore Selected Categories (Chips)
         if (activeCategories != null && !activeCategories.isEmpty()) {

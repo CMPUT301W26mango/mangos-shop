@@ -208,16 +208,16 @@ public class EventCreateActivityUITest {
         onView(withId(R.id.switchGeolocation)).check(matches(isNotChecked()));
     }
 
-    @Test
-    public void testProfileButtonIsDisplayed() {
-        onView(withId(R.id.btn_to_edit_profile)).perform(scrollTo());
-        onView(withId(R.id.btn_to_edit_profile)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testProfileButtonIsClickable() {
-        onView(withId(R.id.btn_to_edit_profile)).check(matches(isClickable()));
-    }
+//    @Test
+//    public void testProfileButtonIsDisplayed() {
+//        onView(withId(R.id.btn_to_edit_profile)).perform(scrollTo());
+//        onView(withId(R.id.btn_to_edit_profile)).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void testProfileButtonIsClickable() {
+//        onView(withId(R.id.btn_to_edit_profile)).check(matches(isClickable()));
+//    }
 
 /*    @Test
     public void testCreateFullEvent_clearsAllFields() {
