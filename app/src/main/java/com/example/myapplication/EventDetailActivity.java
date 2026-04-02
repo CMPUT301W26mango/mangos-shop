@@ -238,19 +238,40 @@ public class EventDetailActivity extends AppCompatActivity {
     private Marker createVisibleMarker(MapView map, GeoPoint point, String title) {
         Marker marker = new Marker(map);
         marker.setPosition(point);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
-        int size = (int) (30 * getResources().getDisplayMetrics().density);
-        android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+        float density = getResources().getDisplayMetrics().density;
+        int w = Math.round(30 * density);
+        int h = Math.round(45 * density);
+
+        android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
         android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
-        android.graphics.Paint paint = new android.graphics.Paint();
+        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        float cx = w / 2f;
+        float circleCenterY = 15 * density;
+        float circleRadius = 13 * density;
+
+        // Draw red triangle (pin tip) first so circle overlaps the seam
         paint.setColor(android.graphics.Color.RED);
-        paint.setAntiAlias(true);
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint);
-        paint.setColor(android.graphics.Color.WHITE);
+        paint.setStyle(android.graphics.Paint.Style.FILL);
+        android.graphics.Path path = new android.graphics.Path();
+        path.moveTo(cx - 8 * density, circleCenterY + circleRadius * 0.7f);
+        path.lineTo(cx + 8 * density, circleCenterY + circleRadius * 0.7f);
+        path.lineTo(cx, h);
+        path.close();
+        canvas.drawPath(path, paint);
+
+        // Draw filled red circle (pin head)
+        paint.setStyle(android.graphics.Paint.Style.FILL);
+        paint.setColor(android.graphics.Color.RED);
+        canvas.drawCircle(cx, circleCenterY, circleRadius, paint);
+
+        // Draw white border on circle
         paint.setStyle(android.graphics.Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint);
+        paint.setColor(android.graphics.Color.WHITE);
+        paint.setStrokeWidth(2 * density);
+        canvas.drawCircle(cx, circleCenterY, circleRadius, paint);
 
         marker.setIcon(new android.graphics.drawable.BitmapDrawable(getResources(), bmp));
         marker.setTitle(title);

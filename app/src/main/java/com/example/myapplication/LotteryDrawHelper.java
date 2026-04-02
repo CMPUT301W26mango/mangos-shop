@@ -321,11 +321,12 @@ public class LotteryDrawHelper {
                                                     + ". Please go to the event page to accept or reject your entry.";
 
                                             Map<String, Object> notifData = new HashMap<>();
-                                            notifData.put("recipientDeviceId", pickedId);
-                                            notifData.put("message", notifMessage);
                                             notifData.put("eventId", eventId);
-                                            notifData.put("timestamp", Timestamp.now());
+                                            notifData.put("eventName", displayTitle);
+                                            notifData.put("notiName", "Lottery Winner!");
+                                            notifData.put("description", notifMessage);
                                             notifData.put("read", false);
+                                            notifData.put("timestamp", Timestamp.now());
 
                                             db.collection("users").document(pickedId)
                                                     .collection("notifications")
