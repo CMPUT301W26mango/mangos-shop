@@ -507,6 +507,8 @@ public class EventCreateActivity extends AppCompatActivity {
 
                 if (!waitingListText.isEmpty()) {
                     event.setMaxWaitingListSize(Integer.parseInt(waitingListText));
+                } else {
+                    event.setMaxWaitingListSize(-1);
                 }
 
                 boolean geoRequired = geoSwitch.isChecked();
