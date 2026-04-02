@@ -116,6 +116,7 @@ public class EventListActivity extends BaseActivity {
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
         btnFilter = findViewById(R.id.btnFilter);
+        LinearLayout myEventsNav = findViewById(R.id.nav_my_events);
 //        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
@@ -123,7 +124,7 @@ public class EventListActivity extends BaseActivity {
         displayedEvents = new ArrayList<>();
 
 
-        adapter = new EventAdapter(displayedEvents, getSupportFragmentManager());
+        adapter = new EventAdapter(displayedEvents, getSupportFragmentManager(), false);
 
         db = FirebaseFirestore.getInstance();
         loadEvents();
@@ -132,6 +133,10 @@ public class EventListActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
 
+        myEventsNav.setOnClickListener(v -> {
+            Intent intent = new Intent(EventListActivity.this, MyEventsActivity.class);
+            startActivity(intent);
+        });
 
         lotteryinfoButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
@@ -211,27 +216,52 @@ public class EventListActivity extends BaseActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     allActiveEvents.clear();
                     eventList.clear();
+
+                    List<Event> pendingEvents = new ArrayList<>();
+
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Event event = doc.toObject(Event.class);
                         event.setId(doc.getId());
 
                         boolean isPublic = !Boolean.TRUE.equals(event.getPrivateEvent());
-                        boolean isCoOrg = event.getCoOrganizers() != null
-                                && event.getCoOrganizers().contains(deviceId);
-                        boolean isInvited = event.getInvitedUsers() != null
-                                && event.getInvitedUsers().contains(deviceId);
-                        boolean isActive = event.getRegEnd() != null
-                                && event.getRegEnd().compareTo(now) >= 0;
+                        boolean isCoOrg = event.getCoOrganizers() != null && event.getCoOrganizers().contains(deviceId);
+                        boolean isInvited = event.getInvitedUsers() != null && event.getInvitedUsers().contains(deviceId);
+                        boolean isActive = event.getRegEnd() != null && event.getRegEnd().compareTo(now) >= 0;
 
-                        if (isActive && (isPublic || isCoOrg || isInvited)) {
-                            allActiveEvents.add(event);
+                        if (isActive && isPublic) {
+                            if (isCoOrg || isInvited) {
+                            } else {
+                                pendingEvents.add(event);
+                            }
                         }
                     }
-                    applyFilters();
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e ->
-                        Log.e("EventListActivity", "Error loading events", e));
+
+                    // If there's nothing to check, just update the screen
+                    if (pendingEvents.isEmpty()) {
+                        applyFilters();
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    int[] checkedCount = {0};
+                    for (Event e : pendingEvents) {
+                        db.collection("events").document(e.getId()).collection("waitingList").document(deviceId).get()
+                                .addOnCompleteListener(task -> {
+                                    checkedCount[0]++;
+
+                                    boolean isOnWaitlist = task.isSuccessful() && task.getResult() != null && task.getResult().exists();
+
+                                    if (!isOnWaitlist) {
+                                        allActiveEvents.add(e);
+                                    }
+
+                                    if (checkedCount[0] == pendingEvents.size()) {
+                                        applyFilters();
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+                    }
+                }).addOnFailureListener(e -> Log.e("EventListActivity", "Error loading events", e));
     }
 
     private void launchQRScanner() {

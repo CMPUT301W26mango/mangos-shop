@@ -37,6 +37,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     FragmentManager fragmentManager;
     private FirebaseFirestore db;
 
+    private boolean isMyEventsTab;
+
     /**
     * This is the Constructor for the Adapter, it initializes the event list and the fragment manager
     * @param
@@ -46,12 +48,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      *          The fragment mangager for the eventDetails
     * */
 
-    public EventAdapter(List<Event> eventList, FragmentManager fragmentManager){
-
-
+    public EventAdapter(List<Event> eventList, FragmentManager fragmentManager, boolean isMyEventsTab){
         this.eventList = eventList;
         this.fragmentManager = fragmentManager;
         this.db = FirebaseFirestore.getInstance();
+        this.isMyEventsTab = isMyEventsTab;
     }
 
 
@@ -114,83 +115,89 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         holder.eventStatus.setVisibility(View.GONE);
 
-        String deviceId = Settings.Secure.getString(
-                holder.itemView.getContext().getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-
-        // Check if co-organizer and show badge
-        List<String> coOrgs = event.getCoOrganizers();
-        if (coOrgs != null && coOrgs.contains(deviceId)) {
-            holder.RoleBadge.setVisibility(View.VISIBLE);
-            holder.eventStatus.setVisibility(View.GONE); // no status needed for co-org
-        } else {
-            holder.RoleBadge.setVisibility(View.GONE);
-        }
-
-        String firestoreDocId = event.getId();
-        if (firestoreDocId != null && !firestoreDocId.isEmpty()) {
-            db.collection("events")
-                    .document(firestoreDocId)
-                    .collection("waitingList")
-                    .document(deviceId)
-                    .addSnapshotListener((doc, e) -> {
-
-                        if (e != null || doc == null) return;
 
 
-                        com.google.android.material.card.MaterialCardView card =
-                                (com.google.android.material.card.MaterialCardView) holder.eventCardRoot;
+        com.google.android.material.card.MaterialCardView card =
+                (com.google.android.material.card.MaterialCardView) holder.eventCardRoot;
 
-                        if (doc != null && doc.exists()) {
-                            String status = doc.getString("status");
-                            if (status == null) status = "waiting";
+        if (isMyEventsTab) {
+            String deviceId = Settings.Secure.getString(
+                    holder.itemView.getContext().getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
 
-                            holder.eventStatus.setVisibility(View.VISIBLE);
+            List<String> coOrgs = event.getCoOrganizers();
+            if (coOrgs != null && coOrgs.contains(deviceId)) {
+                holder.RoleBadge.setVisibility(View.VISIBLE);
+                holder.eventStatus.setVisibility(View.GONE);
+            } else {
+                holder.RoleBadge.setVisibility(View.GONE);
+            }
+
+            String firestoreDocId = event.getId();
+            if (firestoreDocId != null && !firestoreDocId.isEmpty()) {
+                db.collection("events")
+                        .document(firestoreDocId)
+                        .collection("waitingList")
+                        .document(deviceId)
+                        .addSnapshotListener((doc, e) -> {
+
+                            if (e != null || doc == null) return;
 
 
+                            if (doc != null && doc.exists()) {
+                                String status = doc.getString("status");
+                                if (status == null) status = "waiting";
 
-                            card.setStrokeWidth(8);
-
-                            if (status.equals("selected")) {
-                                holder.eventStatus.setText("Status: Selected");
-                                holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
-                                card.setStrokeColor(Color.parseColor("#FFBF00"));
-                            } else if (status.equals("accepted")) {
-                                holder.eventStatus.setText("Status: Accepted");
-                                holder.eventStatus.setTextColor(Color.parseColor("#008000"));
-                                card.setStrokeColor(Color.parseColor("#008000"));
-                            } else if (status.equals("rejected")) {
-                                holder.eventStatus.setText("Status: Rejected");
-                                holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
-                                card.setStrokeColor(Color.parseColor("#FF0000"));
-                            } else if (status.equals("waiting")) {
-                                holder.eventStatus.setText("Status: Waiting");
-                                holder.eventStatus.setTextColor(Color.parseColor("#000000"));
-                                card.setStrokeColor(Color.parseColor("#000000")); // Black Border
-                            }
-
-                        } else {
-                            // user not in waiting list
-                            // Check if they are in the invitedUsers array of the main event
-                            List<String> invitedUsers = event.getInvitedUsers();
-
-                            if (invitedUsers != null && invitedUsers.contains(deviceId)) {
-                                // show invited status
                                 holder.eventStatus.setVisibility(View.VISIBLE);
-                                holder.eventStatus.setText("Status: Invited");
-                                holder.eventStatus.setTextColor(Color.parseColor("#800080")); // Purple
+
 
                                 card.setStrokeWidth(8);
-                                card.setStrokeColor(Color.parseColor("#800080")); // Purple Border
-                            } else {
-                                // regular event not join
-                                holder.eventStatus.setVisibility(View.GONE);
-                                card.setStrokeWidth(0);
-                            }
-                        }
-                    });
-        }
 
+                                if (status.equals("selected")) {
+                                    holder.eventStatus.setText("Status: Selected");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#FFBF00"));
+                                    card.setStrokeColor(Color.parseColor("#FFBF00"));
+                                } else if (status.equals("accepted")) {
+                                    holder.eventStatus.setText("Status: Accepted");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#008000"));
+                                    card.setStrokeColor(Color.parseColor("#008000"));
+                                } else if (status.equals("rejected")) {
+                                    holder.eventStatus.setText("Status: Rejected");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#FF0000"));
+                                    card.setStrokeColor(Color.parseColor("#FF0000"));
+                                } else if (status.equals("waiting")) {
+                                    holder.eventStatus.setText("Status: Waiting");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#000000"));
+                                    card.setStrokeColor(Color.parseColor("#000000")); // Black Border
+                                }
+
+                            } else {
+                                // user not in waiting list
+                                // Check if they are in the invitedUsers array of the main event
+                                List<String> invitedUsers = event.getInvitedUsers();
+
+                                if (invitedUsers != null && invitedUsers.contains(deviceId)) {
+                                    // show invited status
+                                    holder.eventStatus.setVisibility(View.VISIBLE);
+                                    holder.eventStatus.setText("Status: Invited");
+                                    holder.eventStatus.setTextColor(Color.parseColor("#800080")); // Purple
+
+                                    card.setStrokeWidth(8);
+                                    card.setStrokeColor(Color.parseColor("#800080")); // Purple Border
+                                } else {
+                                    // regular event not join
+                                    holder.eventStatus.setVisibility(View.GONE);
+                                    card.setStrokeWidth(0);
+                                }
+                            }
+                        });
+            }
+        }
+        else {
+            holder.RoleBadge.setVisibility(View.GONE);
+            holder.eventStatus.setVisibility(View.GONE);
+            card.setStrokeWidth(0);
+        }
 
         // Open the comments when the image is clicked
         holder.viewCommentsBtn.setOnClickListener(v -> {
