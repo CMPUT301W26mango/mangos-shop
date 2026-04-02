@@ -93,6 +93,17 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/RoleBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="ROLE: CO-ORGANIZER"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                android:visibility="gone" />
+
 
 
         </LinearLayout>

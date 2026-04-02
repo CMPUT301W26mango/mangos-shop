@@ -118,6 +118,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 holder.itemView.getContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
+        // Check if co-organizer and show badge
+        List<String> coOrgs = event.getCoOrganizers();
+        if (coOrgs != null && coOrgs.contains(deviceId)) {
+            holder.RoleBadge.setVisibility(View.VISIBLE);
+            holder.eventStatus.setVisibility(View.GONE); // no status needed for co-org
+        } else {
+            holder.RoleBadge.setVisibility(View.GONE);
+        }
+
         String firestoreDocId = event.getId();
         if (firestoreDocId != null && !firestoreDocId.isEmpty()) {
             db.collection("events")
@@ -232,6 +241,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView eventStatus;
         ImageButton viewCommentsBtn;
 
+        TextView RoleBadge;
+
         /**
          * Initializes all the UI elements in this object
          * @param itemView
@@ -247,6 +258,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             eventStatus = itemView.findViewById(R.id.eventStatus);
             eventCardRoot = itemView.findViewById(R.id.eventCardRoot);
             viewCommentsBtn = itemView.findViewById(R.id.viewCommentsBtn);
+            RoleBadge = itemView.findViewById(R.id.RoleBadge);
 
         }
     }
