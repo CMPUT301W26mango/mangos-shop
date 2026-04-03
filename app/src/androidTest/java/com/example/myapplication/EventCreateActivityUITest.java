@@ -6,27 +6,42 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasType;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static org.hamcrest.Matchers.allOf;
+
+import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.intent.Intents;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * The following test file was written with the guidance of Gemini AI
- * Prompt: "Guide me with writing tests for Event" April 2, 2026
+ * Prompt: "Guide me with writing tests for Event creation page" April 2, 2026
  */
 
 /**
@@ -35,6 +50,17 @@ import org.junit.runner.RunWith;
  */
 @RunWith(AndroidJUnit4.class)
 public class EventCreateActivityUITest {
+
+
+    @Before
+    public void setUp() {
+        Intents.init();
+    }
+
+    @After
+    public void tearDown() {
+        Intents.release();
+    }
 
     @Rule
     public ActivityScenarioRule<EventCreateActivity> activityRule =
@@ -115,5 +141,46 @@ public class EventCreateActivityUITest {
                     .perform(scrollTo())
                     .check(matches(withText("Update")));
         }
+    }
+
+    /**
+     * Upload button should be there with proper text
+     */
+    @Test
+    public void testUploadButtonInitialState() {
+        onView(withId(R.id.upload_poster_button))
+                .perform(scrollTo())
+                .check(matches(isDisplayed()))
+                .check(matches(withText("Upload Poster Image")));
+    }
+
+
+    /**
+     * Poster preview image should be hidden by default before any image is selected
+     */
+    @Test
+    public void testPosterPreview_hiddenByDefault() {
+        onView(withId(R.id.poster_image_preview))
+                .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+    }
+
+    /**
+     * Upload poster button should be clickable
+     */
+    @Test
+    public void testUploadPosterButton_isClickable() {
+        onView(withId(R.id.upload_poster_button))
+                .perform(scrollTo())
+                .check(matches(isClickable()));
+    }
+
+    /**
+     * Create button should be visible before any upload is started
+     */
+    @Test
+    public void testCreateButton_visibleBeforeUpload() {
+        onView(withId(R.id.create_event_button))
+                .perform(scrollTo())
+                .check(matches(isDisplayed()));
     }
 }
