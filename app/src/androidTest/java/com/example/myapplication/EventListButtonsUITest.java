@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -9,6 +10,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,6 +24,12 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class EventListButtonsUITest {
+
+    @Rule
+    public GrantPermissionRule permissionRule =
+            GrantPermissionRule.grant(
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                    android.Manifest.permission.CAMERA);
 
     @Rule
     public ActivityScenarioRule<EventListActivity> activityRule =
@@ -66,9 +74,18 @@ public class EventListButtonsUITest {
     }
 
     // Checks if QR scanner button can be clicked without crashing
+
     @Test
     public void testScanQRButtonIsClickable() {
         onView(withId(R.id.scanQRButton))
                 .perform(click());
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        pressBack();
     }
 }
