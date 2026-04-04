@@ -569,6 +569,8 @@ public class EventDetailsFragment extends DialogFragment {
      * @param invitedMsg           TextView shown when device is invited to private event.
      * @param acceptInvBtn         Button to accept a private event invitation.
      * @param declineInvBtn        Button to decline a private event invitation.
+     *
+     * @author Ali
      */
     private void checkStatusAndShowUI(Button registerBtn, Button cancelBtn,
                                       Button acceptBtn,
@@ -685,6 +687,8 @@ public class EventDetailsFragment extends DialogFragment {
      * @param tvSelectedMessage  The selected message to hide on success.
      * @param tvAcceptedMessage  The accepted message to show on success.
      * @param tvDeclinedMessage  The declined message to hide on success.
+     *
+     * @author Ali
      */
     private void acceptSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         db.collection("events").document(firestoreDocId)
@@ -717,6 +721,8 @@ public class EventDetailsFragment extends DialogFragment {
      * @param tvSelectedMessage  The selected message to hide on success.
      * @param tvAcceptedMessage  The accepted message to hide on success.
      * @param tvDeclinedMessage  The declined message to show on success.
+     *
+     * @author Ali
      */
     private void declineSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         db.collection("events").document(firestoreDocId)
@@ -773,6 +779,9 @@ public class EventDetailsFragment extends DialogFragment {
      * @param acceptInvBtn  The accept invite button to hide on success.
      * @param declineInvBtn The decline invite button to hide on success.
      * @param invitedMsg    The invite message TextView to hide on success.
+     *
+     *
+     * @author Ali
      */
     private void declinePrivInvitation(Button acceptInvBtn, Button declineInvBtn, TextView invitedMsg) {
         db.collection("events").document(firestoreDocId)
