@@ -271,6 +271,25 @@ public class EventListActivity extends BaseActivity {
                 }).addOnFailureListener(e -> Log.e("EventListActivity", "Error loading events", e));
     }
 
+
+    /**
+     * Configures and launches the ZXing QR code scanner activity.
+     *
+     * Sets up the scanner with the following options: 
+     *  
+     *    Prompt text — "Press back to cancel" shown on the scanner screen 
+     *    Beep disabled — no sound plays on successful scan 
+     *    Orientation unlocked — scanner works in both portrait and landscape 
+     *    Barcode image disabled — scanned image is not saved to storage 
+     *  
+     *
+     * On a successful scan, the result is handled by scannerLauncher which
+     * extracts the scanned value and passes it as an eventId to EventDetailsFragment. 
+     *
+     * If the user presses back, the scan is cancelled and a toast is shown.
+     *
+     * @author Ali
+     */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Press back to cancel");

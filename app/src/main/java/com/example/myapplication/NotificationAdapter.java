@@ -23,10 +23,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 
 /**
- * Adapter for the notifications RecyclerView.
- * Handles two notification types:
- * - invitation to waiting list of private event
- * - invitation to co-organize event
+ * RecyclerView adapter for displaying notifications to the entrant.
+ *
+ * Handles the following notification types:
+ *   - Invitation to join the waiting list of a private event
+ *   - Invitation to be a co-organizer for an event
+ *
+ * Each notification card shows the notification name, a relative timestamp,
+ * a description with a clickable "here" link that opens the EventDetailsFragment,
+ * an unread indicator dot, and a delete button to remove the notification.
+ *
+ * Clicking "here" in the description marks the notification as read in Firestore
+ * and opens the corresponding event details popup.
+ *
+ * @author Ali
  */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
@@ -35,6 +45,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private FirebaseFirestore db;
     private String deviceId;
 
+    /**
+     * Constructs a new NotificationAdapter.
+     *
+     * @param notificationList The list of NotificationItem objects to display.
+     * @param fragmentManager  The FragmentManager used to show EventDetailsFragment.
+     * @param db               The FirebaseFirestore instance for read/write operations.
+     * @param deviceId         The current device's unique identifier used to scope
+     *                         Firestore operations to the correct user.
+     * @author Ali
+     */
     public NotificationAdapter(List<NotificationItem> notificationList,
                                FragmentManager fragmentManager,
                                FirebaseFirestore db,
@@ -45,6 +65,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.deviceId = deviceId;
     }
 
+
+    /**
+     * Called when RecyclerView needs a new NotificationViewHolder.
+     * Inflates the item_notification layout for each notification card.
+     *
+     * @param parent   The ViewGroup into which the new View will be added.
+     * @param viewType The view type of the new View.
+     * @return A new NotificationViewHolder holding the inflated notification card view.
+     * @author Ali
+     */
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,19 +83,39 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return new NotificationViewHolder(view);
     }
 
+    /**
+     * Binds notification data to the ViewHolder at the given position.
+     *
+     * Sets the notification name, relative timestamp, and description text.
+     * The description includes a clickable "here" span that opens EventDetailsFragment
+     * for the associated event and marks the notification as read in Firestore.
+     *
+     * Shows or hides the unread indicator dot based on the notification's read status.
+     * Sets up the delete button to remove the notification from Firestore.
+     *
+     * The clickable "here" span implementation was written with the guidance of Claude AI.
+     * Prompt: "How do I make a certain part of a textview lead to another fragment when clicked"
+     * Date: 2026-04-02
+     *
+     * @param holder   The ViewHolder to update with data at the given position.
+     * @param position The position of the item in the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
+        // get notification item
         NotificationItem item = notificationList.get(position);
 
-
+        // get notification name
         holder.notificationName.setText(item.getNotiName());
 
+        // show unread dot if notification not seen by user, else its invisible
         if (!item.isRead()) {
             holder.unreadDot.setVisibility(View.VISIBLE);
         } else {
             holder.unreadDot.setVisibility(View.GONE);
         }
 
+        // get time and make it relative to user seeing notification
         if (item.getNotiTime() != null) {
             long timeInMillis = item.getNotiTime().toDate().getTime();
             long now = System.currentTimeMillis();
@@ -80,7 +130,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.notificationTime.setText("");
         }
 
-
+        // create string to store message
         String description = item.getDescription() + " for " + item.getEventName() + "\n Click here to view more details.";
 
         SpannableString ss = new SpannableString(description);
@@ -92,6 +142,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 // Initialize  fragment
                 EventDetailsFragment fragment = new EventDetailsFragment();
 
+                // make notification read after user clicks details
                 item.setRead(true);
                 holder.unreadDot.setVisibility(View.GONE);
 
@@ -124,7 +175,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             }
         };
 
-
+        // layout index of where to click
         int startIndex = description.indexOf("here");
         int endIndex = startIndex + 4;
 
@@ -155,11 +206,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
 
+    /**
+     * Returns the total number of notifications in the list.
+     *
+     * @return The size of the notification list, or 0 if the list is null.
+     * @author Ali
+     */
     @Override
     public int getItemCount() {
         return notificationList != null ? notificationList.size() : 0;
     }
 
+    /**
+     * ViewHolder class that caches references to the UI components of a notification card.
+     * Improves RecyclerView performance by avoiding repeated findViewById calls.
+     * @author Ali
+     */
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
 
         TextView notificationName;
@@ -171,6 +233,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         ImageView clearSingleBtn;
 
+        /**
+         * Initializes the ViewHolder and binds all UI component references
+         * from the notification card layout.
+         *
+         * @param itemView The inflated view for a single notification card.
+         * @author Ali
+         */
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             notificationName = itemView.findViewById(R.id.notification_name);
