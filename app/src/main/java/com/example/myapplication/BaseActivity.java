@@ -10,6 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+/**
+ * A foundational Activity class intended to be extended by other activities in the application.
+ * It provides global functionalities, such as real-time monitoring of user role changes
+ * in Firebase Firestore, ensuring consistent security and navigation state across the app.
+ */
 public class BaseActivity extends AppCompatActivity {
 
     protected FirebaseFirestore db;
@@ -24,6 +29,11 @@ public class BaseActivity extends AppCompatActivity {
         startGlobalRoleListener();
     }
 
+    /**
+     * Initializes a global SnapshotListener to monitor the user's Firestore profile document.
+     * If the 'isAdmin' flag or 'role' field updates to Admin, the application seamlessly
+     * redirects the user to the Admin Dashboard, regardless of their current active screen.
+     */
     private void startGlobalRoleListener() {
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -59,6 +69,10 @@ public class BaseActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Safely removes the Firestore SnapshotListener when the Activity is destroyed
+     * to prevent memory leaks and background application crashes.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

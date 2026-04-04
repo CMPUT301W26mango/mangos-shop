@@ -274,4 +274,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+    /**
+     * Updates the adapter's data set with a filtered list and refreshes the UI.
+     * @param newList The filtered list of events matching the search query.
+     */
+    public void updateList(List<Event> newList) {
+        this.eventList = newList;
+        notifyDataSetChanged();
+    }
+
 }
