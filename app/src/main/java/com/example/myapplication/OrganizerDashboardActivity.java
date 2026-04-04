@@ -192,8 +192,15 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                         notifData.put("read", false);
                         notifData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
 
-                        FirebaseFirestore.getInstance().collection("users").document(entrantDeviceId)
-                                .collection("notifications").add(notifData);
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("users")
+                                .document(entrantDeviceId)
+                                .collection("notifications")
+                                .add(notifData);
+                        Map<String, Object> logData = new HashMap<>(notifData);
+                        logData.put("recipientId", entrantDeviceId);
+                        db.collection("notifications")
+                                .add(logData);
                         sentCount++;
                     }
                     Toast.makeText(this, "Notification sent to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
