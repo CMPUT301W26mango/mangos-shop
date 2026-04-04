@@ -32,6 +32,9 @@ public class UserProfileActivity extends BaseActivity {
      * Establishes connections to Firestore and Firebase Storage, then retrieves and populates
      * the user's current profile data in a single database call.
      *
+     * Written with the assistance of Gemini
+     * Prompt used : "how can I upload images to firebase to make it appear on app?"
+     *
      * @param savedInstanceState If the activity is being re-initialized after previously
      * being shut down, this contains the most recent data.
      */
@@ -73,7 +76,7 @@ public class UserProfileActivity extends BaseActivity {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         android.net.Uri croppedUri = result.getData().getParcelableExtra("croppedUri");
 
-                        // Show the image instantly using Glide (make it a circle!)
+                        // circle it
                         com.bumptech.glide.Glide.with(this)
                                 .load(croppedUri)
                                 .circleCrop()
@@ -176,6 +179,9 @@ public class UserProfileActivity extends BaseActivity {
     /**
      * Removes the user's profile picture by deleting the image file from Firebase Storage
      * and removing the URL reference from my Firestore document. Reverts UI to default.
+     *
+     * Written with the assistance of Gemini
+     * Prompt used : "how can I upload images to firebase to make it appear on app?"
      */
     private void removeProfilePicture() {
         // Remove the URL from Firestore using FieldValue.delete()
