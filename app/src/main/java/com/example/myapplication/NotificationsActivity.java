@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Activity that displays all notifications for the current entrant
+ * Activity responsible for managing and displaying the user's notifications.
+ * This class fetches real-time updates from Firestore, maps them to NotificationItem models,
+ * and provides functionality to clear individual or all notifications.
  */
 public class NotificationsActivity extends BaseActivity {
 
@@ -29,6 +31,13 @@ public class NotificationsActivity extends BaseActivity {
     private FirebaseFirestore db;
     private String deviceId;
 
+    /**
+     * Initializes the activity, sets the content view, and configures the UI components.
+     * Establishes the connection to the RecyclerView and attaches the custom NotificationAdapter.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     * being shut down, this contains the most recent data.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +63,9 @@ public class NotificationsActivity extends BaseActivity {
     }
 
     /**
-     * Loads notifications from Firestore for the current device
-     * ordered by most recent first
+     * Retrieves the user's notifications from the Firestore database in real-time.
+     * Attaches a snapshot listener to the specific user's notification sub-collection,
+     * ordering the results so the most recent notifications appear at the top.
      */
     private void loadNotifications() {
         db.collection("users")
@@ -82,12 +92,12 @@ public class NotificationsActivity extends BaseActivity {
     }
 
     /**
-     * Deletes all notifications in the user's subcollection
+     * Deletes all notifications currently associated with the user's device ID.
+     * Iterates through the current list of notifications and issues a delete command
+     * to Firestore for each respective document.
      */
     private void clearAllNotifications() {
         if (notificationList.isEmpty()) return;
-
-
 
         for (NotificationItem item : notificationList) {
             db.collection("users")
@@ -97,7 +107,6 @@ public class NotificationsActivity extends BaseActivity {
                     .delete()
                     .addOnFailureListener(e -> Log.e("ClearAll", "Failed to delete: " + item.getId()));
         }
-
 
         Toast.makeText(this, "All notifications cleared", Toast.LENGTH_SHORT).show();
     }
