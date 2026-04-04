@@ -116,7 +116,6 @@ public class MyEventsActivity extends BaseActivity {
                 return;
             }
 
-
             int[] checkedCount = {0};
             for (Event e : pendingEvents) {
                 db.collection("events").document(e.getId()).collection("waitingList").document(deviceId).get()
@@ -162,6 +161,8 @@ public class MyEventsActivity extends BaseActivity {
 
     /**
      * Filters the event list based on the user's search query.
+     *
+     * @param query The search
      */
     private void filterEvents(String query) {
         List<Event> filteredList = new ArrayList<>();
