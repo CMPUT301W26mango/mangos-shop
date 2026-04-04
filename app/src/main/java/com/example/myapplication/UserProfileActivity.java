@@ -7,11 +7,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class UserProfileActivity extends AppCompatActivity {
+/**
+ * Activity responsible for displaying and managing the user's main profile.
+ * Handles the retrieval of user data (name, role, profile picture) from Firestore,
+ * and manages the custom cropping and uploading of new profile pictures via Firebase Storage.
+ */
+public class UserProfileActivity extends BaseActivity {
 
     private TextView tvProfileName;
     private TextView tvProfileRole;
@@ -19,9 +22,22 @@ public class UserProfileActivity extends AppCompatActivity {
     private String deviceId;
     private ImageView profileImageView;
     private Button btnUploadProfilePic;
-    private androidx.activity.result.ActivityResultLauncher<android.content.Intent> photoPickerLauncher;
+    private androidx.activity.result.ActivityResultLauncher<String> galleryLauncher;
+    private androidx.activity.result.ActivityResultLauncher<Intent> customCropLauncher;
     private com.google.firebase.storage.FirebaseStorage storage;
+    private Button btnRemoveProfilePic;
 
+    /**
+     * Initializes the activity, binds UI components, and configures image picker launchers.
+     * Establishes connections to Firestore and Firebase Storage, then retrieves and populates
+     * the user's current profile data in a single database call.
+     *
+     * Written with the assistance of Gemini
+     * Prompt used : "how can I upload images to firebase to make it appear on app?"
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     * being shut down, this contains the most recent data.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +48,8 @@ public class UserProfileActivity extends AppCompatActivity {
         tvProfileRole = findViewById(R.id.tvProfileRole);
         profileImageView = findViewById(R.id.profileImageView);
         btnUploadProfilePic = findViewById(R.id.btnUploadProfilePic);
+        btnRemoveProfilePic = findViewById(R.id.btnRemoveProfilePic);
+        btnRemoveProfilePic.setOnClickListener(v -> removeProfilePicture());
         storage = com.google.firebase.storage.FirebaseStorage.getInstance();
 
         // setup firebase and grab the device id
@@ -41,8 +59,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
         // populate the profile screen
         loadUserData();
-        //maybe works now?
-        loadProfilePicture();
 
         // menu click listeners
         findViewById(R.id.rowEditProfile).setOnClickListener(v -> {
@@ -54,32 +70,45 @@ public class UserProfileActivity extends AppCompatActivity {
         });
 
         // Photo picker
-        photoPickerLauncher = registerForActivityResult(
+        customCropLauncher = registerForActivityResult(
                 new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        android.net.Uri imageUri = result.getData().getData();
+                        android.net.Uri croppedUri = result.getData().getParcelableExtra("croppedUri");
 
-                        // Show the image instantly using Glide (make it a circle!)
+                        // circle it
                         com.bumptech.glide.Glide.with(this)
-                                .load(imageUri)
+                                .load(croppedUri)
                                 .circleCrop()
                                 .into(profileImageView);
 
                         // Upload it to Firebase
-                        uploadProfilePicture(imageUri);
+                        uploadProfilePicture(croppedUri);
                     }
                 }
         );
 
-        // Gallarey for the photo
+        galleryLauncher = registerForActivityResult(
+                new androidx.activity.result.contract.ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        Intent intent = new Intent(this, CustomCropActivity.class);
+                        intent.putExtra("imageUri", uri);
+                        customCropLauncher.launch(intent);
+                    }
+                }
+        );
+
         btnUploadProfilePic.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_PICK);
-            intent.setType("image/*");
-            photoPickerLauncher.launch(intent);
+            galleryLauncher.launch("image/*");
         });
     }
 
+    /**
+     * Retrieves the user's data from Firestore, including name, role, and profile image URL.
+     * Populates the UI fields and loads the image via Glide if available, utilizing a single
+     * document read to optimize database performance.
+     */
     private void loadUserData() {
         db.collection("users").document(deviceId).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
@@ -93,6 +122,18 @@ public class UserProfileActivity extends AppCompatActivity {
                 // update role
                 if (doc.contains("role")) {
                     tvProfileRole.setText(doc.getString("role"));
+                }
+                // Update profile picture
+                if (doc.contains("profileImageUrl")) {
+                    String imageUrl = doc.getString("profileImageUrl");
+                    if (imageUrl != null && !imageUrl.isEmpty()) {
+                        profileImageView.setPadding(0, 0, 0, 0);
+                        com.bumptech.glide.Glide.with(this)
+                                .load(imageUrl)
+                                .placeholder(android.R.color.darker_gray)
+                                .circleCrop()
+                                .into(profileImageView);
+                    }
                 }
             }
         }).addOnFailureListener(e -> Log.e("UserProfile", "Failed to load user data", e));
@@ -136,22 +177,31 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Retrieves the user's profile image URL from Firestore and displays it using Glide.
-     * Should be called in onCreate() or alongside loading other user data.
+     * Removes the user's profile picture by deleting the image file from Firebase Storage
+     * and removing the URL reference from my Firestore document. Reverts UI to default.
+     *
+     * Written with the assistance of Gemini
+     * Prompt used : "how can I upload images to firebase to make it appear on app?"
      */
-    private void loadProfilePicture() {
-        db.collection("users").document(deviceId).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists() && documentSnapshot.contains("profileImageUrl")) {
-                String imageUrl = documentSnapshot.getString("profileImageUrl");
+    private void removeProfilePicture() {
+        // Remove the URL from Firestore using FieldValue.delete()
+        db.collection("users").document(deviceId)
+                .update("profileImageUrl", com.google.firebase.firestore.FieldValue.delete())
+                .addOnSuccessListener(aVoid -> {
+                    // Clear Glide and revert the ImageView to the placeholder
+                    com.bumptech.glide.Glide.with(this).clear(profileImageView);
+                    profileImageView.setPadding(24, 24, 24, 24);
+                    profileImageView.setImageResource(android.R.drawable.ic_menu_myplaces);
 
-                if (imageUrl != null && !imageUrl.isEmpty()) {
-                    com.bumptech.glide.Glide.with(this)
-                            .load(imageUrl)
-                            .placeholder(android.R.color.darker_gray)
-                            .circleCrop()
-                            .into(profileImageView);
-                }
-            }
-        });
+                    android.widget.Toast.makeText(this, "Profile picture removed", android.widget.Toast.LENGTH_SHORT).show();
+
+                    // Delete the actual file from Firebase Storage to save space
+                    storage.getReference().child("profile_pictures/" + deviceId + ".jpg").delete()
+                            .addOnFailureListener(e -> Log.e("ProfilePic", "Failed to delete storage file", e));
+                })
+                .addOnFailureListener(e -> {
+                    android.widget.Toast.makeText(this, "Failed to remove picture", android.widget.Toast.LENGTH_SHORT).show();
+                    Log.e("ProfilePic", "Failed to update Firestore", e);
+                });
     }
 }
