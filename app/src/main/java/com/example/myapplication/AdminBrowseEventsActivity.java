@@ -61,6 +61,7 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
 
         buttonBrowseProfiles.setOnClickListener(v -> {
             Intent intent = new Intent(this, AdminBrowseProfilesActivity.class);
+            intent.putExtra("userId", getIntent().getStringExtra("userId"));
             startActivity(intent);
         });
         buttonBrowseImages.setOnClickListener(v -> {
