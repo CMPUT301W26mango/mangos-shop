@@ -56,9 +56,15 @@
         <activity
             android:name=".AdminBrowseProfilesActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".CustomCropActivity"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
