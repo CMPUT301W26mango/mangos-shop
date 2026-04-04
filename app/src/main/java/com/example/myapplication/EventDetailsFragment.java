@@ -781,7 +781,6 @@ public class EventDetailsFragment extends DialogFragment {
                     if (!isAdded() || getContext() == null) return;
 
                     // Hide invite UI
-                    // Hide invite UI
                     acceptInvBtn.setVisibility(View.GONE);
                     declineInvBtn.setVisibility(View.GONE);
                     invitedMsg.setVisibility(View.GONE);
