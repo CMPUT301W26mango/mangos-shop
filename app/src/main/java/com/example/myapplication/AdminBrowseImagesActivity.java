@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.example.myapplication.Profiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,24 @@ public class AdminBrowseImagesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_browse_images);
+        TextView textViewAdminTitle = findViewById(R.id.textViewAdminTitle);
+
+        Profiles profiles = new Profiles();
+        String userId = profiles.getDeviceId(this);
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("name");
+                        if (name == null || name.isEmpty()) {
+                            name = "Admin";
+                        }
+                        textViewAdminTitle.setText(name);
+                    }
+                });
 
         recyclerView = findViewById(R.id.recyclerViewImages);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -40,17 +59,17 @@ public class AdminBrowseImagesActivity extends AppCompatActivity {
 
         loadImages();
 
-        LinearLayout buttonBrowseEvents = findViewById(R.id.buttonBrowseEvents);
-        LinearLayout buttonBrowseProfiles = findViewById(R.id.buttonBrowseProfiles);
-        LinearLayout buttonLogs = findViewById(R.id.buttonLogs);
+        LinearLayout navEvents = findViewById(R.id.nav_admin_events);
+        LinearLayout navProfiles = findViewById(R.id.nav_admin_profiles);
+        LinearLayout navLogs = findViewById(R.id.nav_admin_logs);
 
-        buttonBrowseEvents.setOnClickListener(v ->
+        navEvents.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminBrowseEventsActivity.class)));
 
-        buttonBrowseProfiles.setOnClickListener(v ->
+        navProfiles.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminBrowseProfilesActivity.class)));
 
-        buttonLogs.setOnClickListener(v ->
+        navLogs.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminLogsActivity.class)));
     }
 
