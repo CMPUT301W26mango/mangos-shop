@@ -42,6 +42,11 @@ public class EntrantAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entrant_account);
 
+        android.widget.ImageButton backButton = findViewById(R.id.btn_back);
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
+
         profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();

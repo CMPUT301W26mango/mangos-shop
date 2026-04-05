@@ -31,6 +31,11 @@ public class NotificationSettingsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_settings);
 
+        android.widget.ImageButton backButton = findViewById(R.id.btn_back);
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
+
         db = FirebaseFirestore.getInstance();
         Profiles profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
