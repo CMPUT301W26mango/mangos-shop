@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -27,10 +29,15 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
 
     private List<AdminEventItem> eventList;
     private OnEventClickListener listener;
+    private String posterURL;
 
     public AdminEventAdapter(List<AdminEventItem> eventList, OnEventClickListener listener) {
         this.eventList = eventList;
         this.listener = listener;
+    }
+
+    public String getPosterURL() {
+        return posterURL;
     }
 
     @NonNull
@@ -57,6 +64,17 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
         }
         holder.textViewEventOrganizer.setText("Organizer: " + organizer);
 
+        String imageUrl = eventItem.getPosterURL();
+
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUrl)
+                    .centerCrop()
+                    .into(holder.imagePoster);
+        } else {
+            holder.imagePoster.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
+
         holder.itemView.setOnClickListener(v -> listener.onEventClick(eventItem));
 
         Button btnComments = holder.itemView.findViewById(R.id.btn_view_comments);
@@ -77,12 +95,14 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
 
     public static class AdminEventViewHolder extends RecyclerView.ViewHolder {
         TextView textViewEventTitle, textViewEventLocation, textViewEventOrganizer;
+        ImageView imagePoster;
 
         public AdminEventViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewEventTitle = itemView.findViewById(R.id.textViewEventTitle);
             textViewEventLocation = itemView.findViewById(R.id.textViewEventLocation);
             textViewEventOrganizer = itemView.findViewById(R.id.textViewEventOrganizer);
+            imagePoster = itemView.findViewById(R.id.imagePoster);
         }
     }
 }

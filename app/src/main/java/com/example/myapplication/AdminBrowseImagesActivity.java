@@ -32,6 +32,8 @@ public class AdminBrowseImagesActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewImages);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        int spacing = (int) (16 * getResources().getDisplayMetrics().density);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, spacing, true));
 
         adapter = new AdminImageAdapter(list, item -> showPopup(item));
         recyclerView.setAdapter(adapter);
