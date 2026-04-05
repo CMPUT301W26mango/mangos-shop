@@ -42,8 +42,8 @@ public class NotificationsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
-        deviceId = Settings.Secure.getString(
-                getContentResolver(), Settings.Secure.ANDROID_ID);
+        Profiles profiles = new Profiles();
+        deviceId = profiles.getDeviceId(this);
 
         db = FirebaseFirestore.getInstance();
 
@@ -75,12 +75,21 @@ public class NotificationsActivity extends BaseActivity {
                     if (e != null || snapshots == null) return;
                     notificationList.clear();
                     for (QueryDocumentSnapshot doc : snapshots) {
+                        String eventId = doc.getString("eventId");
+                        String eventName = doc.getString("eventName");
+
+                        String notiName = doc.getString("notiName");
+                        if (notiName == null) notiName = "Notification";
+
+                        String description = doc.getString("description");
+                        if (description == null) description = "No message";
+
                         NotificationItem item = new NotificationItem(
                                 doc.getId(),
-                                doc.getString("eventId"),
-                                doc.getString("eventName"),
-                                doc.getString("notiName"),
-                                doc.getString("description"),
+                                eventId,
+                                eventName,
+                                notiName,
+                                description,
                                 doc.getTimestamp("timestamp"),
                                 Boolean.TRUE.equals(doc.getBoolean("read"))
                         );

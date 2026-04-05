@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -42,6 +43,17 @@ public class UserProfileActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
+        Button backToAdmin = findViewById(R.id.buttonBackToAdmin);
+
+        backToAdmin.setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences("ROLE_PREF", MODE_PRIVATE);
+            prefs.edit().remove("currentRole").apply();
+
+            Intent intent = new Intent(this, AdminBrowseEventsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
 
         // init views
         tvProfileName = findViewById(R.id.tvProfileName);

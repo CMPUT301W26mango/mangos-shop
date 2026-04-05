@@ -180,6 +180,8 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                     }
 
                     int sentCount = 0;
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
                     for (QueryDocumentSnapshot doc : querySnapshots) {
                         String entrantDeviceId = doc.getId();
 
@@ -191,18 +193,42 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                         notifData.put("description", message); // This maps to what the entrant sees as the message
                         notifData.put("read", false);
                         notifData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                        String senderId = new Profiles().getDeviceId(this);
+                        notifData.put("senderId", senderId);
 
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
                         db.collection("users")
                                 .document(entrantDeviceId)
                                 .collection("notifications")
                                 .add(notifData);
-                        Map<String, Object> logData = new HashMap<>(notifData);
-                        logData.put("recipientId", entrantDeviceId);
-                        db.collection("notifications")
-                                .add(logData);
+
                         sentCount++;
                     }
+
+                    String senderId = new Profiles().getDeviceId(this);
+
+                    db.collection("users")
+                            .get()
+                            .addOnSuccessListener(users -> {
+
+                                String senderName = "Unknown";
+
+                                for (QueryDocumentSnapshot user : users) {
+                                    if (user.getString("name") != null) {
+                                        senderName = user.getString("name");
+                                        break;
+                                    }
+                                }
+
+                                Map<String, Object> logData = new HashMap<>();
+                                logData.put("message", message);
+                                logData.put("eventName", eventName);
+                                logData.put("senderId", senderId);
+                                logData.put("senderName", senderName); // ✅ ADD THIS
+                                logData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+
+                                db.collection("notifications").add(logData);
+                            });
                     Toast.makeText(this, "Notification sent to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to reach entrants", Toast.LENGTH_SHORT).show());

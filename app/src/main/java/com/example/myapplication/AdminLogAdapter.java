@@ -39,7 +39,7 @@ public class AdminLogAdapter extends RecyclerView.Adapter<AdminLogAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         AdminLogItem item = list.get(position);
         holder.msg.setText(item.getMessage());
-        holder.sender.setText("From: " + item.getSender());
+        holder.sender.setText("Event: " + item.getSender());
         holder.time.setText(item.getTime());
     }
 
