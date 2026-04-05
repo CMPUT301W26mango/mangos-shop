@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Sayuj
  */
 
-public class OrganizerDashboardActivity extends AppCompatActivity {
+public class OrganizerDashboardActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
 
@@ -43,6 +43,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_organizer_dashboard);
+        setupBottomNavigation("Organizer");
 
         recyclerView = findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,18 +56,6 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
         Button btnNotify = findViewById(R.id.btn_send_notifications);
         btnNotify.setOnClickListener(v -> fetchEventsAndShowBroadcastDialog());
-
-        LinearLayout myEvents = findViewById(R.id.my_events);
-        myEvents.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerDashboardActivity.this, OrganizerDashboardActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myProfile = findViewById(R.id.nav_profile);
-        myProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerDashboardActivity.this, UserProfileActivity.class);
-            startActivity(intent);
-        });
     }
 
     @Override
@@ -180,6 +169,8 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                     }
 
                     int sentCount = 0;
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
                     for (QueryDocumentSnapshot doc : querySnapshots) {
                         String entrantDeviceId = doc.getId();
 
@@ -191,11 +182,42 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                         notifData.put("description", message); // This maps to what the entrant sees as the message
                         notifData.put("read", false);
                         notifData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                        String senderId = new Profiles().getDeviceId(this);
+                        notifData.put("senderId", senderId);
 
-                        FirebaseFirestore.getInstance().collection("users").document(entrantDeviceId)
-                                .collection("notifications").add(notifData);
+
+                        db.collection("users")
+                                .document(entrantDeviceId)
+                                .collection("notifications")
+                                .add(notifData);
+
                         sentCount++;
                     }
+
+                    String senderId = new Profiles().getDeviceId(this);
+
+                    db.collection("users")
+                            .get()
+                            .addOnSuccessListener(users -> {
+
+                                String senderName = "Unknown";
+
+                                for (QueryDocumentSnapshot user : users) {
+                                    if (user.getString("name") != null) {
+                                        senderName = user.getString("name");
+                                        break;
+                                    }
+                                }
+
+                                Map<String, Object> logData = new HashMap<>();
+                                logData.put("message", message);
+                                logData.put("eventName", eventName);
+                                logData.put("senderId", senderId);
+                                logData.put("senderName", senderName); // ✅ ADD THIS
+                                logData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+
+                                db.collection("notifications").add(logData);
+                            });
                     Toast.makeText(this, "Notification sent to " + sentCount + " entrants", Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to reach entrants", Toast.LENGTH_SHORT).show());

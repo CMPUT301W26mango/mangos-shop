@@ -12,6 +12,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.example.myapplication.Profiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,17 +45,24 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
 
     private final List<AdminProfileItem> allProfiles = new ArrayList<>();
     private final List<AdminProfileItem> filteredProfiles = new ArrayList<>();
+    private String currentUserId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_browse_profiles);
+        Button switchButton = findViewById(R.id.buttonSwitchRole);
+
+        switchButton.setOnClickListener(v -> showSwitchDialog());
 
         recyclerViewAdminProfiles = findViewById(R.id.recyclerViewAdminProfiles);
         searchViewProfiles = findViewById(R.id.searchViewProfiles);
         textViewEmptyProfiles = findViewById(R.id.textViewEmptyProfiles);
 
         db = FirebaseFirestore.getInstance();
+        Profiles profiles = new Profiles();
+        currentUserId = profiles.getDeviceId(this);
 
         recyclerViewAdminProfiles.setLayoutManager(new LinearLayoutManager(this));
 
@@ -78,14 +87,28 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
             btnClose.setOnClickListener(v -> dialog.dismiss());
 
             btnDelete.setOnClickListener(v -> {
+
+                String deletedUserId = profileItem.getUserId();
+
                 FirebaseFirestore.getInstance()
                         .collection("users")
-                        .document(profileItem.getUserId())
+                        .document(deletedUserId)
                         .delete()
                         .addOnSuccessListener(aVoid -> {
+
                             Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                            loadProfiles();
+
+                            if (currentUserId != null && currentUserId.equals(deletedUserId)) {
+
+                                Intent intent = new Intent(AdminBrowseProfilesActivity.this, MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+
+                            } else {
+                                dialog.dismiss();
+                                loadProfiles();
+                            }
+
                         });
             });
 
@@ -188,5 +211,33 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
             textViewEmptyProfiles.setVisibility(View.GONE);
             recyclerViewAdminProfiles.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showSwitchDialog() {
+        String[] roles = {"Entrant", "Organizer"};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Switch Role")
+                .setItems(roles, (dialog, which) -> {
+
+                    SharedPreferences prefs = getSharedPreferences("ROLE_PREF", MODE_PRIVATE);
+
+                    if (which == 0) {
+                        prefs.edit().putString("currentRole", "Entrant").apply();
+
+                        Intent intent = new Intent(this, EventListActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
+                    } else {
+                        prefs.edit().putString("currentRole", "Organizer").apply();
+
+                        Intent intent = new Intent(this, OrganizerDashboardActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+
+                })
+                .show();
     }
 }

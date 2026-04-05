@@ -2,20 +2,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="16dp"
     android:layout_margin="8dp"
     android:background="@drawable/rounded_card">
 
     <TextView
         android:id="@+id/textMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Message"
-        android:textStyle="bold"/>
+        android:textSize="16sp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/textSender"
-        android:text="Sent by"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recipient"
+        android:textSize="13sp"
+        android:textColor="@color/gray"
+        android:layout_marginTop="4dp"/>
 
     <TextView
         android:id="@+id/textTime"
-        android:text="Time"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:textSize="12sp"
+        android:textColor="@color/gray"
+        android:layout_marginTop="2dp"/>
 </LinearLayout>

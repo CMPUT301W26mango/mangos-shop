@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.EditText;
@@ -41,6 +42,11 @@ public class EntrantAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entrant_account);
 
+        android.widget.ImageButton backButton = findViewById(R.id.btn_back);
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
+
         profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
         db = FirebaseFirestore.getInstance();
@@ -75,6 +81,13 @@ public class EntrantAccount extends AppCompatActivity {
 
                     Boolean isAdmin = snapshot.getBoolean("isAdmin");
                     String currentRole = snapshot.getString("role");
+
+                    SharedPreferences prefs = getSharedPreferences("ROLE_PREF", MODE_PRIVATE);
+                    String overrideRole = prefs.getString("currentRole", null);
+
+                    if (overrideRole != null) {
+                        return;
+                    }
 
                     if (Boolean.TRUE.equals(isAdmin) || "Admin".equals(currentRole)) {
                         if (!"Admin".equals(currentRole)) {

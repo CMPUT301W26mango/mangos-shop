@@ -16,12 +16,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -80,8 +78,6 @@ public class EventListActivity extends BaseActivity {
     private ImageButton scanQRButton;
     private ImageButton closeInfoButton;
     private ImageButton btnFilter;
-    private ImageButton profileButton; // go to edit profile
-
     private SearchView eventsSearch;
 
     private com.google.firebase.firestore.ListenerRegistration statusListener;
@@ -103,6 +99,7 @@ public class EventListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whole_event_list);
 
+        setupBottomNavigation("Entrant");
 
         scannerLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
@@ -125,7 +122,6 @@ public class EventListActivity extends BaseActivity {
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
         btnFilter = findViewById(R.id.btnFilter);
-//        profileButton = findViewById(R.id.btn_to_edit_profile);
 
         eventList = new ArrayList<>();
         allActiveEvents = new ArrayList<>();
@@ -155,24 +151,6 @@ public class EventListActivity extends BaseActivity {
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
         btnFilter.setOnClickListener((v -> showFilterDialog()));
-
-        LinearLayout myProfile = findViewById(R.id.nav_profile);
-        myProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myNotifications = findViewById(R.id.nav_notifications);
-        myNotifications.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myHistory = findViewById(R.id.nav_history);
-        myHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, MyEventsActivity.class);
-            startActivity(intent);
-        });
 
         // ask for notification permission the second they open this screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -218,7 +196,7 @@ public class EventListActivity extends BaseActivity {
                 .whereLessThanOrEqualTo("regStart", now)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    allActiveEvents.clear();
+//                    allActiveEvents.clear();
                     eventList.clear();
 
                     List<Event> pendingEvents = new ArrayList<>();
@@ -242,11 +220,14 @@ public class EventListActivity extends BaseActivity {
 
                     // If there's nothing to check, just update the screen
                     if (pendingEvents.isEmpty()) {
+                        //adding this here ot debug
+                        allActiveEvents.clear();
                         applyFilters();
                         adapter.notifyDataSetChanged();
                         return;
                     }
 
+                    List<Event> tempActiveEvents = new ArrayList<>();
                     int[] checkedCount = {0};
                     for (Event e : pendingEvents) {
                         db.collection("events").document(e.getId()).collection("waitingList").document(deviceId).get()
@@ -256,10 +237,15 @@ public class EventListActivity extends BaseActivity {
                                     boolean isOnWaitlist = task.isSuccessful() && task.getResult() != null && task.getResult().exists();
 
                                     if (!isOnWaitlist) {
-                                        allActiveEvents.add(e);
+//                                        allActiveEvents.add(e);
+                                        tempActiveEvents.add(e);
                                     }
 
                                     if (checkedCount[0] == pendingEvents.size()) {
+                                        //adding
+                                        allActiveEvents.clear();
+                                        allActiveEvents.addAll(tempActiveEvents);
+                                        //
                                         applyFilters();
                                         adapter.notifyDataSetChanged();
                                     }
@@ -268,6 +254,25 @@ public class EventListActivity extends BaseActivity {
                 }).addOnFailureListener(e -> Log.e("EventListActivity", "Error loading events", e));
     }
 
+
+    /**
+     * Configures and launches the ZXing QR code scanner activity.
+     *
+     * Sets up the scanner with the following options: 
+     *  
+     *    Prompt text — "Press back to cancel" shown on the scanner screen 
+     *    Beep disabled — no sound plays on successful scan 
+     *    Orientation unlocked — scanner works in both portrait and landscape 
+     *    Barcode image disabled — scanned image is not saved to storage 
+     *  
+     *
+     * On a successful scan, the result is handled by scannerLauncher which
+     * extracts the scanned value and passes it as an eventId to EventDetailsFragment. 
+     *
+     * If the user presses back, the scan is cancelled and a toast is shown.
+     *
+     * @author Ali
+     */
     private void launchQRScanner() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Press back to cancel");

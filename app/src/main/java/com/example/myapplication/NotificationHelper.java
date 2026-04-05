@@ -26,7 +26,7 @@ public class NotificationHelper {
         Map<String, Object> notification = new HashMap<>();
         notification.put("eventId", eventId);
         notification.put("eventName", eventName);
-        notification.put("notification_name", notiName);
+        notification.put("notiName", notiName);
         notification.put("description", description);
         notification.put("timestamp", Timestamp.now());
         notification.put("read", false);

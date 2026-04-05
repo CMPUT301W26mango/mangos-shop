@@ -30,8 +30,19 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotifications"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="8dp"
         android:clipToPadding="false"/>
+
+    <FrameLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/bottom_nav_entrant" android:visibility="gone" />
+        <include layout="@layout/bottom_nav_organizer" android:visibility="gone" />
+
+    </FrameLayout>
 
 </LinearLayout>

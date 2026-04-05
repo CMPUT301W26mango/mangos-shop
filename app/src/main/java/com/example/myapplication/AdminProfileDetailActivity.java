@@ -18,9 +18,10 @@ import android.widget.Toast;
 import android.app.AlertDialog;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.provider.Settings;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FieldValue;
 
 
 public class AdminProfileDetailActivity extends AppCompatActivity {
@@ -44,6 +45,10 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
         Button removeOrganizerButton = findViewById(R.id.btn_remove_organizer);
 
         final String userId = getIntent().getStringExtra("userId");
+        String currentDeviceId = Settings.Secure.getString(
+                getContentResolver(),
+                Settings.Secure.ANDROID_ID
+        );
 
         if (userId == null || userId.isEmpty()) {
             Toast.makeText(this, "Missing user ID", Toast.LENGTH_SHORT).show();
@@ -61,7 +66,7 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
 
                         db.collection("users")
                                 .document(userId)
-                                .update("role", "Entrant") // or "user" depending on your app
+                                .update("role", "Entrant")
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(this, "Organizer removed", Toast.LENGTH_SHORT).show();
                                     textProfileRole.setText("Role: Entrant");
@@ -85,10 +90,33 @@ public class AdminProfileDetailActivity extends AppCompatActivity {
 
                         db.collection("users")
                                 .document(userId)
-                                .delete()
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                .get()
+                                .addOnSuccessListener(document -> {
+
+                                    String deviceId = document.getString("deviceId");
+
+                                    db.collection("users")
+                                            .document(userId)
+                                            .delete()
+                                            .addOnSuccessListener(aVoid -> {
+
+                                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
+
+                                                if (deviceId != null && deviceId.equals(currentDeviceId)) {
+
+                                                    Intent intent = new Intent(AdminProfileDetailActivity.this, MainActivity.class);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    startActivity(intent);
+
+                                                } else {
+                                                    finish();
+                                                }
+
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(this, "Error deleting profile", Toast.LENGTH_SHORT).show();
+                                            });
+
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(this, "Error deleting profile", Toast.LENGTH_SHORT).show();

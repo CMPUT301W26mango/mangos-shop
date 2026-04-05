@@ -15,6 +15,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility class responsible for broadcasting mass announcements to specific groups
+ * of entrants for a given event (e.g., the entire waiting list or solely selected entrants).
+ */
 public class AnnouncementHelper {
 
     private static final String TAG = "AnnouncementHelper";
@@ -24,11 +28,11 @@ public class AnnouncementHelper {
      * Shows a popup dialog letting the Organizer type a custom message, then
      * pushes that message as a Notification to everyone in the specified status group.
      *
-     * @param context
-     * @param eventId
-     * @param eventName
-     * @param targetStatus
-     * @param targetDisplayName
+     * @param context           The activity context required to build and display the dialog.
+     * @param eventId           The Firebase ID of the event associated with the announcement.
+     * @param eventName         The name of the event for notification context.
+     * @param targetDisplayName A descriptive name for the targeted group (e.g., "Waiting List") for the dialog title.
+     * @param targetStatus      The list of entrant statuses to target (e.g., "Waiting", "Selected").
      */
     public static void showAnnouncementDialog(Context context, String eventId, String eventName, String targetDisplayName, java.util.List<String> targetStatus) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -57,12 +61,15 @@ public class AnnouncementHelper {
     }
 
     /**
+     * Queries the Firebase 'waitingList' sub-collection for entrants matching the specified status filters.
+     * Iterates through the results and generates a newly formatted notification document
+     * within each respective user's personal notification collection.
      *
-     * @param context
-     * @param eventId
-     * @param eventName
-     * @param statusFilters
-     * @param messageBody
+     * @param context       The activity context used for displaying success or failure Toasts.
+     * @param eventId       The Firebase ID of the event generating the announcement.
+     * @param eventName     The name of the event.
+     * @param statusFilters The specific statuses to query (e.g., ["Waiting", "Selected"]).
+     * @param messageBody   The content of the announcement message.
      */
     private static void sendMassNotification(Context context, String eventId, String eventName, java.util.List<String> statusFilters, String messageBody) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

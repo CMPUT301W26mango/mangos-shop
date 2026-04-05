@@ -63,21 +63,27 @@ public class AdminLogsActivity extends AppCompatActivity {
                     list.clear();
 
                     for (QueryDocumentSnapshot doc : query) {
+                        try {
+                            final String message = doc.getString("message") != null
+                                    ? doc.getString("message")
+                                    : "No message";
 
-                        String message = doc.getString("message");
-                        String sender = doc.getString("senderId");
+                            final String eventName = doc.getString("eventName") != null
+                                    ? doc.getString("eventName")
+                                    : "Unknown Event";
 
-                        list.add(new AdminLogItem(
-                                message != null ? message : "No message",
-                                sender != null ? sender : "Unknown",
-                                "Time not set"
-                        ));
+                            String time = doc.getTimestamp("timestamp") != null
+                                    ? doc.getTimestamp("timestamp").toDate().toString()
+                                    : "No time";
+
+                            list.add(new AdminLogItem(message, eventName, time));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Failed to load logs", Toast.LENGTH_SHORT).show()
-                );
+                });
     }
 }
