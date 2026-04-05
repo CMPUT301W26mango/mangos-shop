@@ -45,6 +45,8 @@ public class MyEventsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whole_event_list);
 
+        setupBottomNavigation("Entrant");
+
         TextView pageTitle = findViewById(R.id.top_page_title);
         pageTitle.setText("Event History");
 
@@ -141,7 +143,7 @@ public class MyEventsActivity extends BaseActivity {
     private void setupBottomNavigation() {
         LinearLayout navEvents = findViewById(R.id.nav_events);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
-        LinearLayout navProfile = findViewById(R.id.nav_profile);
+        LinearLayout navProfile = findViewById(R.id.nav_profile_entrant);
 
         navEvents.setOnClickListener(v -> {
             startActivity(new Intent(this, EventListActivity.class));

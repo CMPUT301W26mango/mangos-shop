@@ -131,9 +131,22 @@ public class UserProfileActivity extends BaseActivity {
                     tvProfileName.setText("Guest");
                 }
 
+                // If Firebase says they are an admin, un-hide the escape button
+                if (Boolean.TRUE.equals(doc.getBoolean("isAdmin")) || "Admin".equalsIgnoreCase(doc.getString("role"))) {
+                    findViewById(R.id.buttonBackToAdmin).setVisibility(android.view.View.VISIBLE);
+                }
+
                 // update role
                 if (doc.contains("role")) {
-                    tvProfileRole.setText(doc.getString("role"));
+                    String role = doc.getString("role");
+                    tvProfileRole.setText(role);
+
+                    // i think this might fix issue
+                    android.content.SharedPreferences prefs = getSharedPreferences("ROLE_PREF", MODE_PRIVATE);
+                    String activeRole = prefs.getString("currentRole", role);
+
+                    // Pass the role dynamically so it shows the right bar
+                    setupBottomNavigation(activeRole);
                 }
                 // Update profile picture
                 if (doc.contains("profileImageUrl")) {
