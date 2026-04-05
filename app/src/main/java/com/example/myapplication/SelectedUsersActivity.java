@@ -43,6 +43,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_users);
 
+
         eventId = getIntent().getStringExtra("eventId");
         db = FirebaseFirestore.getInstance();
 
