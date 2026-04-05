@@ -45,6 +45,7 @@ public class NotificationsActivity extends BaseActivity {
         Profiles profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
 
+        // initialize instance
         db = FirebaseFirestore.getInstance();
 
         recyclerView = findViewById(R.id.recyclerViewNotifications);
@@ -53,8 +54,10 @@ public class NotificationsActivity extends BaseActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
+        // load all notifications
         loadNotifications();
 
+        // clear button
         Button clearAllBtn = findViewById(R.id.clear_all_btn);
 
 
@@ -107,6 +110,7 @@ public class NotificationsActivity extends BaseActivity {
     private void clearAllNotifications() {
         if (notificationList.isEmpty()) return;
 
+        // loop through subcollection to delete all notifications
         for (NotificationItem item : notificationList) {
             db.collection("users")
                     .document(deviceId)
