@@ -170,8 +170,16 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
 
                         String organizerId = document.getString("organizerId");
 
+                        com.google.firebase.Timestamp regEnd = document.getTimestamp("regEnd");
+
                         AdminEventItem eventItem = new AdminEventItem(
-                                eventId, title, location, organizerName, posterURL, organizerId
+                                eventId,
+                                title,
+                                location,
+                                organizerName,
+                                posterURL,
+                                organizerId,
+                                regEnd
                         );
 
                         allEvents.add(eventItem);
