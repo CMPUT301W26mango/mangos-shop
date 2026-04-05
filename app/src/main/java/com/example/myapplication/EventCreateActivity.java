@@ -84,7 +84,6 @@ public class EventCreateActivity extends AppCompatActivity {
     private Switch geoSwitch;
 
     private Switch privSwitch;
-    private ImageButton profileButton;
 
 
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -138,6 +137,8 @@ public class EventCreateActivity extends AppCompatActivity {
                         capacityInput.setText(String.valueOf(event.getCapacity()));
                         waitingListInput.setText(String.valueOf(event.getMaxWaitingListSize()));
                         eventDateInput.setText(event.getDateEvent());
+                        eventTypeDropdown.setText(event.getEventType());
+
 
                         // geo logic
                         geoSwitch.setChecked(event.getGeolocationRequired());

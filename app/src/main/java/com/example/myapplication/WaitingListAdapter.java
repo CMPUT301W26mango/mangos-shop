@@ -39,7 +39,25 @@ public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.
     /** Binds the entrant's name to the row. */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        EnrolledEntrant entrant = entrants.get(position);
         holder.tvEntrantName.setText(entrants.get(position).getName());
+
+        if (entrant.getDeviceId() != null) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(entrant.getDeviceId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        String profileUrl = doc.getString("profileImageUrl");
+                        if (profileUrl != null && !profileUrl.isEmpty()) {
+                            com.bumptech.glide.Glide.with(holder.itemView.getContext())
+                                    .load(profileUrl)
+                                    .circleCrop()
+                                    .placeholder(android.R.drawable.sym_def_app_icon)
+                                    .into(holder.ivProfileIcon);
+                        }
+                    });
+        }
     }
 
     /** Returns the number of entrants currently on the waiting list. */
@@ -50,10 +68,12 @@ public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvEntrantName;
+        android.widget.ImageView ivProfileIcon;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvEntrantName = itemView.findViewById(R.id.tvEntrantName);
+            ivProfileIcon = itemView.findViewById(R.id.ivProfileIcon);
         }
     }
 }

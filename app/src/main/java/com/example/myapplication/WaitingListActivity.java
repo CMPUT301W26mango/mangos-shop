@@ -223,7 +223,9 @@ public class WaitingListActivity extends AppCompatActivity {
                             String email = doc.getString("email");
                             String phone = doc.getString("phone");
                             String enrolmentDate = doc.getString("enrolmentDate");
-                            entrants.add(new EnrolledEntrant(name, email, phone, enrolmentDate));
+                            EnrolledEntrant entrant = new EnrolledEntrant(name, email, phone, enrolmentDate);
+                            entrant.setDeviceId(doc.getId());
+                            entrants.add(entrant);
                         }
                     }
 
