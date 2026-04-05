@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Sayuj
  */
 
-public class OrganizerDashboardActivity extends AppCompatActivity {
+public class OrganizerDashboardActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
 
@@ -43,6 +43,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_organizer_dashboard);
+        setupBottomNavigation("Organizer");
 
         recyclerView = findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,18 +56,6 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
         Button btnNotify = findViewById(R.id.btn_send_notifications);
         btnNotify.setOnClickListener(v -> fetchEventsAndShowBroadcastDialog());
-
-        LinearLayout myEvents = findViewById(R.id.my_events);
-        myEvents.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerDashboardActivity.this, OrganizerDashboardActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myProfile = findViewById(R.id.nav_profile);
-        myProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerDashboardActivity.this, UserProfileActivity.class);
-            startActivity(intent);
-        });
     }
 
     @Override

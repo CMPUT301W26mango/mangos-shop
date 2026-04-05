@@ -99,6 +99,7 @@ public class EventListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.whole_event_list);
 
+        setupBottomNavigation("Entrant");
 
         scannerLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
@@ -150,24 +151,6 @@ public class EventListActivity extends BaseActivity {
 
         scanQRButton.setOnClickListener(v -> launchQRScanner());
         btnFilter.setOnClickListener((v -> showFilterDialog()));
-
-        LinearLayout myProfile = findViewById(R.id.nav_profile);
-        myProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, UserProfileActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myNotifications = findViewById(R.id.nav_notifications);
-        myNotifications.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, NotificationsActivity.class);
-            startActivity(intent);
-        });
-
-        LinearLayout myHistory = findViewById(R.id.nav_history);
-        myHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, MyEventsActivity.class);
-            startActivity(intent);
-        });
 
         // ask for notification permission the second they open this screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

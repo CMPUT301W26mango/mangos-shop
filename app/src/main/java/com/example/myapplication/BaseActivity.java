@@ -89,4 +89,33 @@ public class BaseActivity extends AppCompatActivity {
             globalRoleListener.remove();
         }
     }
+
+    protected void setupBottomNavigation(String role) {
+        android.view.View navEntrant = findViewById(R.id.bottom_nav_entrant_container);
+        android.view.View navOrganizer = findViewById(R.id.bottom_nav_organizer_container);
+
+        // If this screen doesn't have the include tags, just exit
+        if (navEntrant == null || navOrganizer == null) return;
+
+        if ("Organizer".equalsIgnoreCase(role)) {
+            // Show my Organizer bar, hide my Entrant bar
+            navOrganizer.setVisibility(android.view.View.VISIBLE);
+            navEntrant.setVisibility(android.view.View.GONE);
+
+            // Wire up my custom Organizer buttons
+            findViewById(R.id.my_events).setOnClickListener(v -> startActivity(new android.content.Intent(this, OrganizerDashboardActivity.class)));
+            findViewById(R.id.nav_profile_organizer).setOnClickListener(v -> startActivity(new android.content.Intent(this, UserProfileActivity.class)));
+
+        } else {
+            // Show my Entrant bar, hide my Organizer bar
+            navEntrant.setVisibility(android.view.View.VISIBLE);
+            navOrganizer.setVisibility(android.view.View.GONE);
+
+            // Wire up my custom Entrant buttons
+            findViewById(R.id.nav_history).setOnClickListener(v -> startActivity(new android.content.Intent(this, MyEventsActivity.class)));
+            findViewById(R.id.nav_events).setOnClickListener(v -> startActivity(new android.content.Intent(this, EventListActivity.class)));
+            findViewById(R.id.nav_notifications).setOnClickListener(v -> startActivity(new android.content.Intent(this, NotificationsActivity.class)));
+            findViewById(R.id.nav_profile_entrant).setOnClickListener(v -> startActivity(new android.content.Intent(this, UserProfileActivity.class)));
+        }
+    }
 }

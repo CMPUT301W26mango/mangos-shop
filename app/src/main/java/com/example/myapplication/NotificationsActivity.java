@@ -42,6 +42,8 @@ public class NotificationsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
+        setupBottomNavigation("Entrant");
+
         Profiles profiles = new Profiles();
         deviceId = profiles.getDeviceId(this);
 
