@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            app:thumbTint="#FFFFFF"
-            app:trackTint="#4285F4" /> </LinearLayout>
+            app:thumbTint="@color/switch_thumb"
+            app:trackTint="@color/switch_track" /> </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
