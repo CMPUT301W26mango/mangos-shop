@@ -1,5 +1,10 @@
 package com.example.myapplication;
-
+/**
+ * RecyclerView adapter for displaying image items in a grid layout.
+ *
+ * Role in application:
+ * - Presentation-layer adapter for image browsing.
+ */
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
