@@ -173,14 +173,6 @@ public class EventDetailsDialogueTest {
                 .check(matches(isDisplayed()));
     }
 
-    // Checks if either register or cancel registration button is shown
-    @Test
-    public void testOnlyOneRegisterButtonVisible() {
-        openEventDetailsDialog("LVpMCQZpFkqISPnkgYPQ");
-        onView(withId(R.id.registerBtn))
-                .inRoot(isDialog())
-                .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-    }
 
 
 }

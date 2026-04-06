@@ -55,9 +55,6 @@ public class WaitingListAdapterTest {
         recyclerView.setAdapter(adapter);
     }
 
-    // =====================================================
-    // CRITERIA #3 — Count matches total entrant count
-    // =====================================================
 
     @Test
     public void testItemCountMatchesList() {
@@ -82,9 +79,6 @@ public class WaitingListAdapterTest {
                 1, singleAdapter.getItemCount());
     }
 
-    // =====================================================
-    // CRITERIA #2 — List shows entrant name
-    // =====================================================
 
     @Test
     public void testFirstEntrantNameBinding() {
@@ -158,9 +152,6 @@ public class WaitingListAdapterTest {
         assertFalse("Date should not be displayed", displayed.contains("2025-01-15"));
     }
 
-    // =====================================================
-    // CRITERIA #4 — List updates when entrants join or leave
-    // =====================================================
 
     @Test
     public void testCountUpdatesWhenEntrantJoins() {

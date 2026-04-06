@@ -63,20 +63,20 @@ public class EventFilterSearchTest {
     public void testFilterByCategoryOnly() {
         waitForNetwork(3000);
 
-        // Open Filters and select Charity
+        // Open Filters and select Sports
         onView(withId(R.id.btnFilter)).perform(click());
-        onView(withId(R.id.chipCharity)).perform(click());
+        onView(withId(R.id.chipSports)).perform(click());
         onView(withId(R.id.applyFiltersBtn)).perform(click());
 
         waitForNetwork(1000);
 
-        // Verify Food Bank Day (Charity) is present
+        // Verify baseball championship (Sports) is visible
         onView(withId(R.id.recyclerViewEvents))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         waitForNetwork(1500);
 
-        onView(withId(R.id.tv_event_title)).check(matches(withText("Food Bank Day")));
-        onView(withId(R.id.tv_event_type)).check(matches(withText("Charity")));
+        onView(withId(R.id.tv_event_title)).check(matches(withText("baseball championship")));
+        onView(withId(R.id.tv_event_type)).check(matches(withText("Sports")));
 
         onView(withId(R.id.btn_close)).perform(click());
     }

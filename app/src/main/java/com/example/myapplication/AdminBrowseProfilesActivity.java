@@ -113,7 +113,6 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
             btnDelete.setOnClickListener(v -> {
                 String deletedUserId = profileItem.getUserId();
 
-                // Check if they are trying to delete themselves!
                 if (currentUserId != null && currentUserId.equals(deletedUserId)) {
                     FirebaseFirestore.getInstance().collection("users").document(deletedUserId).delete()
                             .addOnSuccessListener(aVoid -> {
@@ -122,10 +121,10 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             });
-                    return; // Stop here so it doesn't run the rest of the code!
+                    return; // Stop here so it doesn't run the rest of the code
                 }
 
-                // If they are an Organizer, trigger the massive sweep!
+
                 if ("Organizer".equalsIgnoreCase(profileItem.getRole())) {
                     deleteOrganizerAndEvents(deletedUserId, dialog);
                 } else {
@@ -305,7 +304,6 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
                         String eventId = eventDoc.getId();
                         String eventName = eventDoc.getString("title");
 
-                        // Dig into the waitingList of this specific event to find the entrants
                         db.collection("events").document(eventId).collection("waitingList").get()
                                 .addOnSuccessListener(waitlistSnaps -> {
 
@@ -340,7 +338,7 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Organizer and their events successfully purged.", Toast.LENGTH_LONG).show();
                                 dialog.dismiss();
-                                loadProfiles(); // Refresh the screen!
+                                loadProfiles();
                             })
                             .addOnFailureListener(e -> android.util.Log.e("AdminDelete", "Failed to delete user profile", e));
 

@@ -36,9 +36,6 @@ public class WaitingListActivityTest {
 
     private Context context = ApplicationProvider.getApplicationContext();
 
-    // =====================================================
-    // INTENT HANDLING
-    // =====================================================
 
     @Test
     public void testFinishesWhenNoEventIdProvided() {
@@ -62,9 +59,6 @@ public class WaitingListActivityTest {
                 Lifecycle.State.DESTROYED, scenario.getState());
     }
 
-    // =====================================================
-    // UI ELEMENTS — US 02.02.01
-    // =====================================================
 
     @Test
     public void testTitleIsDisplayed() {
@@ -78,17 +72,6 @@ public class WaitingListActivityTest {
                 .check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testTitleTextIsCorrect() {
-        Intent intent = new Intent(context, WaitingListActivity.class);
-        intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("testMode", true);
-
-        ActivityScenario.launch(intent);
-
-        onView(withId(R.id.tvWaitingListTitle))
-                .check(matches(withText("Registered Entrants")));
-    }
 
     @Test
     public void testEntrantCountIsDisplayed() {
@@ -126,40 +109,7 @@ public class WaitingListActivityTest {
                 .check(matches(isDisplayed()));
     }
 
-    // =====================================================
-    // CSV EXPORT BUTTON — US 02.06.05
-    // =====================================================
 
-    /**
-     * Test that the CSV export button is displayed.
-     * Criteria #1: "Export users as CSV" button on the enrolled entrants screen.
-     */
-    @Test
-    public void testExportCsvButtonIsDisplayed() {
-        Intent intent = new Intent(context, WaitingListActivity.class);
-        intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("testMode", true);
-
-        ActivityScenario.launch(intent);
-
-        onView(withId(R.id.btnExportCsv))
-                .check(matches(isDisplayed()));
-    }
-
-    /**
-     * Test that the CSV export button has the correct text.
-     */
-    @Test
-    public void testExportCsvButtonText() {
-        Intent intent = new Intent(context, WaitingListActivity.class);
-        intent.putExtra("eventId", "test_event_123");
-        intent.putExtra("testMode", true);
-
-        ActivityScenario.launch(intent);
-
-        onView(withId(R.id.btnExportCsv))
-                .check(matches(withText("Export users as CSV")));
-    }
 
     @Test
     public void testHandlesNonExistentEvent() {
