@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    US 02.02.01
-    Waiting List screen: shows registered entrant names and the Run Lottery button.
-    The lottery draw runs automatically in the background (WorkManager + lazy check).
--->
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -12,7 +8,6 @@
     android:background="#F8E0E0"
     android:padding="16dp">
 
-    <!-- Title -->
     <TextView
         android:id="@+id/tvWaitingListTitle"
         android:layout_width="match_parent"
@@ -24,7 +19,6 @@
         android:gravity="center"
         android:layout_marginBottom="8dp" />
 
-    <!-- Total entrant count -->
     <TextView
         android:id="@+id/tvEntrantCount"
         android:layout_width="match_parent"
@@ -34,7 +28,6 @@
         android:textColor="#555555"
         android:layout_marginBottom="12dp" />
 
-    <!-- Run Lottery button — shown only after deadline has passed and draw hasn't run -->
     <Button
         android:id="@+id/btnRunLottery"
         android:layout_width="wrap_content"
@@ -45,7 +38,6 @@
         android:visibility="gone"
         android:layout_marginBottom="8dp" />
 
-    <!-- Entrant list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEntrants"
         android:layout_width="match_parent"

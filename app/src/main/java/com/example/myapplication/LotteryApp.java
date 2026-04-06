@@ -10,7 +10,6 @@ import androidx.work.WorkManager;
 import java.util.concurrent.TimeUnit;
 
 /**
- * US 02.05.02 — Custom Application class for scheduling the periodic lottery draw scanner.
  *
  * Schedules LotteryDrawWorker as a PeriodicWorkRequest with KEEP policy so it is
  * only ever enqueued once, no matter how many times the app is opened or the device

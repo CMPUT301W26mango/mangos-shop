@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat;
 
 /**
  * Utility class for retrieving the device's last known location.
- * Uses Android's built-in LocationManager (no Google Play Services required).
+ * Uses Android's built-in LocationManager.
  * The result is delivered asynchronously via a callback.
  */
 public class LocationHelper {

@@ -15,28 +15,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * US 02.05.02 — Shared lottery draw logic.
  *
  * Called by:
- * - LotteryDrawWorker (PeriodicWorkRequest — scans all expired events every ~15 min)
- * - WaitingListActivity lazy check (safety net if periodic worker hasn't fired yet)
+ * - LotteryDrawWorker (PeriodicWorkRequest - scans all expired events every ~15 min)
+ * - WaitingListActivity lazy check
  *
  * Draw-once guarantee: a `drawCompleted` boolean on the event document is checked
  * before every draw. The batch write sets `drawCompleted = true` atomically with
  * the status updates, so a second concurrent trigger will find it already true.
- *
- * Firestore field names (from EventStore.addEvent()):
- * event doc  — "regEnd" (Timestamp), "capacity" (Long), "drawCompleted" (Boolean)
- * waitingList — "status" (String: "waiting"/"selected"/"accepted"/"rejected"),
- * document ID == entrant's deviceId
  */
 public class LotteryDrawHelper {
 
     private static final String TAG = "LotteryDrawHelper";
-
-    // -------------------------------------------------------------------------
-    // Callback interface
-    // -------------------------------------------------------------------------
 
     /**
      * Callback so callers know whether the draw succeeded or was skipped.
@@ -46,16 +36,12 @@ public class LotteryDrawHelper {
         void onFailure(Exception e);
     }
 
-    // -------------------------------------------------------------------------
-    // Part 1 — Scan all expired events and draw (used by LotteryDrawWorker)
-    // -------------------------------------------------------------------------
-
     /**
      * Queries Firestore for all events whose registration deadline has passed
      * and whose draw has not yet been completed, then calls performDraw() for each.
      *
      * This is called by the periodic WorkManager worker so it requires no knowledge
-     * of specific event IDs — it finds all events that need drawing on its own.
+     * of specific event IDs - it finds all events that need drawing on its own.
      *
      * @param listener called once per event that is processed (may be null)
      */
@@ -77,7 +63,7 @@ public class LotteryDrawHelper {
                     for (DocumentSnapshot eventDoc : querySnapshot.getDocuments()) {
                         Boolean drawCompleted = eventDoc.getBoolean("drawCompleted");
                         if (Boolean.TRUE.equals(drawCompleted)) {
-                            continue; // already drawn — skip
+                            continue; // already drawn - skip
                         }
 
                         String eventId = eventDoc.getId();
@@ -94,10 +80,6 @@ public class LotteryDrawHelper {
                     if (listener != null) listener.onFailure(e);
                 });
     }
-
-    // -------------------------------------------------------------------------
-    // Part 2 — Perform the draw for a single event (used by both triggers)
-    // -------------------------------------------------------------------------
 
     /**
      * Executes the lottery draw for one event.
@@ -118,7 +100,7 @@ public class LotteryDrawHelper {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference eventRef = db.collection("events").document(eventId);
 
-        // Step 1: read the event document
+        // read the event document
         eventRef.get()
                 .addOnSuccessListener(eventDoc -> {
                     if (!eventDoc.exists()) {
@@ -127,7 +109,7 @@ public class LotteryDrawHelper {
                         return;
                     }
 
-                    // Step 2: guard — skip if draw already ran
+                    // guard - skip if draw already ran
                     Boolean drawCompleted = eventDoc.getBoolean("drawCompleted");
                     if (Boolean.TRUE.equals(drawCompleted)) {
                         Log.d(TAG, "Draw already completed for event: " + eventId);
@@ -135,7 +117,7 @@ public class LotteryDrawHelper {
                         return;
                     }
 
-                    // capacity field name matches EventStore.addEvent(): "capacity"
+                    // capacity field name matches capacity
                     Long capacityLong = eventDoc.getLong("capacity");
                     int capacity = (capacityLong != null) ? capacityLong.intValue() : 0;
                     String eventTitle = eventDoc.getString("title");
@@ -146,7 +128,7 @@ public class LotteryDrawHelper {
                         return;
                     }
 
-                    // Step 3: read waiting list entries with status == "waiting"
+                    // read waiting list entries with status == "waiting"
                     eventRef.collection("waitingList")
                             .whereEqualTo("status", "waiting")
                             .get()
@@ -154,7 +136,7 @@ public class LotteryDrawHelper {
                                 Map<String, String> waitingEntrants = new HashMap<>(); // deviceId -> name
                                 List<String> waitingIds = new ArrayList<>();
                                 for (DocumentSnapshot doc : waitingSnap.getDocuments()) {
-                                    // Document ID is the entrant's deviceId (matches EventDetailsFragment)
+                                    // Document ID is the entrant's deviceId
                                     String entrantName = doc.getString("name");
                                     waitingEntrants.put(doc.getId(), entrantName != null ? entrantName : "");
                                     waitingIds.add(doc.getId());
@@ -166,20 +148,20 @@ public class LotteryDrawHelper {
                                     return;
                                 }
 
-                                // Step 4: shuffle and select up to [capacity] entrants
+                                // shuffle and select up to capacity entrants
                                 Collections.shuffle(waitingIds);
                                 int selectCount = Math.min(capacity, waitingIds.size());
                                 List<String> selected = waitingIds.subList(0, selectCount);
                                 List<String> notSelected = waitingIds.subList(selectCount, waitingIds.size());
 
 
-                                // Step 5: atomic batch write
+                                // atomic batch write
                                 WriteBatch batch = db.batch();
 
                                 for (String userId : selected) {
                                     DocumentReference entrantRef =
                                             eventRef.collection("waitingList").document(userId);
-                                    // "status" field name matches EventDetailsFragment.joinWaitingList()
+
                                     batch.update(entrantRef, "status", "selected");
                                 }
 
@@ -214,10 +196,6 @@ public class LotteryDrawHelper {
                     if (listener != null) listener.onFailure(e);
                 });
     }
-
-    // -------------------------------------------------------------------------
-    // Part 3 — Draw a single replacement from the rejected pool (US 02.05.03)
-    // -------------------------------------------------------------------------
 
     /**
      * Draws a single replacement entrant from the rejected pool.
@@ -269,10 +247,6 @@ public class LotteryDrawHelper {
                     if (listener != null) listener.onFailure(e);
                 });
     }
-
-    // -------------------------------------------------------------------------
-    // Internal helpers
-    // -------------------------------------------------------------------------
 
     /** Marks drawCompleted = true when capacity is 0 or waiting pool is empty. */
     private static void markDrawComplete(FirebaseFirestore db, DocumentReference eventRef,

@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * US 02.02.01 - View the list of entrants who joined the waiting list.
- * US 02.05.02 - Lazy-check safety net: triggers lottery draw if deadline passed and draw not yet done.
- *
  * Displays a real-time list of all entrant names on the waiting list for a
  * specific event. Only the organizer who owns the event (matched by device ID)
  * can view this screen. The lottery draw itself runs automatically in the
@@ -127,7 +124,7 @@ public class WaitingListActivity extends AppCompatActivity {
 
     /**
      * Verifies that the current device owns this event, then:
-     *   1. Runs the lazy draw check (US 02.05.02 safety net).
+     *   1. Runs the lazy draw check.
      *   2. Attaches the real-time waiting list listener.
      */
     private void verifyOwnershipAndLoad() {
@@ -174,7 +171,7 @@ public class WaitingListActivity extends AppCompatActivity {
     }
 
     /**
-     * Lazy draw check (US 02.05.02 safety net).
+     * Lazy draw check.
      *
      * If the registration deadline has passed AND the draw has not been marked
      * complete, trigger the draw immediately. This covers gaps between the
