@@ -67,7 +67,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
 
         Button btnMessageCancelled = findViewById(R.id.btnMessageCancelled);
         btnMessageCancelled.setOnClickListener(v -> {
-            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Unsuccessful/Cancelled", java.util.Arrays.asList("cancelled", "rejected", "not_selected"));
+            AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Unsuccessful/Cancelled", java.util.Arrays.asList("cancelled", "declined", "not_selected"));
         });
     }
 
@@ -91,8 +91,8 @@ public class SelectedUsersActivity extends AppCompatActivity {
                                 addUserRow(containerAccepted, userId, "accepted", doc.getId());
                                 break;
                             case "not_selected":
-                            case "rejected":
-                                addUserRow(containerDeclined, userId, "rejected", doc.getId());
+                            case "declined":
+                                addUserRow(containerDeclined, userId, "declined", doc.getId());
                                 break;
                             case "selected":
                                 addUserRow(containerPending, userId, "selected", doc.getId());

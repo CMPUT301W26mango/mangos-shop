@@ -15,10 +15,11 @@
 
 
     <TextView
+        android:id="@+id/screenTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="15dp"
         android:text="@string/mango_shop_title"
         android:textStyle="bold"
         android:textSize="22sp"

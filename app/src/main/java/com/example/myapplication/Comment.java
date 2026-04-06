@@ -12,6 +12,7 @@ public class Comment {
     private String deviceId;
     private Timestamp timestamp;
     private String commentId;
+    private int replyCount;
 
     /**
      * Empty constructor
@@ -127,5 +128,23 @@ public class Comment {
      * */
     public void setCommentId(String commentId) {
         this.commentId = commentId;
+    }
+
+    /**
+     *  This gets how many replies a comment has
+     * @return
+     *  Integer that is how many reply a comment has
+     * */
+    public int getReplyCount() {
+        return replyCount;
+    }
+
+    /**
+     *  This sets the reply count of the comment
+     * @param replyCount
+     *  Passed in count for how many replies a comment has
+     * */
+    public void setReplyCount(int replyCount) {
+        this.replyCount = replyCount;
     }
 }

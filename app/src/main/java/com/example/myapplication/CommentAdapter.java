@@ -20,7 +20,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         void onCommentLongClick(Comment comment);
     }
 
+    // To open the replies
+    public interface OnCommentClickListener {
+        void onCommentClick(Comment comment);
+    }
+
     private OnCommentLongClickListener longClickListener;
+    private OnCommentClickListener clickListener;
+
 
     /**
      * This is the constructor for the adapter, it sets the comment information, the organizer, and a listener for a delete feature
@@ -31,10 +38,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      * @param organizerId
      *  This is the id of the organizer that organized the event in which the comments are for
      * */
-    public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener){
+    public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener, OnCommentClickListener clickListener){
         this.commentList = commentList;
         this.organizerId = organizerId;
         this.longClickListener = longClickListener;
+        this.clickListener = clickListener;
     }
 
 
@@ -66,6 +74,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      * */
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
+
         Comment comment = commentList.get(position);
         holder.userName.setText(comment.getUserName());
         holder.commentText.setText(comment.getCommentText());
@@ -96,12 +105,29 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             holder.timestampText.setText("Just Now");
         }
 
+        // Handle the Reply UI
+        if (comment.getReplyCount() > 0) {
+            holder.replyIndicator.setVisibility(View.VISIBLE);
+            holder.replyIndicator.setText(comment.getReplyCount() + " replies");
+        } else {
+            holder.replyIndicator.setVisibility(View.GONE);
+        }
+
+        // Handle the standard click to open a thread
+        holder.itemView.setOnClickListener(v -> {
+            clickListener.onCommentClick(comment);
+        });
+
+
         // Listen for a long click to open a delete comment dialogue
         holder.itemView.setOnLongClickListener(v -> {
             longClickListener.onCommentLongClick(comment);
             return true;
         });
+
+
     }
+
 
     /**
      * Defines what is in the comment view holder, it is an extension of a recycler view which allows for scrolling and recycling views
@@ -111,6 +137,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         TextView commentText;
         TextView organizerTag;
         TextView timestampText;
+        TextView replyIndicator;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -118,6 +145,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commentText = itemView.findViewById(R.id.commentContent);
             organizerTag = itemView.findViewById(R.id.isOrganizerTag);
             timestampText = itemView.findViewById(R.id.commentTimestamp);
+            replyIndicator = itemView.findViewById(R.id.replyIndicatorText);
         }
     }
 

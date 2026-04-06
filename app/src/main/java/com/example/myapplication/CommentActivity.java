@@ -1,11 +1,13 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +38,9 @@ public class CommentActivity extends AppCompatActivity {
     private ImageButton backButton;
 
     private String organizerId;
+
+    private String currentCollectionPath;
+    private String parentDocumentPath;
     private boolean isAdmin = false;
 
 
@@ -58,6 +63,16 @@ public class CommentActivity extends AppCompatActivity {
         // Also get the organizer id from that intent
         organizerId = getIntent().getStringExtra("organizerId");
 
+        // Check if we were given a specific subcollection to load
+        currentCollectionPath = getIntent().getStringExtra("collectionPath");
+        parentDocumentPath = getIntent().getStringExtra("parentPath");
+
+        // If currentCollectionPath is null then were at root level
+        if (currentCollectionPath == null) {
+            currentCollectionPath = "events/" + eventId + "/comments";
+        }
+
+
         if (eventId == null) {
             Toast.makeText(this, "Error loading comments", Toast.LENGTH_SHORT).show();
             finish();
@@ -73,10 +88,23 @@ public class CommentActivity extends AppCompatActivity {
         commentInput = findViewById(R.id.commentInput);
         sendButton = findViewById(R.id.buttonSendComment);
         backButton = findViewById(R.id.btnBack);
+        TextView screenTitle = findViewById(R.id.screenTitle);
+
+        if (parentDocumentPath != null) {
+            // Get the username
+            String parentUsername = getIntent().getStringExtra("parentUsername");
+
+            // Update the UI elements
+            screenTitle.setText("Replies for " + parentUsername);
+            commentInput.setHint("Reply to " + parentUsername);
+            sendButton.setText("Reply");
+        }
 
         commentList = new ArrayList<>();
         adapter = new CommentAdapter(commentList, organizerId, comment -> {
             checkRoleAndDelete(comment);
+        }, comment -> {
+            openThread(comment);
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -93,7 +121,7 @@ public class CommentActivity extends AppCompatActivity {
 
     private void loadComments(){
         // Load from the comments subcollection in firebase
-        db.collection("events").document(eventId).collection("comments")
+        db.collection(currentCollectionPath)
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener((snapshots, eventException) -> {
                     if (eventException != null){
@@ -149,10 +177,15 @@ public class CommentActivity extends AppCompatActivity {
                     Comment newComment = new Comment(text, username, deviceId, Timestamp.now());
 
                     // post the comment to the event's subcollection
-                    db.collection("events").document(eventId).collection("comments")
-                            .add(newComment)
+                    db.collection(currentCollectionPath).add(newComment)
                             .addOnSuccessListener(documentReference -> {
                                 commentInput.setText(""); // Clear input on success
+
+                                // If this is a nested thread then update the parents reply count
+                                if (parentDocumentPath != null) {
+                                    db.document(parentDocumentPath)
+                                            .update("replyCount", com.google.firebase.firestore.FieldValue.increment(1));
+                                }
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Failed to post comment", Toast.LENGTH_SHORT).show();
@@ -206,5 +239,16 @@ public class CommentActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void openThread(Comment comment) {
+        Intent intent = new Intent(this, CommentActivity.class);
+        intent.putExtra("eventId", eventId);
+        intent.putExtra("organizerId", organizerId);
+        intent.putExtra("collectionPath", currentCollectionPath + "/" + comment.getCommentId() + "/replies");
+        intent.putExtra("parentPath", currentCollectionPath + "/" + comment.getCommentId());
+        intent.putExtra("parentUsername", comment.getUserName());
+
+        startActivity(intent);
     }
 }
