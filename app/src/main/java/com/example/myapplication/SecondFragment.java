@@ -1,5 +1,14 @@
 package com.example.myapplication;
-
+/**
+ * Fragment that displays the second screen and allows navigation back
+ * to the first fragment.
+ *
+ * Role in application:
+ * - Navigation component for switching between fragments.
+ *
+ * Outstanding issues:
+ * - None
+ */
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
