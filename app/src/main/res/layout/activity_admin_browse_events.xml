@@ -1,48 +1,72 @@
-<LinearLayout
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#F2DADA">
 
-    <TextView
-        android:id="@+id/textViewAdminTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/top_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Admin"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"/>
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <SearchView
-        android:id="@+id/searchViewEvents"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:queryHint="Event Name"
-        android:background="@android:drawable/editbox_background" />
+        <TextView
+            android:id="@+id/textViewAdminTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"/>
+
+        <SearchView
+            android:id="@+id/searchViewEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:queryHint="Event Name"
+            android:background="@android:drawable/editbox_background" />
+
+        <TextView
+            android:id="@+id/textViewEmptyEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No events found"
+            android:textColor="#777777"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewAdminEvents"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:padding="8dp"
-        android:clipToPadding="false"/>
+        android:clipToPadding="false"
 
-    <TextView
-        android:id="@+id/textViewEmptyEvents"
-        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/top_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_admin_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <include
+        android:id="@+id/bottom_nav_admin_container"
+        layout="@layout/bottom_nav_admin"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="No events found"
-        android:textColor="#777777"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <include layout="@layout/bottom_nav_admin"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
