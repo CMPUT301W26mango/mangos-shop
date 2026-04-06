@@ -226,11 +226,19 @@ public class CommentActivity extends AppCompatActivity {
                 .setPositiveButton("Delete", (dialog, which) -> {
 
                     // Delete it from firebase now
-                    db.collection("events").document(eventId)
-                            .collection("comments").document(comment.getCommentId())
+                    db.collection(currentCollectionPath)
+                            .document(comment.getCommentId())
                             .delete()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
+
+                                if (parentDocumentPath != null) {
+                                    db.document(parentDocumentPath)
+                                            .update("replyCount",
+                                                    com.google.firebase.firestore.FieldValue.increment(-1));
+                                }
+
+                                loadComments();
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Failed to delete comment", Toast.LENGTH_SHORT).show();
@@ -248,6 +256,7 @@ public class CommentActivity extends AppCompatActivity {
         intent.putExtra("collectionPath", currentCollectionPath + "/" + comment.getCommentId() + "/replies");
         intent.putExtra("parentPath", currentCollectionPath + "/" + comment.getCommentId());
         intent.putExtra("parentUsername", comment.getUserName());
+        intent.putExtra("isAdmin", isAdmin);
 
         startActivity(intent);
     }
