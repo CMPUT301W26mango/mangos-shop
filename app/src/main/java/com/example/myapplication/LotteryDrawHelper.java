@@ -362,6 +362,7 @@ public class LotteryDrawHelper {
         WriteBatch batch = db.batch();
         batch.update(eventRef, "drawCompleted", true);
         batch.update(eventRef, "drawDate", Timestamp.now());
+        batch.update(eventRef, "invitedUsers", new ArrayList<>());
         batch.commit()
                 .addOnSuccessListener(v -> {
                     if (listener != null) listener.onSuccess(selectedCount);
