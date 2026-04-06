@@ -111,29 +111,32 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
             btnClose.setOnClickListener(v -> dialog.dismiss());
 
             btnDelete.setOnClickListener(v -> {
-
                 String deletedUserId = profileItem.getUserId();
 
-                FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(deletedUserId)
-                        .delete()
-                        .addOnSuccessListener(aVoid -> {
-
-                            Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-
-                            if (currentUserId != null && currentUserId.equals(deletedUserId)) {
-
+                // Check if they are trying to delete themselves!
+                if (currentUserId != null && currentUserId.equals(deletedUserId)) {
+                    FirebaseFirestore.getInstance().collection("users").document(deletedUserId).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(AdminBrowseProfilesActivity.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
+                            });
+                    return; // Stop here so it doesn't run the rest of the code!
+                }
 
-                            } else {
+                // If they are an Organizer, trigger the massive sweep!
+                if ("Organizer".equalsIgnoreCase(profileItem.getRole())) {
+                    deleteOrganizerAndEvents(deletedUserId, dialog);
+                } else {
+                    // Normal Entrant Delete
+                    FirebaseFirestore.getInstance().collection("users").document(deletedUserId).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
                                 loadProfiles();
-                            }
-
-                        });
+                            });
+                }
             });
 
             btnDeleteImage.setOnClickListener(v -> {
@@ -282,5 +285,66 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
 
                 })
                 .show();
+    }
+
+    /**
+     * Deletes an organizer, sweeps the database to delete all their events,
+     * and notifies any entrants who were on the waiting lists.
+     *
+     * @param organizerDeviceId  device id for the organizer
+     * @param dialog the alert/message for the users in the event
+     */
+    private void deleteOrganizerAndEvents(String organizerDeviceId, AlertDialog dialog) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Find all events hosted by this organizer
+        db.collection("events").whereEqualTo("deviceId", organizerDeviceId).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    for (QueryDocumentSnapshot eventDoc : queryDocumentSnapshots) {
+                        String eventId = eventDoc.getId();
+                        String eventName = eventDoc.getString("title");
+
+                        // Dig into the waitingList of this specific event to find the entrants
+                        db.collection("events").document(eventId).collection("waitingList").get()
+                                .addOnSuccessListener(waitlistSnaps -> {
+
+                                    for (QueryDocumentSnapshot entrantDoc : waitlistSnaps) {
+                                        String entrantId = entrantDoc.getId();
+
+                                        // Build and send the cancellation notification
+                                        java.util.Map<String, Object> notifData = new java.util.HashMap<>();
+                                        notifData.put("eventId", eventId);
+                                        notifData.put("eventName", eventName);
+                                        notifData.put("notiName", "Event Cancelled");
+                                        notifData.put("description", "The organizer's account was removed by an Admin, so this event has been cancelled.");
+                                        notifData.put("read", false);
+                                        notifData.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                                        notifData.put("senderId", "SYSTEM_ADMIN");
+
+                                        // Push to entrant's inbox
+                                        db.collection("users").document(entrantId)
+                                                .collection("notifications").add(notifData);
+
+                                        // Delete the entrant from the waitlist subcollection
+                                        entrantDoc.getReference().delete();
+                                    }
+
+                                    // Delete the event document itself
+                                    eventDoc.getReference().delete();
+                                });
+                    }
+
+                    // Delete the Organizer's actual profile document
+                    db.collection("users").document(organizerDeviceId).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Organizer and their events successfully purged.", Toast.LENGTH_LONG).show();
+                                dialog.dismiss();
+                                loadProfiles(); // Refresh the screen!
+                            })
+                            .addOnFailureListener(e -> android.util.Log.e("AdminDelete", "Failed to delete user profile", e));
+
+                })
+                .addOnFailureListener(e -> android.util.Log.e("AdminDelete", "Failed to sweep events", e));
     }
 }

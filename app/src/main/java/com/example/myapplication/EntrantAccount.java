@@ -19,7 +19,7 @@ import com.google.firebase.firestore.ListenerRegistration; // testing for now if
  * (like the event list), and deleting the user account.
  */
 
-public class EntrantAccount extends AppCompatActivity {
+public class EntrantAccount extends BaseActivity {
     private EditText userName, userEmail, userPhone;
     private Profiles profiles;
     private String deviceId;
@@ -59,48 +59,6 @@ public class EntrantAccount extends AppCompatActivity {
         findViewById(R.id.deleteButton).setOnClickListener(v -> showDeleteConfirmation());
 
         loadEntrantData();
-
-        roleCheckerListener();
-    }
-
-
-    //https://gotodba.com/2015/03/09/listener-registration-explained/
-    //https://firebase.google.com/docs/firestore/query-data/listen
-    /**
-     * Real time updater with Firestore
-     * If the admin boolean goes to true in the database, this will auto make them admin(send them to the page, without having to reload the app)
-     */
-    private void roleCheckerListener() {
-        //https://gotodba.com/2015/03/09/listener-registration-explained/
-        //https://firebase.google.com/docs/firestore/query-data/listen
-        roleChecker = db.collection("users").document(deviceId)
-                .addSnapshotListener((snapshot, error) -> {
-                    if (error != null || snapshot == null || !snapshot.exists()) {
-                        return;
-                    }
-
-                    Boolean isAdmin = snapshot.getBoolean("isAdmin");
-                    String currentRole = snapshot.getString("role");
-
-                    SharedPreferences prefs = getSharedPreferences("ROLE_PREF", MODE_PRIVATE);
-                    String overrideRole = prefs.getString("currentRole", null);
-
-                    if (overrideRole != null) {
-                        return;
-                    }
-
-                    if (Boolean.TRUE.equals(isAdmin) || "Admin".equals(currentRole)) {
-                        if (!"Admin".equals(currentRole)) {
-                            db.collection("users").document(deviceId).update("role", "Admin");
-                        }
-
-                        Toast.makeText(EntrantAccount.this, "Admin Access Granted!", Toast.LENGTH_LONG).show();
-
-                        Intent intent = new Intent(EntrantAccount.this, AdminBrowseEventsActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
     }
 
     /**
@@ -172,17 +130,10 @@ public class EntrantAccount extends AppCompatActivity {
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Account")
-                .setMessage("This will remove your data and waiting list entries. Continue?")
+                .setMessage("Are you sure? This will delete your profile and all events you are hosting.")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    profiles.deleteProfile(deviceId, task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(this, "Profile Deleted", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(this, MainActivity.class);
-                            //this should be working/
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
-                    });
+                    // Call the sweep method from BaseActivity
+                    deleteAccountAndEvents();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

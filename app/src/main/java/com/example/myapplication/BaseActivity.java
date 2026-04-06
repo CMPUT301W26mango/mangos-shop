@@ -19,8 +19,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 public class BaseActivity extends AppCompatActivity {
 
     protected FirebaseFirestore db;
-    private ListenerRegistration globalRoleListener;
-
+    private static ListenerRegistration globalRoleListener;
+    protected static boolean isSelfDeleting = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +38,10 @@ public class BaseActivity extends AppCompatActivity {
     private void startGlobalRoleListener() {
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
+        if (globalRoleListener != null) {
+            return;
+        }
+
         globalRoleListener = db.collection("users").document(deviceId)
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
@@ -52,7 +56,9 @@ public class BaseActivity extends AppCompatActivity {
                             return;
                         }
 
-                        Toast.makeText(this, "Your account has been removed by an administrator.", Toast.LENGTH_LONG).show();
+                        if (!isSelfDeleting) {
+                            Toast.makeText(this, "Your account has been removed by an administrator.", Toast.LENGTH_LONG).show();
+                        }
 
                         Intent intent = new Intent(this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -135,4 +141,53 @@ public class BaseActivity extends AppCompatActivity {
             findViewById(R.id.nav_profile_entrant).setOnClickListener(v -> startActivity(new android.content.Intent(this, UserProfileActivity.class)));
         }
     }
+
+    // Global sweep to delete user and all hosted events
+    protected void deleteAccountAndEvents() {
+        isSelfDeleting = true;
+
+        if (globalRoleListener != null) {
+            globalRoleListener.remove();
+            globalRoleListener = null;
+        }
+
+        String deviceId = android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        // Find all events where this user is the host
+        db.collection("events").whereEqualTo("deviceId", deviceId).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot eventDoc : queryDocumentSnapshots) {
+                        String eventId = eventDoc.getId();
+                        String eventName = eventDoc.getString("title");
+
+                        // Notify waitlisted people before deleting
+                        db.collection("events").document(eventId).collection("waitingList").get()
+                                .addOnSuccessListener(waitlistSnaps -> {
+                                    for (com.google.firebase.firestore.QueryDocumentSnapshot entrantDoc : waitlistSnaps) {
+                                        String entrantId = entrantDoc.getId();
+
+                                        java.util.Map<String, Object> notif = new java.util.HashMap<>();
+                                        notif.put("eventName", eventName);
+                                        notif.put("description", "The organizer deleted their account. Event cancelled.");
+                                        notif.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+
+                                        db.collection("users").document(entrantId).collection("notifications").add(notif);
+                                        entrantDoc.getReference().delete();
+                                    }
+                                    eventDoc.getReference().delete();
+                                });
+                    }
+
+                    // Delete the actual user profile last
+                    db.collection("users").document(deviceId).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                android.widget.Toast.makeText(this, "Your Account Has Been Deleted", android.widget.Toast.LENGTH_SHORT).show();
+                                android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
+                                intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                finish();
+                            });
+                });
+    }
+
 }
