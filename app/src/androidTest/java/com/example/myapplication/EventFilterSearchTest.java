@@ -11,6 +11,7 @@ import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -48,6 +49,11 @@ import static org.hamcrest.Matchers.containsString;
 
 @RunWith(AndroidJUnit4.class)
 public class EventFilterSearchTest {
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+            android.Manifest.permission.POST_NOTIFICATIONS,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+    );
 
     @Rule
     public ActivityScenarioRule<EventListActivity> activityRule =

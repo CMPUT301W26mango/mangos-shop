@@ -293,7 +293,7 @@
                         android:id="@+id/filterMaxEventDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Min"
+                        android:hint="Max"
                         android:textSize="12sp"
                         android:padding="8dp"
                         android:focusable="false"
@@ -318,6 +318,28 @@
                 android:layout_marginTop="8dp"
                 android:background="@android:color/darker_gray" />
 
+            <TextView
+                android:id="@+id/availableSpaceErrorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Minimum Available space cannot be greater \n than Max Available Space"
+                android:textSize="11sp"
+                android:textColor="@color/red"
+                android:visibility="invisible"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/eventDateRangeErrorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Minimum Date cannot be greater than Max Available Date"
+                android:textSize="11sp"
+                android:textColor="@color/red"
+                android:visibility="invisible"
+                android:layout_marginTop="4dp"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center" />
 
             <Button
                 android:id="@+id/applyFiltersBtn"
@@ -329,6 +351,7 @@
                 android:text="Apply Filters"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
+
 
 
         </LinearLayout>
