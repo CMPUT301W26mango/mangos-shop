@@ -41,6 +41,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_selected_users);
 
 
         eventId = getIntent().getStringExtra("eventId");
