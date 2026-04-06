@@ -60,6 +60,9 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
 
         recyclerViewAdminProfiles = findViewById(R.id.recyclerViewAdminProfiles);
         searchViewProfiles = findViewById(R.id.searchViewProfiles);
+        searchViewProfiles.setOnClickListener(v -> {
+            searchViewProfiles.setIconified(false);
+        });
         textViewEmptyProfiles = findViewById(R.id.textViewEmptyProfiles);
 
         db = FirebaseFirestore.getInstance();
