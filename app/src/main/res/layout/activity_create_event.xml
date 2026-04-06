@@ -60,8 +60,9 @@
                     android:layout_height="40dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/rounded_input_box"
-                    android:hint="Location"
-                    android:inputType="text"
+                    android:hint="Location (tap to select)"
+                    android:focusable="false"
+                    android:clickable="true"
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 
@@ -123,7 +124,7 @@
                     android:layout_marginTop="30dp"
                     android:background="@drawable/rounded_input_box"
                     android:hint="Event Capacity"
-                    android:inputType="textMultiLine"
+                    android:inputType="number"
                     android:paddingStart="30dp"
                     android:paddingEnd="30dp" />
 

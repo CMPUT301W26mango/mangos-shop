@@ -199,7 +199,8 @@ public class EventDetailActivity extends BaseActivity {
                     // Capacity: enrolled / max
                     Long capacity = doc.getLong("capacity");
                     String capStr = capacity != null ? String.valueOf(capacity) : "?";
-                    db.collection("events").document(eventId).collection("waitingList").get()
+                    db.collection("events").document(eventId).collection("waitingList")
+                            .whereEqualTo("status", "accepted").get()
                             .addOnSuccessListener(wl ->
                                     tvCapacity.setText("Capacity: " + wl.size() + " / " + capStr));
                 })

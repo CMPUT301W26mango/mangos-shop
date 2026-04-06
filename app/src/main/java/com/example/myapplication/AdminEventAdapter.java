@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -56,13 +56,20 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
         if (location == null || location.isEmpty()) {
             location = "No location";
         }
-        holder.textViewEventLocation.setText("Location: " + location);
+        holder.textViewEventLocation.setText(location);
+        if (eventItem.getRegEnd() != null) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd");
+            String formattedDate = sdf.format(eventItem.getRegEnd().toDate());
+            holder.textViewEventDeadline.setText("Registration Closes: " + formattedDate);
+        } else {
+            holder.textViewEventDeadline.setText("Registration Closes: N/A");
+        }
 
         String organizer = eventItem.getOrganizerName();
         if (organizer == null || organizer.isEmpty()) {
             organizer = "Unknown organizer";
         }
-        holder.textViewEventOrganizer.setText("Organizer: " + organizer);
+        holder.textViewEventOrganizer.setText("Hosted by: " + organizer);
 
         String imageUrl = eventItem.getPosterURL();
 
@@ -77,15 +84,14 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
 
         holder.itemView.setOnClickListener(v -> listener.onEventClick(eventItem));
 
-        Button btnComments = holder.itemView.findViewById(R.id.btn_view_comments);
-
-        btnComments.setOnClickListener(v -> {
+        holder.btnComments.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), CommentActivity.class);
             intent.putExtra("eventId", eventItem.getEventId());
             intent.putExtra("organizerId", eventItem.getOrganizerId());
             intent.putExtra("isAdmin", true);
             v.getContext().startActivity(intent);
         });
+
     }
 
     @Override
@@ -94,15 +100,18 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
     }
 
     public static class AdminEventViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewEventTitle, textViewEventLocation, textViewEventOrganizer;
+        TextView textViewEventTitle, textViewEventLocation, textViewEventOrganizer, textViewEventDeadline;
         ImageView imagePoster;
+        ImageButton btnComments;
 
         public AdminEventViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewEventTitle = itemView.findViewById(R.id.textViewEventTitle);
             textViewEventLocation = itemView.findViewById(R.id.textViewEventLocation);
             textViewEventOrganizer = itemView.findViewById(R.id.textViewEventOrganizer);
+            textViewEventDeadline = itemView.findViewById(R.id.textViewEventDeadline);
             imagePoster = itemView.findViewById(R.id.imagePoster);
+            btnComments = itemView.findViewById(R.id.btn_view_comments);
         }
     }
 }

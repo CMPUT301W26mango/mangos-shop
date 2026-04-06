@@ -191,6 +191,12 @@ public class EventCreateActivity extends AppCompatActivity {
         geoSwitch = findViewById(R.id.switchGeolocation);
         privSwitch = findViewById(R.id.switch_private_event);
 
+        // Open map picker when the location field is tapped
+        locationInput.setOnClickListener(v -> {
+            LocationPickerDialog dialog = LocationPickerDialog.newInstance();
+            dialog.setOnLocationSelectedListener(address -> locationInput.setText(address));
+            dialog.show(getSupportFragmentManager(), "location_picker");
+        });
 
         String mode = getIntent().getStringExtra("MODE");
         String eventId = getIntent().getStringExtra("EVENT_ID");
