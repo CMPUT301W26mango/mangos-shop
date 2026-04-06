@@ -247,11 +247,24 @@ public class CommentActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to delete this comment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
 
-
                     db.collection(currentCollectionPath).document(comment.getCommentId())
                             .delete()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
+
+                                // Decrement the reply count for EVERY parent in the chain
+                                if (parentDocumentPath != null) {
+                                    String[] segments = parentDocumentPath.split("/");
+                                    StringBuilder currentPath = new StringBuilder(segments[0] + "/" + segments[1]);
+
+                                    for (int i = 2; i < segments.length; i += 2) {
+                                        currentPath.append("/").append(segments[i]).append("/").append(segments[i+1]);
+
+                                        db.document(currentPath.toString())
+                                                .update("replyCount",
+                                                        com.google.firebase.firestore.FieldValue.increment(-1));
+                                    }
+                                }
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Failed to delete comment", Toast.LENGTH_SHORT).show();

@@ -52,6 +52,9 @@ public class AdminBrowseEventsActivity extends AppCompatActivity {
         TextView textViewAdminTitle = findViewById(R.id.textViewAdminTitle);
         recyclerViewAdminEvents = findViewById(R.id.recyclerViewAdminEvents);
         searchViewEvents = findViewById(R.id.searchViewEvents);
+        searchViewEvents.setOnClickListener(v -> {
+            searchViewEvents.setIconified(false);
+        });
         textViewEmptyEvents = findViewById(R.id.textViewEmptyEvents);
         LinearLayout navProfiles = findViewById(R.id.nav_admin_profiles);
         LinearLayout navImages = findViewById(R.id.nav_admin_images);

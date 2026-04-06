@@ -89,8 +89,26 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         UserProfiles user = userList.get(position);
+        holder.tvName.setText(user.getName());
 
         holder.tvName.setText(user.getName());
+
+        if (user.getDeviceId() != null) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(user.getDeviceId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        String profileUrl = doc.getString("profileImageUrl");
+                        if (profileUrl != null && !profileUrl.isEmpty()) {
+                            com.bumptech.glide.Glide.with(context)
+                                    .load(profileUrl)
+                                    .circleCrop()
+                                    .placeholder(R.drawable.ic_launcher_foreground)
+                                    .into(holder.avatar);
+                        }
+                    });
+        }
 
         // Handle the Invite Click
         holder.itemView.setOnClickListener(v -> {
@@ -173,10 +191,12 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
      */
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
+        android.widget.ImageView avatar;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_user_name);
+            avatar = itemView.findViewById(R.id.user_avatar);
         }
     }
 }

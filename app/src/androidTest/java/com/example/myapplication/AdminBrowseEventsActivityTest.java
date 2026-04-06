@@ -37,7 +37,7 @@ public class AdminBrowseEventsActivityTest {
 
             onView(withId(R.id.searchViewEvents)).check(matches(isDisplayed()));
             onView(withId(R.id.recyclerViewAdminEvents)).check(matches(isDisplayed()));
-            onView(withId(R.id.buttonBrowseProfiles)).check(matches(isDisplayed()));
+            onView(withId(R.id.nav_admin_profiles)).check(matches(isDisplayed()));
         }
     }
 
@@ -46,7 +46,7 @@ public class AdminBrowseEventsActivityTest {
         try (ActivityScenario<AdminBrowseEventsActivity> scenario =
                      ActivityScenario.launch(AdminBrowseEventsActivity.class)) {
 
-            onView(withId(R.id.buttonBrowseProfiles)).perform(click());
+            onView(withId(R.id.nav_admin_profiles)).perform(click());
 
             intended(hasComponent(AdminBrowseProfilesActivity.class.getName()));
         }

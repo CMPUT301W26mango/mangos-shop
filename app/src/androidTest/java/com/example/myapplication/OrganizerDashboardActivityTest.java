@@ -72,7 +72,7 @@ public class OrganizerDashboardActivityTest {
     public void testNavigateToProfile() {
         ActivityScenario.launch(OrganizerDashboardActivity.class);
 
-        onView(withId(R.id.nav_profile)).perform(click());
+        onView(withId(R.id.nav_profile_organizer)).perform(click());
         intended(hasComponent(UserProfileActivity.class.getName()));
     }
 

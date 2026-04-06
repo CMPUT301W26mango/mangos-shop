@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 
 public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapter.AdminProfileViewHolder> {
 
@@ -60,6 +62,18 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
         holder.textName.setText(name);
         holder.textRole.setText(role);
 
+        String profileUrl = profileItem.getProfileImageUrl();
+
+        if (profileUrl != null && !profileUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(profileUrl)
+                    .circleCrop()
+                    .placeholder(android.R.drawable.sym_def_app_icon)
+                    .into(holder.profileImage);
+        } else {
+            holder.profileImage.setImageResource(android.R.drawable.sym_def_app_icon);
+        }
+
         holder.itemView.setOnClickListener(v -> listener.onProfileClick(profileItem));
     }
 
@@ -70,11 +84,13 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
 
     static class AdminProfileViewHolder extends RecyclerView.ViewHolder {
         TextView textName, textRole;
+        ImageView profileImage;
 
         public AdminProfileViewHolder(@NonNull View itemView) {
             super(itemView);
             textName = itemView.findViewById(R.id.textName);
             textRole = itemView.findViewById(R.id.textRole);
+            profileImage = itemView.findViewById(R.id.profileImageView);
         }
     }
 }
