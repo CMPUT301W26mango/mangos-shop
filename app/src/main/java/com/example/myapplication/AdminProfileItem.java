@@ -21,6 +21,7 @@ public class AdminProfileItem {
      * @param name user's name
      * @param email user's email
      * @param role user's role in the application
+     * @param profileImageUrl URL of the user's profile image
      */
     public AdminProfileItem(String userId, String name, String email, String role, String profileImageUrl) {
         this.userId = userId;
@@ -61,7 +62,11 @@ public class AdminProfileItem {
     public String getRole() {
         return role;
     }
-
+    /**
+     * Returns the profile image URL.
+     *
+     * @return profile URL
+     */
     public String getProfileImageUrl() {
         return profileImageUrl;
     }

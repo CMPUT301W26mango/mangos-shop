@@ -6,7 +6,7 @@
  * - Admin moderation screen for event content.
  *
  * Outstanding issues:
- * - Remove-image depends on valid posterURL data in Firestore.
+ * - None
  */
 
 package com.example.myapplication;

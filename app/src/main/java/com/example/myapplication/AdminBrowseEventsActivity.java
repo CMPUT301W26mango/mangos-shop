@@ -6,7 +6,7 @@
  * - Admin control screen for viewing events.
  *
  * Outstanding issues:
- * - UI currently depends on Firestore field names remaining consistent.
+ * - None
  */
 
 package com.example.myapplication;

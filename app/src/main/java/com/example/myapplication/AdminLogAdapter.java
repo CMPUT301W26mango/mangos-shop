@@ -1,5 +1,10 @@
 package com.example.myapplication;
-
+/**
+ * RecyclerView adapter for displaying notification log items on the admin logs screen.
+ *
+ * Role in application:
+ * - Presentation-layer adapter for admin log viewing.
+ */
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
