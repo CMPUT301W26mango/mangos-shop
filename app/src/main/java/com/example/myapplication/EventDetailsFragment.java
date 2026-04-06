@@ -290,7 +290,7 @@ public class EventDetailsFragment extends DialogFragment {
                                     ));
 
                             btnCancel.setOnClickListener(v ->
-                                    leaveWaitingList(registerBtn, btnCancel, acceptBtn, declineBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg, declinedMsg));
+                                    cancelRegistration(registerBtn, btnCancel, acceptBtn, declineBtn, textViewAlreadyRegistered, selectedMsg, acceptedMsg, declinedMsg));
                         }
 
                     } else {
@@ -465,6 +465,23 @@ public class EventDetailsFragment extends DialogFragment {
 
 
 
+    }
+
+    private void cancelRegistration(Button registerBtn, Button cancelBtn, Button acceptBtn, Button declineBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
+        db.collection("events")
+                .document(firestoreDocId)
+                .collection("waitingList")
+                .document(deviceId)
+                .update("status", "cancelled")
+                .addOnSuccessListener(aVoid -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "Registration cancelled.", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded() || getContext() == null) return;
+                    Toast.makeText(getContext(), "Failed to cancel registration.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
