@@ -6,8 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class CommentTest {
@@ -83,5 +86,32 @@ public class CommentTest {
     public void testGetAndSetCommentId() {
         comment.setCommentId("CommentID_12345");
         assertEquals("CommentID_12345", comment.getCommentId());
+    }
+
+    @Test
+    public void testGetAndSetReplyCount() {
+        // Verify default state first
+        assertEquals(0, comment.getReplyCount());
+
+        // Test setter
+        comment.setReplyCount(5);
+        assertEquals(5, comment.getReplyCount());
+    }
+
+    @Test
+    public void testGetAndSetReactions() {
+        // Create dummy reactions map
+        Map<String, String> testReactions = new HashMap<>();
+        testReactions.put("User123", "Like");
+        testReactions.put("User456", "Heart");
+
+        // Test setter
+        comment.setReactions(testReactions);
+
+        // Verify the map was set correctly
+        assertNotNull(comment.getReactions());
+        assertEquals(2, comment.getReactions().size());
+        assertEquals("Like", comment.getReactions().get("User123"));
+        assertEquals("Heart", comment.getReactions().get("User456"));
     }
 }
