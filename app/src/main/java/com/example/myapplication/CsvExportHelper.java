@@ -29,7 +29,7 @@ public class CsvExportHelper {
     public static String generateCsvContent(List<EnrolledEntrant> entrants) {
         StringBuilder csv = new StringBuilder();
 
-        // Header row (criteria #4)
+        // Header row
         csv.append(CSV_HEADER).append("\n");
 
         // Data rows
