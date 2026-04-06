@@ -1,9 +1,9 @@
 package com.example.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * US 02.02.01 - View the list of entrants who joined the waiting list.
  * US 02.05.02 - Lazy-check safety net: triggers lottery draw if deadline passed and draw not yet done.
- * US 02.06.05 - Export entrants as CSV.
  *
  * Displays a real-time list of all entrant names on the waiting list for a
  * specific event. Only the organizer who owns the event (matched by device ID)
@@ -35,7 +34,6 @@ import java.util.List;
 public class WaitingListActivity extends AppCompatActivity {
 
     private static final String TAG = "WaitingListActivity";
-    private static final int CSV_EXPORT_REQUEST = 1001;
 
     private FirebaseFirestore db;
     private ListenerRegistration waitingListListener;
@@ -43,7 +41,9 @@ public class WaitingListActivity extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvEntrantCount;
     private RecyclerView rvEntrants;
-    private Button btnExportCsv;
+    private Button btnRunLottery;
+
+    private Timestamp regEndTimestamp;
 
     private List<EnrolledEntrant> entrants;
     private WaitingListAdapter adapter;
@@ -79,7 +79,7 @@ public class WaitingListActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.tvWaitingListTitle);
         tvEntrantCount = findViewById(R.id.tvEntrantCount);
         rvEntrants = findViewById(R.id.rvEntrants);
-        btnExportCsv = findViewById(R.id.btnExportCsv);
+        btnRunLottery = findViewById(R.id.btnRunLottery);
 
         tvTitle.setText("Waiting List: " + eventName);
 
@@ -89,15 +89,32 @@ public class WaitingListActivity extends AppCompatActivity {
         rvEntrants.setLayoutManager(new LinearLayoutManager(this));
         rvEntrants.setAdapter(adapter);
 
-        // --- Setup CSV export button (US 02.06.05) ---
-        btnExportCsv.setOnClickListener(v -> {
-            Intent intent = CsvExportHelper.createExportIntent(eventName);
-            startActivityForResult(intent, CSV_EXPORT_REQUEST);
-        });
-
         Button btnMessageWaiting = findViewById(R.id.btnMessageWaiting);
         btnMessageWaiting.setOnClickListener(v -> {
             AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Waiting List", java.util.Arrays.asList("waiting"));
+        });
+
+        btnRunLottery.setOnClickListener(v -> {
+            // Safety check: deadline must have passed
+            if (regEndTimestamp == null || regEndTimestamp.compareTo(Timestamp.now()) >= 0) {
+                Toast.makeText(this, "Registration deadline has not passed yet.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            btnRunLottery.setEnabled(false);
+            btnRunLottery.setText("Drawing...");
+            LotteryDrawHelper.performDraw(eventId, new LotteryDrawHelper.OnDrawCompleteListener() {
+                @Override
+                public void onSuccess(int count) {
+                    Toast.makeText(WaitingListActivity.this, count + " entrant(s) selected!", Toast.LENGTH_LONG).show();
+                    btnRunLottery.setVisibility(View.GONE);
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(WaitingListActivity.this, "Draw failed. Try again.", Toast.LENGTH_SHORT).show();
+                    btnRunLottery.setEnabled(true);
+                    btnRunLottery.setText("Run Lottery");
+                }
+            });
         });
 
         // --- Verify ownership, then lazy-check draw, then load waiting list ---
@@ -106,17 +123,6 @@ public class WaitingListActivity extends AppCompatActivity {
             return;
         }
         verifyOwnershipAndLoad();
-    }
-
-    /**
-     * Handles the result from the CSV file picker.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CSV_EXPORT_REQUEST && resultCode == RESULT_OK && data != null) {
-            CsvExportHelper.writeCsvToUri(this, data.getData(), entrants);
-        }
     }
 
     /**
@@ -142,6 +148,15 @@ public class WaitingListActivity extends AppCompatActivity {
                         Toast.makeText(this, "Access denied: you are not the organizer of this event.", Toast.LENGTH_SHORT).show();
                         finish();
                         return;
+                    }
+
+                    // Show "Run Lottery" button if deadline has passed and draw hasn't run
+                    Timestamp regEnd = documentSnapshot.getTimestamp("regEnd");
+                    Boolean drawCompleted = documentSnapshot.getBoolean("drawCompleted");
+                    if (regEnd != null && regEnd.compareTo(Timestamp.now()) < 0
+                            && !Boolean.TRUE.equals(drawCompleted)) {
+                        regEndTimestamp = regEnd;
+                        btnRunLottery.setVisibility(View.VISIBLE);
                     }
 
                     // US 02.05.02 lazy check — safety net if WorkManager missed this event.
@@ -197,8 +212,7 @@ public class WaitingListActivity extends AppCompatActivity {
 
     /**
      * Attaches a real-time snapshot listener to the waitingList subcollection.
-     * Reads name, email, phone, enrolmentDate for display and CSV export.
-     * Status is NOT read or displayed here — the lottery screen handles that.
+     * Reads name, email, phone, enrolmentDate for display.
      */
     private void attachWaitingListListener() {
         waitingListListener = db.collection("events")

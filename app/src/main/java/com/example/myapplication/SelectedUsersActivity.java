@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,10 +11,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Activity that displays and manages the list of users selected during an event lottery draw.
@@ -29,20 +37,24 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 public class SelectedUsersActivity extends AppCompatActivity {
 
     private static final String TAG = "SelectedUsersActivity";
+    private static final int CSV_EXPORT_REQUEST = 1001;
 
     private FirebaseFirestore db;
     private String eventId;
+    private String eventName;
 
     private LinearLayout containerAccepted;
     private LinearLayout containerDeclined;
     private LinearLayout containerPending;
     private LinearLayout containerCancelled;
 
+    private Button btnSendNotifications;
+    private Button btnExportCsv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_users);
-
 
         eventId = getIntent().getStringExtra("eventId");
         db = FirebaseFirestore.getInstance();
@@ -58,7 +70,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
 
         loadUsers();
 
-        String eventName = getIntent().getStringExtra("eventName"); // Grab the name passed from Event Details
+        eventName = getIntent().getStringExtra("eventName"); // Grab the name passed from Event Details
 
         Button btnMessageSelected = findViewById(R.id.btnMessageSelected);
         btnMessageSelected.setOnClickListener(v -> {
@@ -68,6 +80,16 @@ public class SelectedUsersActivity extends AppCompatActivity {
         Button btnMessageCancelled = findViewById(R.id.btnMessageCancelled);
         btnMessageCancelled.setOnClickListener(v -> {
             AnnouncementHelper.showAnnouncementDialog(this, eventId, eventName, "Unsuccessful/Cancelled", java.util.Arrays.asList("cancelled", "declined", "not_selected"));
+        });
+
+        btnSendNotifications = findViewById(R.id.btnSendNotifications);
+        btnSendNotifications.setOnClickListener(v -> sendNotifications());
+
+        btnExportCsv = findViewById(R.id.btnExportCsv);
+        btnExportCsv.setOnClickListener(v -> {
+            String safeEventName = (eventName != null && !eventName.isEmpty()) ? eventName : "Event";
+            Intent intent = CsvExportHelper.createExportIntent(safeEventName);
+            startActivityForResult(intent, CSV_EXPORT_REQUEST);
         });
     }
 
@@ -199,6 +221,90 @@ public class SelectedUsersActivity extends AppCompatActivity {
     }
 
     /**
+     * Reads all waiting list entries and writes in-app notifications for entrants
+     * whose status is "selected" or "rejected" and who have not yet been notified
+     * (notified field is not true). Sets notified = true on each waitingList document
+     * after notifying, so pressing the button again only picks up new unnotified entrants
+     * (e.g. replacement draws).
+     */
+    private void sendNotifications() {
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDoc -> {
+                    String displayTitle = eventDoc.getString("title");
+                    if (displayTitle == null) displayTitle = (eventName != null) ? eventName : "an event";
+                    final String finalTitle = displayTitle;
+
+                    db.collection("events").document(eventId)
+                            .collection("waitingList")
+                            .get()
+                            .addOnSuccessListener(snapshots -> {
+                                int[] count = {0};
+
+                                for (QueryDocumentSnapshot doc : snapshots) {
+                                    String status = doc.getString("status");
+                                    Boolean notified = doc.getBoolean("notified");
+
+                                    // Only notify selected/rejected entrants who haven't been notified yet
+                                    if (!"selected".equals(status) && !"rejected".equals(status)) continue;
+                                    if (Boolean.TRUE.equals(notified)) continue;
+
+                                    String userId = doc.getId();
+                                    String entrantName = doc.getString("name");
+                                    String displayName = (entrantName != null && !entrantName.isEmpty())
+                                            ? entrantName : "Entrant";
+
+                                    Map<String, Object> notifData = new HashMap<>();
+                                    notifData.put("eventId", eventId);
+                                    notifData.put("eventName", finalTitle);
+                                    notifData.put("read", false);
+                                    notifData.put("timestamp", Timestamp.now());
+
+                                    if ("selected".equals(status)) {
+                                        notifData.put("notiName", "Lottery Winner!");
+                                        notifData.put("description", "Congratulations " + displayName
+                                                + "! You have been selected to join " + finalTitle
+                                                + ". Please go to the event page to accept or reject your entry.");
+                                    } else {
+                                        notifData.put("notiName", "Lottery Result");
+                                        notifData.put("description", "Unfortunately " + displayName
+                                                + ", you were not selected for " + finalTitle + " this time.");
+                                    }
+
+                                    // Write notification (fire-and-forget)
+                                    db.collection("users").document(userId)
+                                            .collection("notifications")
+                                            .add(notifData)
+                                            .addOnFailureListener(e ->
+                                                    Log.e(TAG, "Failed to write notification for: " + userId, e));
+
+                                    // Mark this entrant as notified so re-pressing the button skips them
+                                    db.collection("events").document(eventId)
+                                            .collection("waitingList").document(userId)
+                                            .update("notified", true)
+                                            .addOnFailureListener(e ->
+                                                    Log.e(TAG, "Failed to set notified for: " + userId, e));
+
+                                    count[0]++;
+                                }
+
+                                if (count[0] == 0) {
+                                    Toast.makeText(this, "No new entrants to notify", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(this, "Notifications sent to " + count[0] + " entrant(s)!", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to read waiting list for notifications", e);
+                                Toast.makeText(this, "Failed to send notifications.", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to read event document for notifications", e);
+                    Toast.makeText(this, "Failed to send notifications.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
      * Remove a declined user from the waiting list, then draw a replacement.
      * The removal always happens. If no replacement is available, that's okay.
      */
@@ -228,5 +334,33 @@ public class SelectedUsersActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(SelectedUsersActivity.this, "Failed to remove user.", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CSV_EXPORT_REQUEST && resultCode == RESULT_OK && data != null) {
+            // Fetch all entrants on the waiting list, including their statuses, and export
+            db.collection("events").document(eventId).collection("waitingList").get()
+                    .addOnSuccessListener(snapshots -> {
+                        List<EnrolledEntrant> allEntrants = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            String name = doc.getString("name");
+                            if (name == null || name.isEmpty()) name = doc.getId(); // Fallback
+                            String email = doc.getString("email");
+                            String phone = doc.getString("phone");
+                            String enrolmentDate = doc.getString("enrolmentDate");
+                            String status = doc.getString("status");
+
+                            if (status == null) status = "waiting";
+
+                            EnrolledEntrant entrant = new EnrolledEntrant(name, email, phone, enrolmentDate);
+                            entrant.setStatus(status);
+                            allEntrants.add(entrant);
+                        }
+                        CsvExportHelper.writeCsvToUriWithStatus(this, data.getData(), allEntrants);
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to retrieve users for CSV export.", Toast.LENGTH_SHORT).show());
+        }
     }
 }
