@@ -26,7 +26,6 @@ public class AdminLogsTest {
      */
     @Test
     public void testActivityLaunch() {
-        // passes if no crash
     }
 
     /**
@@ -39,7 +38,6 @@ public class AdminLogsTest {
             onView(withId(R.id.recyclerViewLogs))
                     .perform(swipeUp());
         } catch (Exception ignored) {
-            // If Firebase blocks UI, test still passes
         }
     }
 }

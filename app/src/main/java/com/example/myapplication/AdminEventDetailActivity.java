@@ -155,7 +155,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 imageRef.delete()
                         .addOnSuccessListener(unused -> clearPosterUrlFromFirestore())
                         .addOnFailureListener(e -> {
-                            // Even if storage delete fails, still clear the app reference
                             clearPosterUrlFromFirestore();
                         });
 

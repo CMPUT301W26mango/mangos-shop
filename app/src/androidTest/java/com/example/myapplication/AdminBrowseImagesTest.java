@@ -39,7 +39,6 @@ public class AdminBrowseImagesTest {
      */
     @Test
     public void testActivityLaunch() {
-        // passes if activity starts
     }
 
     /**
@@ -48,7 +47,7 @@ public class AdminBrowseImagesTest {
     @Test
     public void testScrollImages() {
 
-        waitFor(2000); // allow Firestore load
+        waitFor(2000);
 
         try {
             onView(withId(R.id.recyclerViewImages))
