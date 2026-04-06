@@ -331,7 +331,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Available Spots"
+                android:text="Waitlist Availability"
                 android:textSize="16sp"
                 android:textColor="@color/darkergray"/>
 

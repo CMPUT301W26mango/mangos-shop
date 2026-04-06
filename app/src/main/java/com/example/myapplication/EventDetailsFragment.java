@@ -210,7 +210,7 @@ public class EventDetailsFragment extends DialogFragment {
 
                                         int currentWaitListSize = snapshots.size();
                                         int remainingSpots = (int)(maxSpots - currentWaitListSize);
-                                        tvSpots.setText(String.valueOf(Math.max(0, remainingSpots)));
+                                        tvSpots.setText(String.valueOf(Math.max(0, remainingSpots)) + "/" + maxSpots);
 
                                     });
                         }

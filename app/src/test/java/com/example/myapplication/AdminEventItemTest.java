@@ -43,7 +43,6 @@ public class AdminEventItemTest {
         assertEquals(organizerId, item.getOrganizerId());
         assertEquals(timestamp, item.getRegEnd());
 
-        // deadline is never set → should be null
         assertNull(item.getDeadline());
     }
 
