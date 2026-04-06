@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -101,11 +102,11 @@ public class CommentActivity extends AppCompatActivity {
         }
 
         commentList = new ArrayList<>();
-        adapter = new CommentAdapter(commentList, organizerId, comment -> {
-            checkRoleAndDelete(comment);
-        }, comment -> {
-            openThread(comment);
-        });
+        adapter = new CommentAdapter(commentList, organizerId,
+                comment -> checkRoleAndDelete(comment),
+                comment -> openThread(comment),
+                (comment, emoji) -> saveReaction(comment, emoji)
+        );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -116,6 +117,17 @@ public class CommentActivity extends AppCompatActivity {
         // Listeners for the button
         sendButton.setOnClickListener(v -> postComment());
         backButton.setOnClickListener(v -> finish());
+
+        recyclerView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (adapter.getOpenReactionIndex() != -1) {
+                    int oldIndex = adapter.getOpenReactionIndex();
+                    adapter.setOpenReactionIndex(-1);
+                    adapter.notifyItemChanged(oldIndex);
+                }
+            }
+            return false;
+        });
 
     }
 
@@ -183,8 +195,18 @@ public class CommentActivity extends AppCompatActivity {
 
                                 // If this is a nested thread then update the parents reply count
                                 if (parentDocumentPath != null) {
-                                    db.document(parentDocumentPath)
-                                            .update("replyCount", com.google.firebase.firestore.FieldValue.increment(1));
+                                    String[] segments = parentDocumentPath.split("/");
+
+                                    // The path starts with events/{eventId}
+                                    StringBuilder currentPath = new StringBuilder(segments[0] + "/" + segments[1]);
+
+                                    // Loop through the path and add +1 to every comment/reply document in the chain
+                                    for (int i = 2; i < segments.length; i += 2) {
+                                        currentPath.append("/").append(segments[i]).append("/").append(segments[i+1]);
+
+                                        db.document(currentPath.toString())
+                                                .update("replyCount", com.google.firebase.firestore.FieldValue.increment(1));
+                                    }
                                 }
                             })
                             .addOnFailureListener(e -> {
@@ -225,9 +247,8 @@ public class CommentActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to delete this comment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
 
-                    // Delete it from firebase now
-                    db.collection("events").document(eventId)
-                            .collection("comments").document(comment.getCommentId())
+
+                    db.collection(currentCollectionPath).document(comment.getCommentId())
                             .delete()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
@@ -248,7 +269,31 @@ public class CommentActivity extends AppCompatActivity {
         intent.putExtra("collectionPath", currentCollectionPath + "/" + comment.getCommentId() + "/replies");
         intent.putExtra("parentPath", currentCollectionPath + "/" + comment.getCommentId());
         intent.putExtra("parentUsername", comment.getUserName());
+        intent.putExtra("isAdmin", isAdmin);
 
         startActivity(intent);
+    }
+
+    private void saveReaction(Comment comment, String emoji) {
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        Object updateValue;
+
+        if (emoji == null) {
+            updateValue = com.google.firebase.firestore.FieldValue.delete();
+        } else {
+            updateValue = emoji;
+        }
+
+
+        // use dot notation to update just this specific users reaction inside the map
+        db.collection(currentCollectionPath).document(comment.getCommentId())
+                .update("reactions." + deviceId, updateValue)
+                .addOnSuccessListener(aVoid -> {
+                    // the snapshot will automatically refresh
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to add reaction", Toast.LENGTH_SHORT).show();
+                });
     }
 }

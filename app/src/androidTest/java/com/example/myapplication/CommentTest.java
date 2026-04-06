@@ -18,6 +18,7 @@ import java.util.UUID;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.doubleClick;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
@@ -27,7 +28,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 /**
  * This Test class Tests the comments
@@ -36,10 +39,10 @@ import static org.hamcrest.Matchers.not;
  * It tests that the users name exists in the box
  * This Test class was also written with the help of Google "Gemini" LLM
  * Prompt: Given these following scenarios recommend proper test cases to test them
- *  - click the comment button on the event, it should open the comments
- *  - Open click the comment button on the event, and we should be able to type something in the comment bar
- *  - The comment should be posted and that comment should appear in comments
- *  - The username of the person who made that comment should be shown
+ * - click the comment button on the event, it should open the comments
+ * - Open click the comment button on the event, and we should be able to type something in the comment bar
+ * - The comment should be posted and that comment should appear in comments
+ * - The username of the person who made that comment should be shown
  * */
 @RunWith(AndroidJUnit4.class)
 public class CommentTest {
@@ -128,6 +131,107 @@ public class CommentTest {
         )).check(matches(not(withText(""))));
     }
 
+    @Test
+    public void testTapToOpenReplies() {
+        waitForNetwork(3000);
+
+        // Navigate to comments
+        onView(withId(R.id.recyclerViewEvents))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.viewCommentsBtn)));
+        waitForNetwork(1000);
+
+        // Post a unique comment to interact with
+        String uniqueComment = "Reply Thread Check " + UUID.randomUUID().toString().substring(0, 8);
+        onView(withId(R.id.commentInput)).perform(typeText(uniqueComment), closeSoftKeyboard());
+        onView(withId(R.id.buttonSendComment)).perform(click());
+        waitForNetwork(2000);
+
+        // Tap the comment to open the reply thread
+        onView(withId(R.id.recyclerViewComments))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(uniqueComment)), click()));
+        waitForNetwork(1000);
+
+        // Verify the screen title changed to indicate we are in a reply thread
+        onView(withId(R.id.screenTitle)).check(matches(withText(startsWith("Replies for"))));
+    }
+
+    @Test
+    public void testReplyCountUpdates() {
+        waitForNetwork(3000);
+
+        // Navigate to comments
+        onView(withId(R.id.recyclerViewEvents))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.viewCommentsBtn)));
+        waitForNetwork(1000);
+
+        // Post parent comment
+        String parentComment = "Parent Count Test " + UUID.randomUUID().toString().substring(0, 8);
+        onView(withId(R.id.commentInput)).perform(typeText(parentComment), closeSoftKeyboard());
+        onView(withId(R.id.buttonSendComment)).perform(click());
+        waitForNetwork(2000);
+
+        // Open the parent comment's replies
+        onView(withId(R.id.recyclerViewComments))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(parentComment)), click()));
+        waitForNetwork(1000);
+
+        // Send a reply
+        onView(withId(R.id.commentInput)).perform(typeText("This is a nested reply!"), closeSoftKeyboard());
+        onView(withId(R.id.buttonSendComment)).perform(click());
+        waitForNetwork(2000);
+
+        // Go back to the main comment thread
+        onView(withId(R.id.btnBack)).perform(click());
+        waitForNetwork(1000);
+
+        // Find the specific parent card and verify its reply text is visible and reads "1 replies"
+        Matcher<View> parentCard = allOf(
+                withParent(withId(R.id.recyclerViewComments)),
+                hasDescendant(withText(parentComment))
+        );
+
+        onView(allOf(withId(R.id.replyIndicatorText), isDescendantOfA(parentCard)))
+                .check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.replyIndicatorText), isDescendantOfA(parentCard)))
+                .check(matches(withText(containsString("1 replies"))));
+    }
+
+    @Test
+    public void testDoubleTapToReact() {
+        waitForNetwork(3000);
+
+        // Navigate to comments
+        onView(withId(R.id.recyclerViewEvents))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.viewCommentsBtn)));
+        waitForNetwork(1000);
+
+        // Post a comment to react to
+        String reactComment = "Reaction Test " + UUID.randomUUID().toString().substring(0, 8);
+        onView(withId(R.id.commentInput)).perform(typeText(reactComment), closeSoftKeyboard());
+        onView(withId(R.id.buttonSendComment)).perform(click());
+        waitForNetwork(2000);
+
+        // Double tap the specific comment
+        onView(withId(R.id.recyclerViewComments))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(reactComment)), doubleClick()));
+        waitForNetwork(500);
+
+        // Click the thumbs up chip on the visible popup
+        onView(allOf(withId(R.id.chipThumbsUp), isDisplayed())).perform(click());
+        waitForNetwork(1000);
+
+        // Verify the reaction tally is now visible on that specific comment card and contains the emoji
+        Matcher<View> targetCard = allOf(
+                withParent(withId(R.id.recyclerViewComments)),
+                hasDescendant(withText(reactComment))
+        );
+
+        onView(allOf(withId(R.id.reactionTallyText), isDescendantOfA(targetCard)))
+                .check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.reactionTallyText), isDescendantOfA(targetCard)))
+                .check(matches(withText(containsString("👍"))));
+    }
+
     private void waitForNetwork(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -137,9 +241,7 @@ public class CommentTest {
     }
 
     /**
-     * Custom ViewAction to click a specific button INSIDE a RecyclerView row.
-     * Standard RecyclerViewActions.actionOnItemAtPosition clicks the entire row,
-     * which would accidentally open EventDetailsFragment instead of CommentActivity.
+     * Custom ViewAction to click a specific button inside a RecyclerView row.
      */
     public static ViewAction clickChildViewWithId(final int id) {
         return new ViewAction() {

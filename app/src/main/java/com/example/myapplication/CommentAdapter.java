@@ -1,11 +1,21 @@
 package com.example.myapplication;
+import android.text.format.DateUtils;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a RecyclerView adapter that allows for a scrollable list of comments
@@ -25,8 +35,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         void onCommentClick(Comment comment);
     }
 
+    // To react to a comment
+    public interface OnCommentReactListener {
+        void onCommentReact(Comment comment, String emoji);
+    }
+
     private OnCommentLongClickListener longClickListener;
     private OnCommentClickListener clickListener;
+    private OnCommentReactListener reactListener;
+
+    private int openReactionIndex = -1;
+
+
 
 
     /**
@@ -38,11 +58,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      * @param organizerId
      *  This is the id of the organizer that organized the event in which the comments are for
      * */
-    public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener, OnCommentClickListener clickListener){
+    public CommentAdapter(List<Comment> commentList, String organizerId, OnCommentLongClickListener longClickListener, OnCommentClickListener clickListener, OnCommentReactListener reactListener){
         this.commentList = commentList;
         this.organizerId = organizerId;
         this.longClickListener = longClickListener;
         this.clickListener = clickListener;
+        this.reactListener = reactListener;
     }
 
 
@@ -74,34 +95,24 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      * */
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-
         Comment comment = commentList.get(position);
         holder.userName.setText(comment.getUserName());
         holder.commentText.setText(comment.getCommentText());
 
         // Check if the comment writer is an organizer or not
         if (comment.getDeviceId() != null && comment.getDeviceId().equals(organizerId)) {
-            holder.organizerTag.setVisibility(View.VISIBLE); // Show it
+            holder.organizerTag.setVisibility(View.VISIBLE);
         } else {
-            holder.organizerTag.setVisibility(View.GONE); // Hide it
+            holder.organizerTag.setVisibility(View.GONE);
         }
 
         // Write the timestamp in readable language
-        // This was written with the help from stack overflow: https://stackoverflow.com/questions/7082518/android-getrelativetime-example
         if (comment.getTimestamp() != null){
             long millisecondTime = comment.getTimestamp().toDate().getTime();
-
-            // Generate the readable string
-            CharSequence readableTime = android.text.format.DateUtils.getRelativeTimeSpanString(
-                    millisecondTime,
-                    System.currentTimeMillis(),
-                    android.text.format.DateUtils.MINUTE_IN_MILLIS
-            );
-
+            CharSequence readableTime = DateUtils.getRelativeTimeSpanString(
+                    millisecondTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
             holder.timestampText.setText(readableTime);
-
         } else {
-            // Do it just now as a default
             holder.timestampText.setText("Just Now");
         }
 
@@ -113,19 +124,110 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             holder.replyIndicator.setVisibility(View.GONE);
         }
 
-        // Handle the standard click to open a thread
-        holder.itemView.setOnClickListener(v -> {
-            clickListener.onCommentClick(comment);
+// Show the reactions tally
+        Map<String, String> reactions = comment.getReactions();
+        if (reactions != null && !reactions.isEmpty()) {
+            Map<String, Integer> tallyMap = new HashMap<>();
+            for (String emoji : reactions.values()) {
+                tallyMap.put(emoji, tallyMap.getOrDefault(emoji, 0) + 1);
+            }
+            StringBuilder tallyString = new StringBuilder();
+            for (Map.Entry<String, Integer> entry : tallyMap.entrySet()) {
+                tallyString.append(entry.getKey()).append(" ").append(entry.getValue()).append("   ");
+            }
+            holder.reactionTallyText.setText(tallyString.toString().trim());
+            holder.reactionTallyCard.setVisibility(View.VISIBLE);
+        } else {
+            holder.reactionTallyCard.setVisibility(View.GONE);
+        }
+
+        if (openReactionIndex == position) {
+            holder.reactionPopupCard.setVisibility(View.VISIBLE);
+        } else {
+            holder.reactionPopupCard.setVisibility(View.GONE);
+        }
+
+
+        String myDeviceId = android.provider.Settings.Secure.getString(holder.itemView.getContext().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+        String myReaction = comment.getReactions().get(myDeviceId);
+
+        holder.reactionGroup.setOnCheckedStateChangeListener(null);
+        holder.reactionGroup.clearCheck();
+
+        if (myReaction != null) {
+            switch (myReaction) {
+                case "👍": holder.reactionGroup.check(R.id.chipThumbsUp); break;
+                case "❤️": holder.reactionGroup.check(R.id.chipHeart); break;
+                case "😂": holder.reactionGroup.check(R.id.chipLaugh); break;
+                case "👎": holder.reactionGroup.check(R.id.chipThumbsDown); break;
+            }
+        }
+
+
+        holder.reactionGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) {
+                reactListener.onCommentReact(comment, null);
+            } else {
+                Chip selectedChip = group.findViewById(checkedIds.get(0));
+                String emoji = selectedChip.getText().toString();
+                reactListener.onCommentReact(comment, emoji);
+            }
+
+
         });
 
 
-        // Listen for a long click to open a delete comment dialogue
-        holder.itemView.setOnLongClickListener(v -> {
-            longClickListener.onCommentLongClick(comment);
-            return true;
+        GestureDetector gestureDetector = new GestureDetector(holder.itemView.getContext(), new android.view.GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) { return true; }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                int currentPos = holder.getBindingAdapterPosition();
+                if (currentPos == RecyclerView.NO_POSITION) return false;
+
+                // Single tapping closes reaction popup
+                if (openReactionIndex != -1) {
+                    int oldIndex = openReactionIndex;
+                    openReactionIndex = -1;
+                    notifyItemChanged(oldIndex);
+                } else {
+                    // Act regular to open replies
+                    clickListener.onCommentClick(commentList.get(currentPos));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                int currentPos = holder.getBindingAdapterPosition();
+                if (currentPos == RecyclerView.NO_POSITION) return false;
+
+                int previousIndex = openReactionIndex;
+
+                if (openReactionIndex == currentPos) {
+                    openReactionIndex = -1; // Close if tapping the currently open one
+                } else {
+                    openReactionIndex = currentPos; // Open the new one
+                }
+
+                if (previousIndex != -1){
+                    notifyItemChanged(previousIndex);
+                }
+                notifyItemChanged(currentPos);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                int currentPos = holder.getBindingAdapterPosition();
+                if (currentPos != RecyclerView.NO_POSITION) {
+                    longClickListener.onCommentLongClick(commentList.get(currentPos));
+                }
+            }
         });
 
-
+        holder.itemView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
     }
 
 
@@ -138,6 +240,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         TextView organizerTag;
         TextView timestampText;
         TextView replyIndicator;
+        TextView reactionTallyText;
+        ChipGroup reactionGroup;
+        CardView reactionPopupCard;
+        CardView reactionTallyCard;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -146,6 +252,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             organizerTag = itemView.findViewById(R.id.isOrganizerTag);
             timestampText = itemView.findViewById(R.id.commentTimestamp);
             replyIndicator = itemView.findViewById(R.id.replyIndicatorText);
+            reactionGroup = itemView.findViewById(R.id.reactionChipGroup);
+            reactionTallyText = itemView.findViewById(R.id.reactionTallyText);
+            reactionPopupCard = itemView.findViewById(R.id.reactionPopupCard);
+            reactionTallyCard = itemView.findViewById(R.id.reactionTallyCard);
+
         }
     }
 
@@ -157,6 +268,24 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public int getItemCount() {
         return commentList.size();
+    }
+
+    /**
+     * This is to know which comment has the reaction pop up opened
+     * @return
+     *  Index of the comment where the reaction pop up is
+     * */
+    public int getOpenReactionIndex() {
+        return openReactionIndex;
+    }
+
+    /**
+     * This sets where the reaction popup currently is
+     * @param index
+     *  The index of the comment that has the popup opened
+     * */
+    public void setOpenReactionIndex(int index) {
+        this.openReactionIndex = index;
     }
 
 }

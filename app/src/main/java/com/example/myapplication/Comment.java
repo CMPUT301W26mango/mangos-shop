@@ -2,6 +2,8 @@ package com.example.myapplication;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
+import java.util.Map;
+
 /**
  * This is a comment class it represents one comment
  * It stores the text, date, who made the comment on which device, and when
@@ -13,6 +15,9 @@ public class Comment {
     private Timestamp timestamp;
     private String commentId;
     private int replyCount;
+
+    private Map<String, String> reactions = new java.util.HashMap<>();
+
 
     /**
      * Empty constructor
@@ -146,5 +151,23 @@ public class Comment {
      * */
     public void setReplyCount(int replyCount) {
         this.replyCount = replyCount;
+    }
+
+    /**
+     *  This gets the reactions that a comment has
+     * @return
+     *  Returns the hashmap that stores the reactions
+     * */
+    public Map<String, String> getReactions() {
+        return reactions;
+    }
+
+    /**
+     *  This sets the reactions for a comment
+     * @param reactions
+     *  Passed in reaction to store
+     * */
+    public void setReactions(Map<String, String> reactions) {
+        this.reactions = reactions;
     }
 }
