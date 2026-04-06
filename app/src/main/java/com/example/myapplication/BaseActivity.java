@@ -40,8 +40,25 @@ public class BaseActivity extends AppCompatActivity {
 
         globalRoleListener = db.collection("users").document(deviceId)
                 .addSnapshotListener((snapshot, error) -> {
-                    if (error != null || snapshot == null || !snapshot.exists()) {
+                    if (error != null) {
+                        android.util.Log.e("BaseActivity", "Listen failed.", error);
                         return;
+                    }
+
+                    if (snapshot == null || !snapshot.exists()) {
+
+                        String currentActivity = this.getClass().getSimpleName();
+                        if (currentActivity.equals("MainActivity") || currentActivity.equals("CreateAccount")) {
+                            return;
+                        }
+
+                        Toast.makeText(this, "Your account has been removed by an administrator.", Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                        return; // Stop here because the user document is gone
                     }
 
                     Boolean isAdmin = snapshot.getBoolean("isAdmin");
