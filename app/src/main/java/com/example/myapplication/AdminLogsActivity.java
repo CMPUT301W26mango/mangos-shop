@@ -1,4 +1,14 @@
 package com.example.myapplication;
+/**
+ * Activity that displays notification logs sent by organizers,
+ * allowing the administrator to view all notification activity.
+ *
+ * Role in application:
+ * - Admin control screen for viewing notification logs.
+ *
+ * Outstanding issues:
+ * - None
+ */
 
 import android.content.Intent;
 import android.os.Bundle;

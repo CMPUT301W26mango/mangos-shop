@@ -26,6 +26,8 @@ public class AdminEventItem {
      * @param location event location
      * @param organizerName organizer name
      * @param posterURL URL of the event poster image
+     * @param organizerId unique ID of the organizer
+     * @param regEnd timestamp representing the registration deadline
      */
     public AdminEventItem(String eventId, String title, String location,
                           String organizerName, String posterURL,
@@ -79,15 +81,27 @@ public class AdminEventItem {
     public String getPosterURL() {
         return posterURL;
     }
-
+    /**
+     * Returns the organizer Id.
+     *
+     * @return unique organizer Id
+     */
     public String getOrganizerId() {
         return organizerId;
     }
-
+    /**
+     * Gets the event deadline as a string.
+     *
+     * @return deadline string
+     */
     public String getDeadline() {
         return deadline;
     }
-
+    /**
+     * Gets the registration end timestamp.
+     *
+     * @return Firestore Timestamp representing registration deadline
+     */
     public com.google.firebase.Timestamp getRegEnd() {
         return regEnd;
     }

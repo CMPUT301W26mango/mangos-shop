@@ -6,7 +6,7 @@
  * - Admin control screen for viewing user records.
  *
  * Outstanding issues:
- * - None for now
+ * - None
  */
 
 package com.example.myapplication;

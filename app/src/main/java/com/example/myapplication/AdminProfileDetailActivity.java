@@ -5,8 +5,7 @@
  * - Admin inspection screen for user information.
  *
  * Outstanding issues:
- * - Profile detail currently supports viewing only and does not include delete actions as it's not
- * part of the halfway checkpoint.
+ * - None
  */
 
 package com.example.myapplication;

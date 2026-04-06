@@ -1,4 +1,14 @@
 package com.example.myapplication;
+/**
+ * Activity that allows an administrator to browse all event images,
+ * view event details, and remove event images or events.
+ *
+ * Role in application:
+ * - Admin control screen for managing event images.
+ *
+ * Outstanding issues:
+ * - None
+ */
 
 import android.app.AlertDialog;
 import android.os.Bundle;

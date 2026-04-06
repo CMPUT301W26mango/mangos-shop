@@ -1,4 +1,10 @@
 package com.example.myapplication;
+/**
+ * RecyclerView adapter for displaying event images on the admin browse images screen.
+ *
+ * Role in application:
+ * - Presentation-layer adapter for admin image browsing.
+ */
 
 import android.view.LayoutInflater;
 import android.view.View;
