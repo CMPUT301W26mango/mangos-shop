@@ -34,6 +34,7 @@ import com.example.myapplication.Profiles;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class AdminBrowseProfilesActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewAdminProfiles;
@@ -94,11 +95,15 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
             TextView tvEmail = dialogView.findViewById(R.id.tv_email);
             TextView tvRole = dialogView.findViewById(R.id.tv_role);
             Button btnDelete = dialogView.findViewById(R.id.btn_delete_profile);
+            Button btnDeleteImage = dialogView.findViewById(R.id.btn_delete_image);
             ImageButton btnClose = dialogView.findViewById(R.id.btn_close);
 
             tvName.setText(profileItem.getName());
             tvEmail.setText(profileItem.getEmail());
             tvRole.setText(profileItem.getRole());
+            if (profileItem.getProfileImageUrl() == null || profileItem.getProfileImageUrl().isEmpty()) {
+                btnDeleteImage.setVisibility(View.GONE);
+            }
 
             btnClose.setOnClickListener(v -> dialog.dismiss());
 
@@ -126,6 +131,24 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
                             }
 
                         });
+            });
+
+            btnDeleteImage.setOnClickListener(v -> {
+
+                String userId = profileItem.getUserId();
+
+                FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(userId)
+                        .update("profileImageUrl", null)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Profile image deleted", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            loadProfiles();
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                        );
             });
 
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -163,12 +186,13 @@ public class AdminBrowseProfilesActivity extends AppCompatActivity {
                         String name = document.getString("name");
                         String email = document.getString("email");
                         String role = document.getString("role");
+                        String profileUrl = document.getString("profileImageUrl");
 
                         if (name == null || name.isEmpty()) {
                             name = "Unnamed User";
                         }
 
-                        AdminProfileItem profileItem = new AdminProfileItem(userId, name, email, role);
+                        AdminProfileItem profileItem = new AdminProfileItem(userId, name, email, role, profileUrl);
                         allProfiles.add(profileItem);
                     }
 

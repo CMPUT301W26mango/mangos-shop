@@ -8,6 +8,7 @@ public class AdminProfileItem {
     private String name;
     private String email;
     private String role;
+    private String profileImageUrl;
     /**
      * Empty constructor required for Firebase or default object creation.
      */
@@ -21,11 +22,12 @@ public class AdminProfileItem {
      * @param email user's email
      * @param role user's role in the application
      */
-    public AdminProfileItem(String userId, String name, String email, String role) {
+    public AdminProfileItem(String userId, String name, String email, String role, String profileImageUrl) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.profileImageUrl = profileImageUrl;
     }
     /**
      * Returns the Firestore document ID of the user.
@@ -58,5 +60,9 @@ public class AdminProfileItem {
      */
     public String getRole() {
         return role;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 }
