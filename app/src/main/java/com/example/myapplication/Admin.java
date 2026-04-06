@@ -8,7 +8,6 @@ package com.example.myapplication;
 public class Admin extends UserProfiles {
     /**
      * Auto assign Admin if database says they are
-     * need for data mapping
      */
     public Admin() {
         super();

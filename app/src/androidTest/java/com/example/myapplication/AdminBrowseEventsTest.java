@@ -56,7 +56,7 @@ public class AdminBrowseEventsTest {
     @Test
     public void testClickEventItem() {
 
-        waitFor(2000); // wait for Firestore data
+        waitFor(2000);
 
         onView(withId(R.id.recyclerViewAdminEvents))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
@@ -69,7 +69,7 @@ public class AdminBrowseEventsTest {
     @Test
     public void testClickCommentsButton() {
 
-        waitFor(2000); // wait for Firestore data
+        waitFor(2000);
 
         onView(withId(R.id.recyclerViewAdminEvents))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(

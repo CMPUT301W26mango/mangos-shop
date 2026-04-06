@@ -56,7 +56,7 @@ public class AdminBrowseProfilesTest {
     @Test
     public void testClickProfileItem() {
 
-        waitFor(2000); // wait for Firestore
+        waitFor(2000);
 
         onView(withId(R.id.recyclerViewAdminProfiles))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));

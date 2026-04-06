@@ -16,7 +16,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.*;
 
 /**
  * Intent tests for AdminProfileDetailActivity.
- * Focuses on UI interactions that do not depend on Firestore.
  */
 @RunWith(AndroidJUnit4.class)
 public class AdminProfileDetailTest {
@@ -33,7 +32,7 @@ public class AdminProfileDetailTest {
                 ApplicationProvider.getApplicationContext(),
                 AdminProfileDetailActivity.class
         );
-        intent.putExtra("userId", "nonexistent_user"); // won't exist in DB
+        intent.putExtra("userId", "nonexistent_user");
         rule.launchActivity(intent);
     }
 
@@ -50,7 +49,6 @@ public class AdminProfileDetailTest {
                     .perform(click());
 
         } catch (Exception ignored) {
-            // Activity may close → acceptable
         }
     }
 
