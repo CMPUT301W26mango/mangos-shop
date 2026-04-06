@@ -84,7 +84,7 @@
         <activity android:name=".NotificationSettingsActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".MyEventsActivity" />
-        <activity android:name=".AdminBrowseImagesActivity"/>
+
 
 
         <activity android:name=".AdminLogsActivity" />
