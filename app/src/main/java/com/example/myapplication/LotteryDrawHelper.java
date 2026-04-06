@@ -18,17 +18,17 @@ import java.util.Map;
  * US 02.05.02 — Shared lottery draw logic.
  *
  * Called by:
- *   - LotteryDrawWorker (PeriodicWorkRequest — scans all expired events every ~15 min)
- *   - WaitingListActivity lazy check (safety net if periodic worker hasn't fired yet)
+ * - LotteryDrawWorker (PeriodicWorkRequest — scans all expired events every ~15 min)
+ * - WaitingListActivity lazy check (safety net if periodic worker hasn't fired yet)
  *
  * Draw-once guarantee: a `drawCompleted` boolean on the event document is checked
  * before every draw. The batch write sets `drawCompleted = true` atomically with
  * the status updates, so a second concurrent trigger will find it already true.
  *
  * Firestore field names (from EventStore.addEvent()):
- *   event doc  — "regEnd" (Timestamp), "capacity" (Long), "drawCompleted" (Boolean)
- *   waitingList — "status" (String: "waiting"/"selected"/"accepted"/"rejected"),
- *                 document ID == entrant's deviceId
+ * event doc  — "regEnd" (Timestamp), "capacity" (Long), "drawCompleted" (Boolean)
+ * waitingList — "status" (String: "waiting"/"selected"/"accepted"/"rejected"),
+ * document ID == entrant's deviceId
  */
 public class LotteryDrawHelper {
 
@@ -103,13 +103,13 @@ public class LotteryDrawHelper {
      * Executes the lottery draw for one event.
      *
      * Steps:
-     *  1. Read the event document.
-     *  2. If drawCompleted == true, abort silently.
-     *  3. Read the waiting list entries with status == "waiting".
-     *  4. Shuffle and select the first [capacity] entries.
-     *  5. Commit a WriteBatch: update selected entrants to "selected",
-     *     set drawCompleted = true and drawDate = now on the event document.
-     *  6. Send in-app notifications to selected entrants.
+     * 1. Read the event document.
+     * 2. If drawCompleted == true, abort silently.
+     * 3. Read the waiting list entries with status == "waiting".
+     * 4. Shuffle and select the first [capacity] entries.
+     * 5. Commit a WriteBatch: update selected entrants to "selected",
+     * set drawCompleted = true and drawDate = now on the event document.
+     * 6. Send in-app notifications to selected entrants.
      *
      * @param eventId  Firestore document ID of the event
      * @param listener optional callback; pass null if not needed
@@ -249,9 +249,12 @@ public class LotteryDrawHelper {
 
                     String pickedId = picked.getId();
 
-                    // Update status to "selected" — organizer will send notification via the button
+                    // Update status to "selected" AND reset notified to false
                     eventRef.collection("waitingList").document(pickedId)
-                            .update("status", "selected")
+                            .update(
+                                    "status", "selected",
+                                    "notified", false
+                            )
                             .addOnSuccessListener(aVoid -> {
                                 Log.d(TAG, "drawReplacement: selected " + pickedId + " for event: " + eventId);
                                 if (listener != null) listener.onSuccess(1);
