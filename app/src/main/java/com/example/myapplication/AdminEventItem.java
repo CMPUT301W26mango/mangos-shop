@@ -10,6 +10,9 @@ public class AdminEventItem {
     private String organizerName;
     private String posterURL;
     private String organizerId;
+    private String deadline;
+    private com.google.firebase.Timestamp regEnd;
+
     /**
      * Empty constructor required for Firebase or default object creation.
      */
@@ -25,13 +28,16 @@ public class AdminEventItem {
      * @param posterURL URL of the event poster image
      */
     public AdminEventItem(String eventId, String title, String location,
-                          String organizerName, String posterURL, String organizerId) {
+                          String organizerName, String posterURL,
+                          String organizerId,
+                          com.google.firebase.Timestamp regEnd) {
         this.eventId = eventId;
         this.title = title;
         this.location = location;
         this.organizerName = organizerName;
         this.posterURL = posterURL;
         this.organizerId = organizerId;
+        this.regEnd = regEnd;
     }
     /**
      * Returns the Firestore document ID of the event.
@@ -76,5 +82,13 @@ public class AdminEventItem {
 
     public String getOrganizerId() {
         return organizerId;
+    }
+
+    public String getDeadline() {
+        return deadline;
+    }
+
+    public com.google.firebase.Timestamp getRegEnd() {
+        return regEnd;
     }
 }
