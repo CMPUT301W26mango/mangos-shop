@@ -43,6 +43,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_users);
 
+
         eventId = getIntent().getStringExtra("eventId");
         db = FirebaseFirestore.getInstance();
 
@@ -124,6 +125,16 @@ public class SelectedUsersActivity extends AppCompatActivity {
                     android.widget.Button btnAction = row.findViewById(R.id.btn_action);
 
                     tvName.setText(name);
+
+                    ImageView avatar = row.findViewById(R.id.avatar);
+                    String profileUrl = userDoc.getString("profileImageUrl");
+                    if (profileUrl != null && !profileUrl.isEmpty()) {
+                        com.bumptech.glide.Glide.with(this)
+                                .load(profileUrl)
+                                .circleCrop()
+                                .placeholder(android.R.drawable.sym_def_app_icon)
+                                .into(avatar);
+                    }
 
                     // Color name based on status
                     switch (status) {

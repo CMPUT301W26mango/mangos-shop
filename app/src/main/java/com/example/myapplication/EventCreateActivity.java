@@ -84,7 +84,6 @@ public class EventCreateActivity extends AppCompatActivity {
     private Switch geoSwitch;
 
     private Switch privSwitch;
-    private ImageButton profileButton;
 
 
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -138,6 +137,8 @@ public class EventCreateActivity extends AppCompatActivity {
                         capacityInput.setText(String.valueOf(event.getCapacity()));
                         waitingListInput.setText(String.valueOf(event.getMaxWaitingListSize()));
                         eventDateInput.setText(event.getDateEvent());
+                        eventTypeDropdown.setText(event.getEventType());
+
 
                         // geo logic
                         geoSwitch.setChecked(event.getGeolocationRequired());
@@ -190,6 +191,12 @@ public class EventCreateActivity extends AppCompatActivity {
         geoSwitch = findViewById(R.id.switchGeolocation);
         privSwitch = findViewById(R.id.switch_private_event);
 
+        // Open map picker when the location field is tapped
+        locationInput.setOnClickListener(v -> {
+            LocationPickerDialog dialog = LocationPickerDialog.newInstance();
+            dialog.setOnLocationSelectedListener(address -> locationInput.setText(address));
+            dialog.show(getSupportFragmentManager(), "location_picker");
+        });
 
         String mode = getIntent().getStringExtra("MODE");
         String eventId = getIntent().getStringExtra("EVENT_ID");

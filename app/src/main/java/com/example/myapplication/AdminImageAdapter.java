@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.ViewHolder> {
@@ -28,7 +30,7 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_admin_image, parent, false);
+                .inflate(R.layout.item_image, parent, false);
         return new ViewHolder(view);
     }
 
@@ -36,7 +38,16 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdminImageItem item = list.get(position);
 
-        holder.image.setImageResource(android.R.drawable.ic_menu_gallery);
+        String url = item.getImageUrl();
+
+        if (url != null && !url.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(url)
+                    .centerCrop()
+                    .into(holder.image);
+        } else {
+            holder.image.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
 
         holder.itemView.setOnClickListener(v -> listener.onClick(item));
     }
