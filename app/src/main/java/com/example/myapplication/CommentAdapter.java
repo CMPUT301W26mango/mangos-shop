@@ -46,9 +46,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private int openReactionIndex = -1;
 
-
-
-
     /**
      * This is the constructor for the adapter, it sets the comment information, the organizer, and a listener for a delete feature
      * @param commentList

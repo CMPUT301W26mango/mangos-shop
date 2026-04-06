@@ -36,7 +36,6 @@ import java.util.List;
  * Clicking "here" in the description marks the notification as read in Firestore
  * and opens the corresponding event details popup.
  *
- * @author Ali
  */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
@@ -53,7 +52,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * @param db               The FirebaseFirestore instance for read/write operations.
      * @param deviceId         The current device's unique identifier used to scope
      *                         Firestore operations to the correct user.
-     * @author Ali
      */
     public NotificationAdapter(List<NotificationItem> notificationList,
                                FragmentManager fragmentManager,
@@ -73,7 +71,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * @param parent   The ViewGroup into which the new View will be added.
      * @param viewType The view type of the new View.
      * @return A new NotificationViewHolder holding the inflated notification card view.
-     * @author Ali
      */
     @NonNull
     @Override
@@ -210,7 +207,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * Returns the total number of notifications in the list.
      *
      * @return The size of the notification list, or 0 if the list is null.
-     * @author Ali
      */
     @Override
     public int getItemCount() {
@@ -220,7 +216,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     /**
      * ViewHolder class that caches references to the UI components of a notification card.
      * Improves RecyclerView performance by avoiding repeated findViewById calls.
-     * @author Ali
      */
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
 
@@ -238,7 +233,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
          * from the notification card layout.
          *
          * @param itemView The inflated view for a single notification card.
-         * @author Ali
          */
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -37,7 +37,6 @@ public class CommentActivity extends AppCompatActivity {
     private EditText commentInput;
     private Button sendButton;
     private ImageButton backButton;
-
     private String organizerId;
 
     private String currentCollectionPath;

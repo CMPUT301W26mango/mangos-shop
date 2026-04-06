@@ -37,8 +37,6 @@ import androidx.core.content.ContextCompat;
  * Displays event details as a popup dialog
  * Receives eventId via Bundle from QR scan result or event being clicked from EventListFragment
  * Uses respective eventId to fetch data from Firebase and display in a popup
- * @author Ali
- * @author Aditya
  */
 public class EventDetailsFragment extends DialogFragment {
 
@@ -106,8 +104,7 @@ public class EventDetailsFragment extends DialogFragment {
      * Extracts event details from db including title, location, capacity, image poster, etc.
      * regStart/regEnd handled as timestamp and event date handled as string
      * Shows different buttons depending on user registration status
-     * @author Ali
-     * @author Aditya
+     *
      * @param eventId Id used to fetch correct event from db
      * @param view  UI layout of screen to display details
      */
@@ -307,47 +304,6 @@ public class EventDetailsFragment extends DialogFragment {
                 });
     }
 
-
-
-
-    /**
-     * This Method manages the checking of whether the user has already joined the waiting list, it shows the correct view
-     * depending on if the user is signed up or not.
-     * Note instead of using this function, the work has been transferred over to "checkStatusAndShowUI"
-     * This function is here in case its needed in the future.
-     * @param registerBtn
-     *  The instance of the register button, needs to be shown or hidden
-     * @param cancelBtn
-     *  The instance of the cancel button, needs to be shown or hidden
-     * @param textViewAlreadyRegistered
-     *  This is a text view to show that they are already registered and can cancel
-     * */
-    private void isRegistered(Button registerBtn, Button cancelBtn, TextView textViewAlreadyRegistered){
-        db.collection("events")
-                .document(firestoreDocId)
-                .collection("waitingList")
-                .document(deviceId)
-                .get()
-                .addOnSuccessListener(doc -> {
-
-                    if (!isAdded() || getContext() == null) return;
-                    if (doc.exists()) {
-                        // If already reigsterd show cancel button
-                        registerBtn.setVisibility(View.GONE);
-                        cancelBtn.setVisibility(View.VISIBLE);
-                        textViewAlreadyRegistered.setVisibility(View.VISIBLE);
-                    } else {
-                        // If not registerd then show register button
-                        registerBtn.setVisibility(View.VISIBLE);
-                        cancelBtn.setVisibility(View.GONE);
-                        textViewAlreadyRegistered.setVisibility(View.GONE);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(logTag, "Something went wrong when checking registration status", e);
-                });
-    }
-
     /**
      * Adds the current device to the event's waiting list subcollection in Firestore.
      *
@@ -371,9 +327,6 @@ public class EventDetailsFragment extends DialogFragment {
         Map<String, Object> entrantInfo = new HashMap<>();
         entrantInfo.put("userId", deviceId);
         entrantInfo.put("status", "waiting");
-
-
-
 
         db.collection("events").document(firestoreDocId).collection("waitingList").get().addOnSuccessListener(waitingListCount -> {
             if (!isAdded() || getContext() == null) return;
@@ -458,12 +411,7 @@ public class EventDetailsFragment extends DialogFragment {
                 }
             });
 
-
-
         });
-
-
-
 
     }
 
@@ -505,56 +453,6 @@ public class EventDetailsFragment extends DialogFragment {
     }
 
     /**
-     * Removes the current device from the event's waiting list and also removes them
-     * from the invitedUsers array, then dismisses the dialog.
-     *
-     * Removing from invitedUsers ensures the event is no longer visible to the
-     * entrant if it was a private event they were invited to.
-     *
-     * @param registerBtn              The register button to show on success.
-     * @param cancelBtn                The cancel button to hide on success.
-     * @param acceptBtn                The accept button to hide on success.
-     * @param declineBtn               The decline button to hide on success.
-     * @param textViewAlreadyRegistered TextView to hide on success.
-     * @param tvSelectedMessage        The selected status message to hide on success.
-     * @param tvAcceptedMessage        The accepted status message to hide on success.
-     * @param tvDeclinedMessage        The declined status message to hide on success.
-     */
-    private void leaveWaitingList(Button registerBtn, Button cancelBtn, Button acceptBtn, Button declineBtn, TextView textViewAlreadyRegistered, TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
-        //  Remove the user from the waiting list sub-collection
-        db.collection("events")
-                .document(firestoreDocId)
-                .collection("waitingList")
-                .document(deviceId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    //  Remove the user from the invitedUsers array so they lose access/visibility
-                    db.collection("events")
-                            .document(firestoreDocId)
-                            .update("invitedUsers", com.google.firebase.firestore.FieldValue.arrayRemove(deviceId))
-                            .addOnSuccessListener(updateVoid -> {
-                                if (!isAdded() || getContext() == null) return;
-
-                                Log.d(logTag, "Successfully left waiting list and removed from invitedUsers");
-                                Toast.makeText(getContext(), "You've left the event.", Toast.LENGTH_SHORT).show();
-
-
-                                dismiss();
-                            })
-                            .addOnFailureListener(e -> {
-
-                                if (!isAdded() || getContext() == null) return;
-                                dismiss();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    if (!isAdded() || getContext() == null) return;
-                    Log.e(logTag, "Something went wrong when leaving", e);
-                    Toast.makeText(getContext(), "Something went wrong when leaving", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    /**
      * Sets up a real-time Firestore snapshot listener on the current device's waiting list
      * document and updates the UI based on the entrant's current status.
      *
@@ -586,8 +484,6 @@ public class EventDetailsFragment extends DialogFragment {
      * @param invitedMsg           TextView shown when device is invited to private event.
      * @param acceptInvBtn         Button to accept a private event invitation.
      * @param declineInvBtn        Button to decline a private event invitation.
-     *
-     * @author Ali
      */
     private void checkStatusAndShowUI(Button registerBtn, Button cancelBtn,
                                       Button acceptBtn,
@@ -704,8 +600,6 @@ public class EventDetailsFragment extends DialogFragment {
      * @param tvSelectedMessage  The selected message to hide on success.
      * @param tvAcceptedMessage  The accepted message to show on success.
      * @param tvDeclinedMessage  The declined message to hide on success.
-     *
-     * @author Ali
      */
     private void acceptSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         db.collection("events").document(firestoreDocId)
@@ -738,8 +632,6 @@ public class EventDetailsFragment extends DialogFragment {
      * @param tvSelectedMessage  The selected message to hide on success.
      * @param tvAcceptedMessage  The accepted message to hide on success.
      * @param tvDeclinedMessage  The declined message to show on success.
-     *
-     * @author Ali
      */
     private void declineSelection(Button acceptBtn, Button declineBtn,  TextView tvSelectedMessage, TextView tvAcceptedMessage, TextView tvDeclinedMessage) {
         db.collection("events").document(firestoreDocId)
@@ -796,9 +688,6 @@ public class EventDetailsFragment extends DialogFragment {
      * @param acceptInvBtn  The accept invite button to hide on success.
      * @param declineInvBtn The decline invite button to hide on success.
      * @param invitedMsg    The invite message TextView to hide on success.
-     *
-     *
-     * @author Ali
      */
     private void declinePrivInvitation(Button acceptInvBtn, Button declineInvBtn, TextView invitedMsg) {
         db.collection("events").document(firestoreDocId)
