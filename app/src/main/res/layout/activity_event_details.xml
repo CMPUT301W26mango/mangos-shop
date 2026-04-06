@@ -7,7 +7,6 @@
     android:background="#F4E7E7"
     tools:context=".EventDetailActivity">
 
-    <!-- Header row: back button | event name+date | action icons -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +26,6 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back" />
 
-        <!-- Action icons pinned to the end -->
         <LinearLayout
             android:id="@+id/header_actions"
             android:layout_width="wrap_content"
@@ -64,7 +62,6 @@
                 android:contentDescription="Settings" />
         </LinearLayout>
 
-        <!-- Event name and date, between back button and action icons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,14 +94,12 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- osmdroid map — roughly top-third of screen -->
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:focusable="true" />
 
-    <!-- Scrollable content below map -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"

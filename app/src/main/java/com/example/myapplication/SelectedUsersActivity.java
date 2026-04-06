@@ -196,7 +196,6 @@ public class SelectedUsersActivity extends AppCompatActivity {
                     container.addView(row);
                 })
                 .addOnFailureListener(e -> {
-                    // to userId if user doc not found
                     View row = LayoutInflater.from(this)
                             .inflate(R.layout.item_selected_user, container, false);
                     TextView tvName = row.findViewById(R.id.user_name);
@@ -270,7 +269,7 @@ public class SelectedUsersActivity extends AppCompatActivity {
                                                 + ", you were not selected for " + finalTitle + " this time.");
                                     }
 
-                                    // Write notification (fire-and-forget)
+                                    // Write notification
                                     db.collection("users").document(userId)
                                             .collection("notifications")
                                             .add(notifData)

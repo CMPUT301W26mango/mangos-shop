@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * US 02.06.05 - Export enrolled entrants list to CSV.
  *
  * Uses ACTION_CREATE_DOCUMENT so the user picks where to save.
  * No FileProvider, no manifest changes, no extra XML files needed.
@@ -23,10 +22,6 @@ public class CsvExportHelper {
     /**
      * Generates CSV content as a String.
      * This is the core logic - separated from file I/O so it can be unit tested.
-     *
-     * Criteria #4: Properly formatted with headers.
-     * Criteria #5: Works for 0 or more enrolled entrants.
-     * Criteria #2: Includes name, email, phone, enrolment date.
      *
      * @param entrants list of enrolled entrants (can be empty)
      * @return complete CSV string with header row and data rows
@@ -69,7 +64,7 @@ public class CsvExportHelper {
     }
 
     /**
-     * Writes CSV content (with Status column) to the URI the user chose in the file picker.
+     * Writes CSV content to the URI the user chose in the file picker.
      *
      * @param context  the Activity context
      * @param uri      the URI returned by the file picker
@@ -116,7 +111,6 @@ public class CsvExportHelper {
      * Creates an intent that opens Android's file picker for saving.
      * The user picks where to save the CSV file.
      *
-     * Criteria #3: File downloads to device.
      *
      * @param eventName name of the event (used in the default filename)
      * @return intent to launch with startActivityForResult

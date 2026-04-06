@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    US 02.02.01 - Single entrant row in the waiting list.
--->
+
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,7 +17,6 @@
         android:gravity="center_vertical"
         android:padding="14dp">
 
-        <!-- Profile icon placeholder -->
         <ImageView
             android:id="@+id/ivProfileIcon"
             android:layout_width="40dp"
@@ -28,7 +25,6 @@
             android:contentDescription="Profile icon"
             android:layout_marginEnd="12dp" />
 
-        <!-- Entrant name -->
         <TextView
             android:id="@+id/tvEntrantName"
             android:layout_width="0dp"

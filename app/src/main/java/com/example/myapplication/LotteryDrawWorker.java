@@ -10,14 +10,13 @@ import androidx.work.WorkerParameters;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * US 02.05.02 — Periodic WorkManager worker that scans for events needing a lottery draw.
  *
  * Scheduled once at app startup (via LotteryApp) as a PeriodicWorkRequest running
  * approximately every 15 minutes. Each run calls LotteryDrawHelper.scanAndDrawAll(),
  * which queries Firestore for events whose registration deadline has passed and whose
  * draw has not yet been completed.
  *
- * This worker requires ZERO changes to event creation code — it finds all events
+ * This worker requires ZERO changes to event creation code - it finds all events
  * that need drawing on its own, regardless of when or how they were created.
  *
  * Returns Result.success() even if individual draws fail (so the periodic schedule
@@ -36,10 +35,8 @@ public class LotteryDrawWorker extends Worker {
     public Result doWork() {
         Log.d(TAG, "Periodic scan started.");
 
-        // LotteryDrawHelper.scanAndDrawAll() is async (Firestore callbacks).
+        // LotteryDrawHelper.scanAndDrawAll() is async.
         // Use a CountDownLatch to block until the scan query completes.
-        // Individual performDraw() calls are fire-and-forget (fire async after the latch
-        // is released) which is fine — they will complete on the Firestore background thread.
         CountDownLatch latch = new CountDownLatch(1);
 
         LotteryDrawHelper.scanAndDrawAll(new LotteryDrawHelper.OnDrawCompleteListener() {

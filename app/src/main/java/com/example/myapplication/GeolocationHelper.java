@@ -9,11 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * US 02.02.03 - Enable or disable geolocation requirement for an event.
  *
  * Utility class - not a separate screen. The geolocation toggle lives
- * on the Event Settings screen (built by another teammate). This class
- * provides methods they can call to wire up the toggle.
+ * on the Event Settings screen. This class provides methods they can call to wire up the toggle.
  *
  */
 public class GeolocationHelper {
@@ -22,9 +20,7 @@ public class GeolocationHelper {
 
     /**
      * Loads the current geolocation setting from Firestore and sets the switch.
-     * If the field doesn't exist yet, defaults to false (OFF).
-     *
-     * Criteria #4: Setting is stored with the event in Firebase.
+     * If the field doesn't exist yet, defaults to false.
      *
      * @param activity the Activity context
      * @param eventId  the event document ID
@@ -58,9 +54,6 @@ public class GeolocationHelper {
     /**
      * Sets up the switch to write to Firestore whenever it is toggled.
      * If the write fails, the switch reverts to its previous state.
-     *
-     * Criteria #1: Toggle for geolocation requirement on event form.
-     * Criteria #4: Setting is stored with the event in Firebase.
      *
      * @param activity the Activity context
      * @param eventId  the event document ID

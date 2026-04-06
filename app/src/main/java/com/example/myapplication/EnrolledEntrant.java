@@ -1,13 +1,10 @@
 package com.example.myapplication;
 
 /**
- * US 02.06.05 — Data class representing an enrolled entrant.
  *
  * Used by CsvExportHelper to generate CSV output.
- * Fields match acceptance criteria #2: name, email, phone, enrolment date.
  *
  * deviceId and status are set after construction via setters so the existing
- * 4-param constructor stays compatible with CsvExportHelperTest.
  */
 public class EnrolledEntrant {
 

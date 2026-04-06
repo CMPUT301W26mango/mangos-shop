@@ -544,11 +544,11 @@ public class EventDetailsFragment extends DialogFragment {
      * Resets all UI elements to hidden on each snapshot update before showing
      * the appropriate elements. Handles the following statuses:
      *
-     *   "selected" — shows congratulations message with accept and decline buttons
-     *   "accepted" — shows enrolled message with cancel registration button
-     *   "declined" — shows declined message only
-     *   "rejected" — shows rejected message with redraw info and leave button
-     *   "waiting" — shows already registered text with leave button
+     *   "selected" - shows congratulations message with accept and decline buttons
+     *   "accepted" - shows enrolled message with cancel registration button
+     *   "declined" - shows declined message only
+     *   "rejected" - shows rejected message with redraw info and leave button
+     *   "waiting" - shows already registered text with leave button
      *
      *
      * If the device is not in the waiting list and is invited, shows the private event
