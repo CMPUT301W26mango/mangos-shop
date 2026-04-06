@@ -120,17 +120,18 @@ public class EventDetailActivity extends BaseActivity {
                         }
                     });
         });
-
-        if (eventId != null) {
-            loadEventData();
-            loadEntrantLocations();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (mapView != null) mapView.onResume();
+
+        // Refresh event data and map markers every time screen becomes visible
+        if (eventId != null) {
+            loadEventData();
+            loadEntrantLocations();
+        }
 
         String currentDeviceId = android.provider.Settings.Secure.getString(
                 getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);

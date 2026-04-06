@@ -34,17 +34,73 @@
 
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/btnMessageSelected"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Message Selected Entrants" />
+        android:orientation="vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp">
 
-    <Button
-        android:id="@+id/btnMessageCancelled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Message Cancelled Entrants" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnSendNotifications"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:padding="8dp"
+                android:textSize="12sp"
+                android:backgroundTint="#4A90D9"
+                android:textColor="#FFFFFF"
+                android:text="Send Notifications" />
+
+            <Button
+                android:id="@+id/btnExportCsv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:padding="8dp"
+                android:textSize="12sp"
+                android:backgroundTint="#4A90D9"
+                android:textColor="#FFFFFF"
+                android:text="Export CSV" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btnMessageSelected"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:padding="8dp"
+                android:textSize="12sp"
+                android:text="Msg Selected" />
+
+            <Button
+                android:id="@+id/btnMessageCancelled"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:padding="8dp"
+                android:textSize="12sp"
+                android:text="Msg Cancelled" />
+        </LinearLayout>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"

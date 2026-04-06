@@ -18,6 +18,7 @@ import java.util.List;
 public class CsvExportHelper {
 
     private static final String CSV_HEADER = "Name,Email,Phone,Enrolment Date";
+    private static final String CSV_HEADER_WITH_STATUS = "Name,Email,Phone,Enrolment Date,Status";
 
     /**
      * Generates CSV content as a String.
@@ -45,6 +46,48 @@ public class CsvExportHelper {
         }
 
         return csv.toString();
+    }
+
+    /**
+     * Generates CSV content including a Status column.
+     * Used by SelectedUsersActivity to export all entrants with their current status.
+     *
+     * @param entrants list of enrolled entrants (can be empty)
+     * @return complete CSV string with header row (including Status) and data rows
+     */
+    public static String generateCsvContentWithStatus(List<EnrolledEntrant> entrants) {
+        StringBuilder csv = new StringBuilder();
+        csv.append(CSV_HEADER_WITH_STATUS).append("\n");
+        for (EnrolledEntrant entrant : entrants) {
+            csv.append(escapeCsv(entrant.getName())).append(",");
+            csv.append(escapeCsv(entrant.getEmail())).append(",");
+            csv.append(escapeCsv(entrant.getPhone())).append(",");
+            csv.append(escapeCsv(entrant.getEnrolmentDate())).append(",");
+            csv.append(escapeCsv(entrant.getStatus())).append("\n");
+        }
+        return csv.toString();
+    }
+
+    /**
+     * Writes CSV content (with Status column) to the URI the user chose in the file picker.
+     *
+     * @param context  the Activity context
+     * @param uri      the URI returned by the file picker
+     * @param entrants list of enrolled entrants
+     */
+    public static void writeCsvToUriWithStatus(Context context, Uri uri, List<EnrolledEntrant> entrants) {
+        String csvContent = generateCsvContentWithStatus(entrants);
+        try {
+            OutputStream outputStream = context.getContentResolver().openOutputStream(uri);
+            if (outputStream != null) {
+                outputStream.write(csvContent.getBytes());
+                outputStream.flush();
+                outputStream.close();
+                Toast.makeText(context, "CSV exported successfully.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(context, "Error exporting CSV.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

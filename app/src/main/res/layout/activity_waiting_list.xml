@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    US 02.02.01 + US 02.06.05
-    Waiting List screen: shows registered entrant names and a CSV export button.
+    US 02.02.01
+    Waiting List screen: shows registered entrant names and the Run Lottery button.
     The lottery draw runs automatically in the background (WorkManager + lazy check).
 -->
 <LinearLayout
@@ -34,6 +34,17 @@
         android:textColor="#555555"
         android:layout_marginBottom="12dp" />
 
+    <!-- Run Lottery button — shown only after deadline has passed and draw hasn't run -->
+    <Button
+        android:id="@+id/btnRunLottery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run Lottery"
+        android:backgroundTint="#D32F2F"
+        android:textColor="#FFFFFF"
+        android:visibility="gone"
+        android:layout_marginBottom="8dp" />
+
     <!-- Entrant list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEntrants"
@@ -42,16 +53,6 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="16dp" />
-
-    <!-- Export CSV button (US 02.06.05) -->
-    <Button
-        android:id="@+id/btnExportCsv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Export users as CSV"
-        android:backgroundTint="#4A90D9"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/btnMessageWaiting"
