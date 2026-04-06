@@ -11,11 +11,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -68,6 +70,7 @@ import android.content.Intent;
 public class EventListActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
+    private TextView textViewEmpty;
     private EventAdapter adapter;
     private List<Event> eventList;
     private List<Event> allActiveEvents;
@@ -119,6 +122,7 @@ public class EventListActivity extends BaseActivity {
         });
 
         recyclerView = findViewById(R.id.recyclerViewEvents);
+        textViewEmpty = findViewById(R.id.textViewEmpty);
         lotteryinfoButton = findViewById(R.id.lotteryinfoButton);
         scanQRButton = findViewById(R.id.scanQRButton);
         btnFilter = findViewById(R.id.btnFilter);
@@ -418,6 +422,8 @@ public class EventListActivity extends BaseActivity {
         TextInputEditText maxDateInput = dialog.findViewById(R.id.filterMaxEventDate);
         TextInputEditText minSpotsInput = dialog.findViewById(R.id.filterMinSpots);
         TextInputEditText maxSpotsInput = dialog.findViewById(R.id.filterMaxSpots);
+        TextView spaceErrorText = dialog.findViewById(R.id.availableSpaceErrorText);
+        TextView dateErrorText = dialog.findViewById(R.id.eventDateRangeErrorText);
         ChipGroup chipGroup = dialog.findViewById(R.id.chipGroupEventType);
         Button filterApplyButton = dialog.findViewById(R.id.applyFiltersBtn);
 
@@ -453,8 +459,33 @@ public class EventListActivity extends BaseActivity {
         maxDateInput.setOnClickListener(v -> showDatePicker(maxDateInput));
 
         filterApplyButton.setOnClickListener(v->{
-            gatherAndApplyFilters(dialog);
-            dialog.dismiss();
+            boolean passesValidation = true;
+
+            String minSpotsStr = minSpotsInput.getText().toString();
+            String maxSpotsStr = maxSpotsInput.getText().toString();
+            if (!minSpotsStr.isEmpty() && !maxSpotsStr.isEmpty()) {
+                int min = Integer.parseInt(minSpotsStr);
+                int max = Integer.parseInt(maxSpotsStr);
+                if (min > max) {
+                    spaceErrorText.setVisibility(View.VISIBLE);
+                    passesValidation = false;
+                }
+            }
+
+            String minDateStr = minDateInput.getText().toString();
+            String maxDateStr = maxDateInput.getText().toString();
+
+            if (!minDateStr.isEmpty() && !maxDateStr.isEmpty()) {
+                if (minDateStr.compareTo(maxDateStr) > 0) {
+                    dateErrorText.setVisibility(View.VISIBLE);
+                    passesValidation = false;
+                }
+            }
+
+            if (passesValidation) {
+                gatherAndApplyFilters(dialog);
+                dialog.dismiss();
+            }
         });
 
 
@@ -633,6 +664,12 @@ public class EventListActivity extends BaseActivity {
                 displayedEvents.add(event);
             }
         }
+        if (displayedEvents.isEmpty()) {
+            textViewEmpty.setVisibility(View.VISIBLE);
+        } else {
+            textViewEmpty.setVisibility(View.GONE);
+        }
+
 
         adapter.notifyDataSetChanged();
     }
